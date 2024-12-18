@@ -18,8 +18,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { useRouter } from "next/router";
 import { useMutation } from "@tanstack/react-query";
-import { LoginTypes } from "@/types/auth";
-import { LoginUser } from "@/lib/actions/auth";
+import { LoginTypes, LoginUser } from "@/lib/actions/auth";
 import { formatPhoneNumber, formatUzbekistanPhoneNumber } from "@/lib/functions";
 
 const loginSchema = z.object({

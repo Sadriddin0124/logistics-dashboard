@@ -47,7 +47,7 @@ export default function GasManagementForm() {
       price_2: "434$",
     },
   });
-  const [carOptions, setCarOptions] = useState<Option[]>(carList);
+  const [carOptions] = useState<Option[]>(carList);
   const [selectedCar, setSelectedCar] = useState<Option | null>(null);
   const [entries] = useState<GasEntry[]>([
     { machine: "Isuzu 01A113AA", quantity: "300(м3)", price: "2500 сум" },

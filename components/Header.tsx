@@ -15,13 +15,13 @@ import { LogOut, Key } from "lucide-react";
 import { useRouter } from "next/router";
 import { fetchMe } from "@/lib/actions/auth";
 import { useQuery } from "@tanstack/react-query";
-import { PasswordChangeDialog } from "./auth/change-password";
+// import { PasswordChangeDialog } from "./auth/change-password";
 import Breadcrumb from "./BreadCrumb";
 import Image from "next/image";
 import NotificationImage from "@/public/images/notification.png"
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
+  // const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
 
   const { push, pathname } = useRouter();
   const { data: me } = useQuery({
@@ -32,7 +32,7 @@ export default function Header() {
   
   return (
     <header className="bg-white shadow-sm w-full">
-      <PasswordChangeDialog setIsDialogOpen={setIsDialogOpen} isDialogOpen={isDialogOpen}/>
+      {/* <PasswordChangeDialog setIsDialogOpen={setIsDialogOpen} isDialogOpen={isDialogOpen}/> */}
       <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
         <div className="flex items-center gap-2">
           <Breadcrumb/>
@@ -58,7 +58,7 @@ export default function Header() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => setIsDialogOpen(true)}>
+            <DropdownMenuItem >
               <Key className="mr-2 h-4 w-4" />
               <span>Parolni o&apos;zgartirish</span>
             </DropdownMenuItem>
