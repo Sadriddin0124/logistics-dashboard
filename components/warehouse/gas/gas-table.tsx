@@ -67,7 +67,7 @@ export default function GasTable() {
               <TableCell className="px-5">{station.remainingGas}</TableCell>
               <TableCell className="px-5">{station.lastPaymentDate}</TableCell>
               <TableCell className="px-5">
-                <Link href={`/warehouse/oil/oil-info?id=${station?.id}`}>
+                <Link href={`/warehouse/gas/gas-info?id=${station?.id}`}>
                   <Button
                     variant="ghost"
                     size="icon"
