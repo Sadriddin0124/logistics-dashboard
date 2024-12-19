@@ -8,10 +8,10 @@ import {
 } from "@/components/ui/sidebar";
 import {
   BarChart2,
+  CarFront,
   ClipboardList,
   Menu,
   Package,
-  Settings,
   Users,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
@@ -69,7 +69,7 @@ const menuItems: MenuItem[] = [
   {
     id: "5",
     title: "Техники",
-    icon: <Settings />,
+    icon: <CarFront />,
     key: "cars",
     href: "/cars",
   },

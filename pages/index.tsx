@@ -127,7 +127,8 @@ import MultiSelector from '@/components/ui-items/MultipleSelector'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@radix-ui/react-label'
-import React, { useRef, useState } from 'react'
+import { useRouter } from 'next/router'
+import React, { useEffect, useRef, useState } from 'react'
 import { FormProvider, useFieldArray, useForm, useFormContext } from 'react-hook-form'
 
 type FormValues = {
@@ -157,8 +158,13 @@ const Home = () => {
     append({name: data.firstName, amount: 0})
     
   }
+  const { push } = useRouter()
+  useEffect(()=> {
+    push("/warehouse/gas")
+  },[push])
   return (
     <div>
+      <div className='hidden'>
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <ChildComponent/>
@@ -167,6 +173,7 @@ const Home = () => {
       </FormProvider>
       <FastCounter/>
       <MultiSelector/>
+    </div>
     </div>
   )
 }

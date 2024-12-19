@@ -52,13 +52,14 @@ export default function GasManagementForm() {
         <CardContent className="p-6 space-y-6">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid grid-cols-2 gap-6">
+              
               <div className="space-y-2">
-                <label className="text-sm">
-                  Количество купленного газа (м3)
-                </label>
-                <Input disabled={id ? true : false} placeholder="0" />
+                <label className="text-sm">Название заправки</label>
+                <Input
+                  disabled={id ? true : false}
+                  placeholder="Название заправки..."
+                />
               </div>
-
               <div className="space-y-2">
                 <label className="text-sm">Оплаченная сумма</label>
                 <Input {...register("price_2")} placeholder="Цена..." />
@@ -66,12 +67,11 @@ export default function GasManagementForm() {
             </div>
 
             <div className="grid grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-sm">Название заправки</label>
-                <Input
-                  disabled={id ? true : false}
-                  placeholder="Название компании..."
-                />
+            <div className="space-y-2">
+                <label className="text-sm">
+                  Количество купленного газа (м3)
+                </label>
+                <Input disabled={id ? true : false} placeholder="0" />
               </div>
 
               <div className="space-y-2">

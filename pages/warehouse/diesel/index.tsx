@@ -50,12 +50,12 @@ export default function GasManagementForm() {
   const [carOptions] = useState<Option[]>(carList);
   const [selectedCar, setSelectedCar] = useState<Option | null>(null);
   const [entries] = useState<GasEntry[]>([
-    { machine: "Isuzu 01A113AA", quantity: "300(м3)", price: "2500 сум" },
-    { machine: "Isuzu 01A113AA", quantity: "300(м3)", price: "2500 сум" },
-    { machine: "Isuzu 01A113AA", quantity: "300(м3)", price: "2500 сум" },
-    { machine: "Isuzu 01A113AA", quantity: "300(м3)", price: "2500 сум" },
-    { machine: "Isuzu 01A113AA", quantity: "300(м3)", price: "2500 сум" },
-    { machine: "Isuzu 01A113AA", quantity: "300(м3)", price: "2500 сум" },
+    { machine: "Isuzu 01A113AA", quantity: "10 (литр)", price: "2500 сум" },
+    { machine: "Isuzu 01A113AA", quantity: "10 (литр)", price: "2500 сум" },
+    { machine: "Isuzu 01A113AA", quantity: "10 (литр)", price: "2500 сум" },
+    { machine: "Isuzu 01A113AA", quantity: "10 (литр)", price: "2500 сум" },
+    { machine: "Isuzu 01A113AA", quantity: "10 (литр)", price: "2500 сум" },
+    { machine: "Isuzu 01A113AA", quantity: "10 (литр)", price: "2500 сум" },
   ]);
   const { id } = useRouter().query;
   const onSubmit = (data: FormValues) => {
@@ -80,7 +80,7 @@ export default function GasManagementForm() {
                   options={carOptions}
                   value={selectedCar}
                   onChange={handleSelectCar}
-                  placeholder={""}
+                  placeholder={"Isuzu 01A111AA"}
                   noOptionsMessage={() => "Type to add new option..."}
                 />
               </div>
@@ -91,16 +91,16 @@ export default function GasManagementForm() {
             </div>
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-2">
+                <label className="text-sm">Цена на cаларка  (литр)</label>
+                <Input {...register("price_1")} placeholder="Цена..." />
+              </div>
+              <div className="space-y-2">
                 <label className="text-sm">
-                  Количество купленного газа (м3)
+                Количество купленного cаларка  (литр)
                 </label>
                 <Input disabled={id ? true : false} placeholder="0" />
               </div>
 
-              <div className="space-y-2">
-                <label className="text-sm">Цена на газ (м3)</label>
-                <Input {...register("price_1")} placeholder="Цена..." />
-              </div>
             </div>
 
             <div className="flex justify-end">
@@ -167,7 +167,7 @@ export default function GasManagementForm() {
             <TableBody>
               <TableRow>
                 <TableCell className="font-medium">10,000,000 сум</TableCell>
-                <TableCell>300(м3)</TableCell>
+                <TableCell>10 (литр)</TableCell>
                 <TableCell>2500 сум</TableCell>
                 <TableCell>
                   <Button

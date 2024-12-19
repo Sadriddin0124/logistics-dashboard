@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import FuelTable from "@/components/warehouse/gas/gas-table";
+import OilTable from "@/components/warehouse/oil/oil-table";
 import Link from "next/link";
 import React from "react";
 
@@ -24,7 +24,7 @@ const Fuel = () => {
           </Button>
         </Link>
       </div>
-      <FuelTable />
+      <OilTable />
     </div>
   );
 };

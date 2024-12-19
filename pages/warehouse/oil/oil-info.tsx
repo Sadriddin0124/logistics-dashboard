@@ -18,7 +18,8 @@ import { useForm } from "react-hook-form";
 interface GasEntry {
   machine: string;
   quantity: string;
-  price: string;
+  start: string;
+  end: string;
 }
 
 interface FormValues {
@@ -34,12 +35,12 @@ export default function GasManagementForm() {
         }
     })
   const [entries] = useState<GasEntry[]>([
-    { machine: "Isuzu 01A113AA", quantity: "300(м3)", price: "2500 сум" },
-    { machine: "Isuzu 01A113AA", quantity: "300(м3)", price: "2500 сум" },
-    { machine: "Isuzu 01A113AA", quantity: "300(м3)", price: "2500 сум" },
-    { machine: "Isuzu 01A113AA", quantity: "300(м3)", price: "2500 сум" },
-    { machine: "Isuzu 01A113AA", quantity: "300(м3)", price: "2500 сум" },
-    { machine: "Isuzu 01A113AA", quantity: "300(м3)", price: "2500 сум" },
+    { machine: "Isuzu 01A113AA", quantity: "10 (литр)", start: "12.12.2024", end: "12.05.2025" },
+    { machine: "Isuzu 01A113AA", quantity: "10 (литр)", start: "12.12.2024", end: "12.05.2025" },
+    { machine: "Isuzu 01A113AA", quantity: "10 (литр)", start: "12.12.2024", end: "12.05.2025" },
+    { machine: "Isuzu 01A113AA", quantity: "10 (литр)", start: "12.12.2024", end: "12.05.2025" },
+    { machine: "Isuzu 01A113AA", quantity: "10 (литр)", start: "12.12.2024", end: "12.05.2025" },
+    { machine: "Isuzu 01A113AA", quantity: "10 (литр)", start: "12.12.2024", end: "12.05.2025" },
   ]);
   const { id } = useRouter().query;
   const onSubmit = (data: FormValues) => {
@@ -53,10 +54,11 @@ export default function GasManagementForm() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
-                <label className="text-sm">
-                Количество купленного масло  (литр)
-                </label>
-                <Input disabled={id ? true : false} placeholder="0" />
+                <label className="text-sm">Название масло</label>
+                <Input
+                  disabled={id ? true : false}
+                  placeholder="Название компании..."
+                />
               </div>
 
               <div className="space-y-2">
@@ -66,14 +68,13 @@ export default function GasManagementForm() {
             </div>
 
             <div className="grid grid-cols-2 gap-6">
+            
               <div className="space-y-2">
-                <label className="text-sm">Название масло</label>
-                <Input
-                  disabled={id ? true : false}
-                  placeholder="Название компании..."
-                />
+                <label className="text-sm">
+                Количество купленного масло  (литр)
+                </label>
+                <Input disabled={id ? true : false} placeholder="0" />
               </div>
-              
               <div className="space-y-2">
                 <label className="text-sm">Цена на масло  (литр)</label>
                 <Input {...register("price_1",)} placeholder="Цена..." />
@@ -104,7 +105,8 @@ export default function GasManagementForm() {
             <TableRow className="border-b border-b-gray-300">
                 <TableHead className="font-bold">Машина</TableHead>
                 <TableHead className="font-bold">Количество</TableHead>
-                <TableHead className="font-bold">Цена</TableHead>
+                <TableHead className="font-bold">Последний дата заменa</TableHead>
+                <TableHead className="font-bold">Следующая дата замены</TableHead>
                 <TableHead className="font-bold"></TableHead>
               </TableRow>
             </TableHeader>
@@ -113,7 +115,8 @@ export default function GasManagementForm() {
                 <TableRow key={index} className="border-b border-b-gray-300">
                   <TableCell>{entry.machine}</TableCell>
                   <TableCell>{entry.quantity}</TableCell>
-                  <TableCell>{entry.price}</TableCell>
+                  <TableCell>{entry.start}</TableCell>
+                  <TableCell>{entry.end}</TableCell>
                   <TableCell className="text-center">
                     <Button
                       variant="secondary"
