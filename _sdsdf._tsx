@@ -267,11 +267,11 @@ export default function CategoriesList() {
         </div>
       </div>
       <Table>
-        <TableHeader>
+        <TableHeader className="font-bold">
           <TableRow className="bg-gray-100">
-            <TableHead>Mahsulot nomi (O`z)</TableHead>
-            <TableHead>Holati</TableHead>
-            <TableHead>Amallar</TableHead>
+            <TableHead className="font-bold">Mahsulot nomi (O`z)</TableHead>
+            <TableHead className="font-bold">Holati</TableHead>
+            <TableHead className="font-bold">Amallar</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

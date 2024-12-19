@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Bold, Italic, Underline, Link } from "lucide-react";
 import { useFormContext } from "react-hook-form";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 
 // Add this constant to disable the focus-only preview feature
 

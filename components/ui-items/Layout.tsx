@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "./Sidebar";
-import Header from "./Header";
+import Header from "../header/Header";
 import { usePathname } from "next/navigation";
 
 interface LayoutProps {
@@ -17,7 +17,7 @@ export default function Layout({ children }: LayoutProps) {
     <SidebarProvider>
       <div className="flex min-h-screen w-full">
         <div
-          className={`transition-all duration-300 ${
+          className={`transition-all duration-300 overflow-hidden ${
             sideBar ? "hidden" : "block md:w-[287px] md:min-w-[287px]"
           }`}
         >
@@ -40,7 +40,7 @@ export default function Layout({ children }: LayoutProps) {
           <div className="flex flex-col w-full gap-3">
             {pathname !== "/login" && (
               <div className="flex h-16 items-center gap-2 border-b">
-                <Header />
+                <Header setSideBar={setSideBar} sideBar={sideBar}/>
               </div>
             )}
           </div>

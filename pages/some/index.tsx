@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import MultiSelector from '@/components/MultipleSelector'; // Adjust the import path as needed
+import MultiSelector from '@/components/ui-items/MultipleSelector'; // Adjust the import path as needed
 
 // type Option = { label: string; value: string };
 

@@ -39,8 +39,8 @@ const Breadcrumb = () => {
   };
 
   return (
-    <nav aria-label="breadcrumb" className="w-full px-3 pt-5 pb-2">
-      <ol className="breadcrumb flex gap-2">
+    <nav aria-label="breadcrumb" className="w-full px-3">
+      <ol className="breadcrumb flex items-center gap-2">
         <li>
           <Link href="/" className="hover:text-gray-500">
             Главная

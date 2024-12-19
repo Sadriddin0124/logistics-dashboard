@@ -77,12 +77,12 @@ export default function GasManagementForm() {
       <Card>
         <CardContent className="p-6">
           <Table>
-            <TableHeader>
+            <TableHeader className="font-bold">
               <TableRow className="border-b border-b-gray-300">
-                <TableHead>Машина</TableHead>
-                <TableHead>Количество</TableHead>
-                <TableHead>Цена</TableHead>
-                <TableHead></TableHead>
+                <TableHead className="font-bold">Машина</TableHead>
+                <TableHead className="font-bold">Количество</TableHead>
+                <TableHead className="font-bold">Цена</TableHead>
+                <TableHead className="font-bold"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

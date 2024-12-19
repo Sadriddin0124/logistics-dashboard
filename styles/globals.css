@@ -84,13 +84,13 @@
 * {
   border-color: transparent;
 }
-.image-container {
+.aspect_16_9 {
   aspect-ratio: 16 / 9;
   width: 100%; /* Adjust as needed */
   overflow: hidden;
 }
 
-.category-container {
+.aspect_1_1 {
   aspect-ratio: 1 / 1;
   width: 100%; /* Adjust as needed */
   overflow: hidden;

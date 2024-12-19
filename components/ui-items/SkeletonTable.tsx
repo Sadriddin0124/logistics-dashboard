@@ -6,10 +6,10 @@ export default function TableSkeleton() {
     <div className="p-4">
       <Skeleton className="h-6 w-full mb-[30px]" />
       <Table>
-        <TableHeader>
+        <TableHeader className="font-bold">
           <TableRow>
             {[...Array(5)].map((_, index) => (
-              <TableHead key={index}>
+              <TableHead className="font-bold" key={index}>
                 <Skeleton className="h-4 w-full" />
               </TableHead>
             ))}

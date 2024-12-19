@@ -23,13 +23,13 @@ export function FuelLog() {
   return (
     <div className="rounded-md border">
       <Table>
-        <TableHeader>
+        <TableHeader className="font-bold">
           <TableRow className="border-b-gray-300 border-b">
-            <TableHead>Количество</TableHead>
-            <TableHead>Заправка</TableHead>
-            <TableHead>Цена</TableHead>
-            <TableHead>Дата</TableHead>
-            {/* <TableHead></TableHead> */}
+            <TableHead className="font-bold">Количество</TableHead>
+            <TableHead className="font-bold">Заправка</TableHead>
+            <TableHead className="font-bold">Цена</TableHead>
+            <TableHead className="font-bold">Дата</TableHead>
+            {/* <TableHead className="font-bold"></TableHead> */}
           </TableRow>
         </TableHeader>
         <TableBody>

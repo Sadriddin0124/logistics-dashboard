@@ -1,7 +1,7 @@
 // pages/_app.tsx
 
-import Layout from "@/components/Layout";
-import ReactQueryProvider from "@/components/ReactQueryProvider";
+import Layout from "@/components/ui-items/Layout";
+import ReactQueryProvider from "@/components/ui-items/ReactQueryProvider";
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import Head from "next/head";

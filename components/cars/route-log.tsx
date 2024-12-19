@@ -23,14 +23,14 @@ export function RouteLog() {
   return (
     <div className="rounded-md border">
       <Table>
-        <TableHeader>
+        <TableHeader className="font-bold">
           <TableRow className="border-b-gray-300 border-b">
-            <TableHead>ID рейса</TableHead>
-            <TableHead>Шофёр</TableHead>
-            <TableHead>Цена</TableHead>
-            <TableHead>Дата отправления</TableHead>
-            <TableHead>Дата приезда</TableHead>
-            <TableHead>Груз</TableHead>
+            <TableHead className="font-bold">ID рейса</TableHead>
+            <TableHead className="font-bold">Шофёр</TableHead>
+            <TableHead className="font-bold">Цена</TableHead>
+            <TableHead className="font-bold">Дата отправления</TableHead>
+            <TableHead className="font-bold">Дата приезда</TableHead>
+            <TableHead className="font-bold">Груз</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

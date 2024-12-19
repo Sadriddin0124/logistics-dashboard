@@ -59,8 +59,8 @@ export default function VehicleForm() {
   };
   return (
     <div>
-    <div className="p-10 mt-8 bg-white rounded-2xl">
-      <div className="w-full mx-auto p-6">
+    <div className="p-10 mx-auto container mt-8 bg-white rounded-2xl">
+      <div className="w-full ">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="grid gap-6 md:grid-cols-2">
             <div>

@@ -18,7 +18,7 @@ export function AutoPartsForm() {
   };
 
   return (
-    <Card>
+    <Card className="rounded-2xl">
       <CardHeader>
         <CardTitle>Запчасти для автомобиля</CardTitle>
       </CardHeader>

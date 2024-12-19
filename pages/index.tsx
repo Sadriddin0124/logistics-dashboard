@@ -123,7 +123,7 @@
 // };
 
 // export default Home;
-import MultiSelector from '@/components/MultipleSelector'
+import MultiSelector from '@/components/ui-items/MultipleSelector'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@radix-ui/react-label'

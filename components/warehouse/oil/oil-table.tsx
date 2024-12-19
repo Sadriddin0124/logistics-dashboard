@@ -45,12 +45,12 @@ export default function FuelTable() {
   return (
     <div className="w-full mx-auto bg-white rounded-2xl min-h-screen">
       <Table>
-        <TableHeader>
+        <TableHeader className="font-bold">
           <TableRow className='border-b border-gray-200'>
-            <TableHead>Название заправки</TableHead>
-            <TableHead>Остаточный газ</TableHead>
-            <TableHead>День последней оплаты</TableHead>
-            <TableHead className="w-[50px]"></TableHead>
+            <TableHead className="font-bold">Название заправки</TableHead>
+            <TableHead className="font-bold">Остаточный газ</TableHead>
+            <TableHead className="font-bold">День последней оплаты</TableHead>
+            <TableHead className="font-bold w-[50px]"></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
