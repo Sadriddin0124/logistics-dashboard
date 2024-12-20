@@ -42,8 +42,7 @@
 //     defaultValues: {
 //       cart: [{ name: "", amount: 0 }],
 //     },
-    
-    
+
 //   });
 //   const { fields, append, prepend, update, remove } = useFieldArray({
 //     name: "cart",
@@ -123,130 +122,149 @@
 // };
 
 // export default Home;
-import MultiSelector from '@/components/ui-items/MultipleSelector'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@radix-ui/react-label'
-import { useRouter } from 'next/router'
-import React, { useEffect, useRef, useState } from 'react'
-import { FormProvider, useFieldArray, useForm, useFormContext } from 'react-hook-form'
+// import MultiSelector from '@/components/ui-items/MultipleSelector'
+// import { Button } from '@/components/ui/button'
+// import { Input } from '@/components/ui/input'
+// import { Label } from '@radix-ui/react-label'
+// import { useRouter } from 'next/router'
+// import React, { useEffect, useRef, useState } from 'react'
+// import { FormProvider, useFieldArray, useForm, useFormContext } from 'react-hook-form'
 
-type FormValues = {
-  firstName: string
-  lastName: string
-  cart: {name: string, amount: number}[]
-}
+// type FormValues = {
+//   firstName: string
+//   lastName: string
+//   cart: {name: string, amount: number}[]
+// }
 
-const Home = () => {
-  const methods = useForm<FormValues>({
+// const Home = () => {
+//   const methods = useForm<FormValues>({
+//     defaultValues: {
+//       firstName: "s",
+//       lastName: "r",
+//       cart: [{name: "salom", amount: 0}]
+//     }
+//   })
+//   const { handleSubmit, watch, control } = methods
+//   const { append } = useFieldArray({
+//     name: "cart",
+//     control,
+//   })
+//   const cart = watch("cart")
+//   console.log(cart);
+
+//   const onSubmit = (data: FormValues) => {
+//     console.log(data);
+//     append({name: data.firstName, amount: 0})
+
+//   }
+//   const { push } = useRouter()
+//   useEffect(()=> {
+//     push("/warehouse/gas")
+//   },[push])
+//   return (
+//     <div>
+//       <div className='hidden'>
+//       <FormProvider {...methods}>
+//         <form onSubmit={handleSubmit(onSubmit)}>
+//           <ChildComponent/>
+//           <Button type='submit'>Submit</Button>
+//         </form>
+//       </FormProvider>
+//       <FastCounter/>
+//       <MultiSelector/>
+//     </div>
+//     </div>
+//   )
+// }
+
+// export default Home
+
+// const ChildComponent = () => {
+//   const { register, formState: { errors } } = useFormContext();
+
+//   return (
+//     <div className="max-w-md space-y-2">
+//       <Label>Ism</Label>
+//       <Input {...register("firstName", { required: "Ismni kirit" })} />
+//       {errors.firstName && typeof errors.firstName.message === 'string' && (
+//         <p>{errors.firstName.message}</p>
+//       )}
+
+//       <Label>Familiya</Label>
+//       <Input {...register("lastName", { required: "Familiyani kirit" })} />
+//       {errors.lastName && typeof errors.lastName.message === 'string' && (
+//         <p>{errors.lastName.message}</p>
+//       )}
+//     </div>
+//   );
+// };
+
+// const FastCounter = () => {
+//   const [count, setCount] = useState(0);
+//   const [isCounting, setIsCounting] = useState(false);
+//   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+//   // Start counting when the mouse is pressed
+//   const handleMouseDown = () => {
+//     if (!isCounting) {
+//       setIsCounting(true);
+//       intervalRef.current = setInterval(() => {
+//         setCount((prevCount) => prevCount + 1);
+//       }, 50); // Adjust the speed of counting here (50ms interval)
+//     }
+//   };
+
+//   // Stop counting when the mouse is released
+//   const handleMouseUp = () => {
+//     setIsCounting(false);
+//     if (intervalRef.current) {
+//       clearInterval(intervalRef.current);
+//     }
+//   };
+
+//   // Stop counting if the mouse leaves the button or area
+//   const handleMouseLeave = () => {
+//     setIsCounting(false);
+//     if (intervalRef.current) {
+//       clearInterval(intervalRef.current);
+//     }
+//   };
+
+//   return (
+//     <div>
+//       <Button
+//         onMouseDown={handleMouseDown}
+//         onMouseUp={handleMouseUp}
+//         onMouseLeave={handleMouseLeave}
+//         className=' active:scale-95'
+//       >
+//         Hold to Count Fast
+//       </Button>
+//       <p>Count: {count}</p>
+//     </div>
+//   );
+// };
+"use client";
+
+import { CurrencyInputs } from "@/components/ui-items/currency-inputs";
+import React from "react";
+import { useForm, FormProvider } from "react-hook-form";
+
+const FormWrapper: React.FC = () => {
+  const methods = useForm({
     defaultValues: {
-      firstName: "s",
-      lastName: "r",
-      cart: [{name: "salom", amount: 0}]
-    }
-  })
-  const { handleSubmit, watch, control } = methods
-  const { append } = useFieldArray({
-    name: "cart",
-    control,
-  })
-  const cart = watch("cart")
-  console.log(cart);
-  
-  const onSubmit = (data: FormValues) => {
-    console.log(data);
-    append({name: data.firstName, amount: 0})
-    
-  }
-  const { push } = useRouter()
-  useEffect(()=> {
-    push("/warehouse/gas")
-  },[push])
-  return (
-    <div>
-      <div className='hidden'>
-      <FormProvider {...methods}>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <ChildComponent/>
-          <Button type='submit'>Submit</Button>
-        </form>
-      </FormProvider>
-      <FastCounter/>
-      <MultiSelector/>
-    </div>
-    </div>
-  )
-}
-
-export default Home
-
-
-
-const ChildComponent = () => {
-  const { register, formState: { errors } } = useFormContext();
+      price_uzs: "",
+      price_usd: "",
+    },
+  });
 
   return (
-    <div className="max-w-md space-y-2">
-      <Label>Ism</Label>
-      <Input {...register("firstName", { required: "Ismni kirit" })} />
-      {errors.firstName && typeof errors.firstName.message === 'string' && (
-        <p>{errors.firstName.message}</p>
-      )}
-
-      <Label>Familiya</Label>
-      <Input {...register("lastName", { required: "Familiyani kirit" })} />
-      {errors.lastName && typeof errors.lastName.message === 'string' && (
-        <p>{errors.lastName.message}</p>
-      )}
-    </div>
+    <FormProvider {...methods}>
+      <form className="space-y-4">
+        <CurrencyInputs name="price" />
+      </form>
+    </FormProvider>
   );
 };
 
-
-
-const FastCounter = () => {
-  const [count, setCount] = useState(0);
-  const [isCounting, setIsCounting] = useState(false);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Start counting when the mouse is pressed
-  const handleMouseDown = () => {
-    if (!isCounting) {
-      setIsCounting(true);
-      intervalRef.current = setInterval(() => {
-        setCount((prevCount) => prevCount + 1);
-      }, 50); // Adjust the speed of counting here (50ms interval)
-    }
-  };
-
-  // Stop counting when the mouse is released
-  const handleMouseUp = () => {
-    setIsCounting(false);
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
-  };
-
-  // Stop counting if the mouse leaves the button or area
-  const handleMouseLeave = () => {
-    setIsCounting(false);
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
-  };
-
-  return (
-    <div>
-      <Button
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseLeave}
-        className=' active:scale-95'
-      >
-        Hold to Count Fast
-      </Button>
-      <p>Count: {count}</p>
-    </div>
-  );
-};
-
+export default FormWrapper;

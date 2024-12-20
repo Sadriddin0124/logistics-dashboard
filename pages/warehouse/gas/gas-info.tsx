@@ -22,15 +22,17 @@ interface GasEntry {
 }
 
 interface FormValues {
-  price_1: string;
-  price_2: string;
+  price: string;
+  purchased?: string;
+  paid: string;
 }
 
 export default function GasManagementForm() {
   const { register, handleSubmit } = useForm<FormValues>({
     defaultValues: {
-      price_1: "34$",
-      price_2: "434$",
+      price: "",
+      paid: "",
+      purchased : "",
     },
   });
   const [entries] = useState<GasEntry[]>([
@@ -61,8 +63,8 @@ export default function GasManagementForm() {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm">Оплаченная сумма</label>
-                <Input {...register("price_2")} placeholder="Цена..." />
+                <label className="text-">Оплаченная сумма</label>
+                <Input {...register("paid")} placeholder="Цена..." />
               </div>
             </div>
 
@@ -76,7 +78,7 @@ export default function GasManagementForm() {
 
               <div className="space-y-2">
                 <label className="text-sm">Цена на газ (м3)</label>
-                <Input {...register("price_1")} placeholder="Цена..." />
+                <Input {...register("price")} placeholder="Цена..." />
               </div>
             </div>
 

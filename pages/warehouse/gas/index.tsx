@@ -16,7 +16,7 @@ const Gas = () => {
           </Button>
         </Link>
         <Link
-          href={"/warehouse/gas/gas-info"}
+          href={"/warehouse/gas/gas-create"}
           className="flex justify-end my-4"
         >
           <Button className="bg-[#4880FF] text-white hover:bg-blue-600 w-[300px] rounded-md">

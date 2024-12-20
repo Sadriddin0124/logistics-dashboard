@@ -1,9 +1,6 @@
-import { $api, $apiAuth } from "@/pages/api/api";
+import { $apiAuth } from "@/pages/api/api";
+import { LoginTypes } from "../types/auth.types";
 // import { ChangePasswordType, LoginTypes } from "@/types/auth";
-export interface LoginTypes {
-  phone_number: string;
-  password: string;
-}
 
 export interface MeType {
   first_name: string;
@@ -18,16 +15,16 @@ export interface ChangePasswordType {
   confirm_password: string;
 }
 export const LoginUser = async (data: LoginTypes) => {
-    const response = await $apiAuth.post("/moderator/login", data);
+    const response = await $apiAuth.post("/auth/token", data);
     return response.data;
   };
 
-export const ChangePassword = async (data: ChangePasswordType) => {
-    const response = await $api.post("/auth/change_password", data);
-    return response.data;
-  };
+// export const ChangePassword = async (data: ChangePasswordType) => {
+//     const response = await $api.post("/auth/change_password", data);
+//     return response.data;
+//   };
 
-export const fetchMe = async () => {
-    const response = await $api.get("/moderator/me");
-    return response.data;
-  };
+// export const fetchMe = async () => {
+//     const response = await $api.get("/moderator/me");
+//     return response.data;
+//   };

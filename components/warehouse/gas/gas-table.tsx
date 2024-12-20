@@ -43,7 +43,7 @@ export default function OilTable() {
 
 
   return (
-    <div className="w-full mx-auto bg-white rounded-2xl min-h-screen">
+    <div className="w-full mx-auto bg-white p-8 rounded-2xl min-h-screen">
       <Table>
         <TableHeader className="font-bold">
           <TableRow className='border-b border-gray-200'>

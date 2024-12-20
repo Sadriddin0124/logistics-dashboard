@@ -36,33 +36,33 @@ $api.interceptors.response.use(
       // }
     }
     console.log(error);
-    // if (error.response.status === 401 && !originalRequest._retry) {
-    //   originalRequest._retry = true; // Prevent infinite retry loops
+    if (error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true; // Prevent infinite retry loops
 
-    //   // Get the refresh token
-    //   const refreshToken = localStorage.getItem("refreshToken");
+      // Get the refresh token
+      const refreshToken = localStorage.getItem("refreshToken");
 
-    //   try {
-    //     // Request a new access token
-    //     const { data } = await $apiAuth.post(`/auth/refresh`, {
-    //       refresh: refreshToken,
-    //     });
-    //     console.log(data);
+      try {
+        // Request a new access token
+        const { data } = await $apiAuth.post(`/auth/api/token/refresh/`, {
+          refresh: refreshToken,
+        });
+        console.log(data);
 
-    //     // Store the new access token
-    //     localStorage.setItem("accessToken", data.access);
+        // Store the new access token
+        localStorage.setItem("accessToken", data.access);
 
-    //     // Update the Authorization header
-    //     $api.defaults.headers.common["Authorization"] = `Bearer ${data.access}`;
+        // Update the Authorization header
+        $api.defaults.headers.common["Authorization"] = `Bearer ${data.access}`;
 
-    //     // Retry the original request with the new token
-    //     return $api(originalRequest);
-    //   } catch (error) {
-    //     console.error("Failed to refresh token:", error);
-    //     // Optionally, redirect to login page or show an error
-    //     return Promise.reject(error);
-    //   }
-    // }
+        // Retry the original request with the new token
+        return $api(originalRequest);
+      } catch (error) {
+        console.error("Failed to refresh token:", error);
+        // Optionally, redirect to login page or show an error
+        return Promise.reject(error);
+      }
+    }
 
     return Promise.reject(error);
   }
