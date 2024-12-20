@@ -8,11 +8,19 @@ const Flight = () => {
     <div className=" container mx-auto">
       <div className="flex w-full justify-end gap-8">
         <Link
+          href={"/flight/flight-order"}
+          className="flex justify-end my-4"
+        >
+          <Button className="bg-[#4880FF] text-white hover:bg-blue-600 w-[300px] rounded-md">
+          Добавить рейс  на заказ
+          </Button>
+        </Link>
+        <Link
           href={"/flight/flight-info"}
           className="flex justify-end my-4"
         >
           <Button className="bg-[#4880FF] text-white hover:bg-blue-600 w-[300px] rounded-md">
-            Добавить заправку
+          Добавить рейс
           </Button>
         </Link>
       </div>

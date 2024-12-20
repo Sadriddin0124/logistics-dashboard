@@ -16,7 +16,6 @@ import { FileUploader } from "../ui-items/FileUploader";
 import { useEffect, useState } from "react";
 import { ImageType } from "@/lib/types/file.types";
 
-
 export default function FlightForm() {
   const {
     register,
@@ -29,30 +28,32 @@ export default function FlightForm() {
       region: "",
       city: "",
       route: "",
-      routePrice: "",
+      departureDate: "",
+      arrivalDate: "",
       vehicle: "",
       driver: "",
       tripPrice: "",
-      cost: "",
+      spending: "",
       cargoInfo: "",
       expenses: "",
     },
   });
-  const [image, setImage] = useState<ImageType>({id: "", file: ""})
-  const region = watch("region")
-  useEffect(()=> {
+  const [image, setImage] = useState<ImageType>({ id: "", file: "" });
+  const region = watch("region");
+  useEffect(() => {
     if (region === "На территории Узбекистана.") {
-        setValue("city", "")
-        setValue("route", "")
-        setValue("routePrice", "")
-        setValue("vehicle", "")
-        setValue("driver", "")
-        setValue("tripPrice", "")
-        setValue("cost", "")
-        setValue("cargoInfo", "")
-        setValue("expenses", "")
+      setValue("city", "");
+      setValue("route", "");
+      setValue("departureDate", "");
+      setValue("arrivalDate", "");
+      setValue("vehicle", "");
+      setValue("driver", "");
+      setValue("tripPrice", "");
+      setValue("spending", "");
+      setValue("cargoInfo", "");
+      setValue("expenses", "");
     }
-  },[region, setValue])
+  }, [region, setValue]);
   const onSubmit = (data: IFlight) => {
     console.log(data);
     // Handle form submission
@@ -63,7 +64,7 @@ export default function FlightForm() {
     setValue(name, value);
   };
   console.log(region);
-  
+
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -110,14 +111,14 @@ export default function FlightForm() {
 
         {/* City Selection */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">Выберите город*</label>
+          <label className="text-sm font-medium">Выберите область*</label>
           <Select onValueChange={(value) => handleSelectChange(value, "city")}>
             <SelectTrigger>
               <SelectValue placeholder="Выберите..." />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="city1">Город 1</SelectItem>
-              <SelectItem value="city2">Город 2</SelectItem>
+              <SelectItem value="city1">область 1</SelectItem>
+              <SelectItem value="city2">область 2</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -154,7 +155,9 @@ export default function FlightForm() {
 
         {/* Trip Price */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">введите цену Рейсы*</label>
+          <label className="text-sm font-medium">
+            Введите стоимость рейса*
+          </label>
           <Input
             type="text"
             placeholder="Введите цену"
@@ -164,25 +167,34 @@ export default function FlightForm() {
 
         {/* Route Price */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">введите цену Рейсы*</label>
+          <label className="text-sm font-medium">Введите дату отъезда*</label>
           <Input
-            type="text"
+            type="date"
             placeholder="Введите цену"
-            {...register("routePrice", { required: true })}
+            {...register("departureDate", { required: true })}
           />
         </div>
 
         {/* Cost */}
         <div className="space-y-2">
-          <label className="text-sm font-medium">Введите стоимость*</label>
+          <label className="text-sm font-medium">
+            Расходы, выделяемые водителю на рейс*
+          </label>
           <Input
             type="text"
             placeholder="Введите цену"
-            {...register("cost", { required: true })}
+            {...register("spending", { required: true })}
           />
         </div>
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Введите дату прибытия*</label>
+        <Input
+          type="date"
+          placeholder="Введите цену"
+          {...register("arrivalDate", { required: true })}
+        />
       </div>
-
+      </div>
       {/* Cargo Information */}
       <div className="space-y-2">
         <label className="text-sm font-medium">Информация о грузе</label>
@@ -194,9 +206,10 @@ export default function FlightForm() {
       </div>
 
       {/* Expenses */}
-      {region !== "На территории Узбекистана." && <div className="grid grid-cols-2 gap-6">
-        <FileUploader image={image} setImage={setImage} type=".xlsx"/>
-      {/* <div className="space-y-2">
+      {region !== "На территории Узбекистана." && (
+        <div className="grid grid-cols-2 gap-6">
+          <FileUploader image={image} setImage={setImage} type=".xlsx" />
+          {/* <div className="space-y-2">
         <label className="text-sm font-medium">
           Загрузите отчет о расходах
         </label>
@@ -206,14 +219,21 @@ export default function FlightForm() {
           {...register("expenses")}
         />
       </div> */}
-      </div>}
+        </div>
+      )}
 
-      <div className="w-full flex justify-end">
+      <div className="w-full flex justify-end gap-6">
         <Button
           type="submit"
           className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded-md"
         >
-          Добавить
+          Завершить рейс
+        </Button>
+        <Button
+          type="submit"
+          className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded-md"
+        >
+          Сохранить
         </Button>
       </div>
     </form>
