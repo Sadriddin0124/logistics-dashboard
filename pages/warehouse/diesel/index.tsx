@@ -13,8 +13,14 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
 import { useRouter } from "next/router";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import Select, { SingleValue } from "react-select";
+import { CurrencyInputs } from "@/components/ui-items/currency-inputs";
+import { IDieselType } from "@/lib/types/diesel.types";
+import { useMutation } from "@tanstack/react-query";
+import { createDiesel } from "@/lib/actions/diesel.action";
+import { queryClient } from "@/components/ui-items/ReactQueryProvider";
+import { toast } from "react-toastify";
 
 interface GasEntry {
   machine: string;
@@ -22,18 +28,14 @@ interface GasEntry {
   price: string;
 }
 
-interface FormValues {
-  price_1: string;
-  price_2: string;
-}
 
-interface Option {
+export interface Option {
   label: string;
   value: string;
 }
 
 const carList: Option[] = [
-  { value: "add", label: "+ Добавить" },
+  { value: "", label: "+ Добавить" },
   { value: "2", label: "Honda Civic" },
   { value: "3", label: "Tesla Model 3" },
   { value: "4", label: "Ford Mustang" },
@@ -41,12 +43,8 @@ const carList: Option[] = [
 ];
 
 export default function GasManagementForm() {
-  const { register, handleSubmit } = useForm<FormValues>({
-    defaultValues: {
-      price_1: "34$",
-      price_2: "434$",
-    },
-  });
+  const methods = useForm<IDieselType>();
+  const { register, handleSubmit, setValue, reset } = methods;
   const [carOptions] = useState<Option[]>(carList);
   const [selectedCar, setSelectedCar] = useState<Option | null>(null);
   const [entries] = useState<GasEntry[]>([
@@ -58,61 +56,78 @@ export default function GasManagementForm() {
     { machine: "Isuzu 01A113AA", quantity: "10 (литр)", price: "2500 сум" },
   ]);
   const { id } = useRouter().query;
-  const onSubmit = (data: FormValues) => {
-    console.log(data);
+  const { mutate: createMutation } = useMutation({
+    mutationFn: createDiesel,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["diesel"] });
+      reset()
+      toast.success(" muvaffaqiyatli qo'shildi!");
+    },
+    onError: () => {
+      toast.error("ni qo'shishda xatolik!");
+    }
+  });
+  const onSubmit = (data: IDieselType) => {
+    createMutation(data);
   };
-  const handleSelectCar = (value: SingleValue<Option>) => {
-    setSelectedCar(value);
+  const handleSelectCar = (newValue: SingleValue<Option>) => {
+    setSelectedCar(newValue);
+    setValue("car", newValue?.value as string)
   };
   return (
     <div className="w-full container mx-auto mt-8 space-y-8">
       {/* Top Form Section */}
       <Card>
         <CardContent className="p-6 space-y-6">
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="space-y-6 col-span-1"
-          >
-            <div className="grid grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label>Выберите </label>
-                <Select
-                  options={carOptions}
-                  value={selectedCar}
-                  onChange={handleSelectCar}
-                  placeholder={"Isuzu 01A111AA"}
-                  noOptionsMessage={() => "Type to add new option..."}
-                />
+          <FormProvider {...methods}>
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="space-y-6 col-span-1"
+            >
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="mb-2">Выберите </label>
+                  <Select
+                    options={carOptions}
+                    value={selectedCar}
+                    onChange={handleSelectCar}
+                    placeholder={"Isuzu 01A111AA"}
+                    noOptionsMessage={() => "Type to add new option..."}
+                  />
+                </div>
+                {selectedCar?.value === "" && (
+                  <div className="space-y-2">
+                    <label className="text-sm">Добавить марку автомобиля</label>
+                    <Input {...register("car")} disabled={id ? true : false} placeholder="" />
+                  </div>
+                )}
               </div>
-              {selectedCar?.value === "add" && <div className="space-y-2">
-                <label className="text-sm">Добавить марку автомобиля</label>
-                <Input disabled={id ? true : false} placeholder="" />
-              </div>}
-            </div>
-            <div className="grid grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-sm">Цена на cаларка  (литр)</label>
-                <Input {...register("price_1")} placeholder="Цена..." />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm">
-                Количество купленного cаларка  (литр)
-                </label>
-                <Input disabled={id ? true : false} placeholder="0" />
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-sm">Цена на cаларка (литр)</label>
+                  <CurrencyInputs name="price"/>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm">
+                    Количество купленного cаларка (литр)
+                  </label>
+                  <Input {...register("oil_volume", {required: true, valueAsNumber: true})} placeholder="0" type="number"/>
+                </div>
               </div>
 
-            </div>
-
-            <div className="flex justify-end">
-              <Button className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded">
-                Добавить
-              </Button>
-            </div>
-          </form>
+              <div className="flex justify-end">
+                <Button className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded">
+                  Добавить
+                </Button>
+              </div>
+            </form>
+          </FormProvider>
 
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-sm">Оставшееся количество газа (м3)</label>
+              <label className="text-sm">
+                Оставшееся количество cаларка (литр)
+              </label>
               <Input value="2300" readOnly className="bg-muted" />
             </div>
           </div>

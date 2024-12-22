@@ -4,3 +4,5 @@
   export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs))
   }
+
+export const removeCommas = (value: string): string => value?.replace(/,/g, "");

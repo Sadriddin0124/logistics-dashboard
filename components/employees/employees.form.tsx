@@ -1,146 +1,159 @@
-'use client'
+"use client";
 
-import { useForm } from 'react-hook-form'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
+import * as React from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 
-interface FormValues {
-  employeeName: string
-  phoneNumber: string
-  region: string
-  route: string
-  price: string
-  departureDate: string
-  cargoInfo: string
-}
+import { useForm, Controller } from "react-hook-form";
+import { IEmployee } from "@/lib/types/employee.types";
+import { useMutation } from "@tanstack/react-query";
+import { createEmployee } from "@/lib/actions/employees.action";
+import { queryClient } from "../ui-items/ReactQueryProvider";
+import { toast } from "react-toastify";
+import {
+  formatPhoneNumber,
+  formatUzbekistanPhoneNumber,
+} from "@/lib/functions";
 
-export default function EmployeesForm() {
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm<FormValues>()
-
-  const onSubmit = (data: FormValues) => {
-    console.log(data)
-  }
-
+export default function EmployeesInfoForm() {
+  const { control, handleSubmit } = useForm<IEmployee>({
+    defaultValues: {
+      phone: "+998"
+    }
+  });
+  const { mutate: createMutation } = useMutation({
+    mutationFn: createEmployee,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["employees"] });
+      toast.success(" muvaffaqiyatli qo'shildi!");
+    },
+    onError: () => {
+      toast.error("ni qo'shishda xatolik!");
+    },
+  });
+  const onSubmit = (data: IEmployee) => {
+    createMutation({ ...data, phone: formatPhoneNumber(data?.phone) });
+  };
   return (
-    <div className="p-6 container bg-white rounded-xl mt-8 mx-auto">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 bg-white">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <label className="text-sm">
-              Имя сотрудника*
-            </label>
-            <Input
-              className="bg-[#F4F4F5]"
-              placeholder="Введите имя сотрудника"
-              {...register("employeeName", { required: "Это поле обязательно" })}
-            />
-            {errors.employeeName && <p className="text-red-500 text-xs mt-1">{errors.employeeName.message}</p>}
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm">
-              Номер телефона сотрудника*
-            </label>
-            <Input
-              className="bg-[#F4F4F5]"
-              placeholder="Введите номер телефона сотрудника."
-              {...register("phoneNumber", { required: "Это поле обязательно" })}
-            />
-            {errors.phoneNumber && <p className="text-red-500 text-xs mt-1">{errors.phoneNumber.message}</p>}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <label className="text-sm">
-              Выберите область*
-            </label>
-            <Select onValueChange={(value) => setValue('region', value)}>
-              <SelectTrigger className="bg-[#F4F4F5]">
-                <SelectValue placeholder="Выберите..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="region1">Область 1</SelectItem>
-                <SelectItem value="region2">Область 2</SelectItem>
-                <SelectItem value="region3">Область 3</SelectItem>
-              </SelectContent>
-            </Select>
-            {errors.region && <p className="text-red-500 text-xs mt-1">{errors.region.message}</p>}
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm">
-              введите цену Рейсы
-            </label>
-            <Input
-              className="bg-[#F4F4F5]"
-              placeholder="Введите цену"
-              {...register("price", { required: "Это поле обязательно" })}
-            />
-            {errors.price && <p className="text-red-500 text-xs mt-1">{errors.price.message}</p>}
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-sm">
-            Маршрут
+    <div className="container mx-auto space-y-8 mt-8 ">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="grid gap-6 md:grid-cols-2 bg-white rounded-2xl p-8"
+      >
+        <div>
+          <label className="text-sm font-medium mb-2 block">
+            Полное имя водителя*
           </label>
-          <Select onValueChange={(value) => setValue('route', value)}>
-            <SelectTrigger className="bg-[#F4F4F5]">
-              <SelectValue placeholder="Выберите..." />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="route1">Маршрут 1</SelectItem>
-              <SelectItem value="route2">Маршрут 2</SelectItem>
-              <SelectItem value="route3">Маршрут 3</SelectItem>
-            </SelectContent>
-          </Select>
-          {errors.route && <p className="text-red-500 text-xs mt-1">{errors.route.message}</p>}
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-sm">
-            Введите дату отъезда
-          </label>
-          <Input
-            className="bg-[#F4F4F5]"
-            placeholder="Введите дату"
-            type="date"
-            {...register("departureDate", { required: "Это поле обязательно" })}
+          <Controller
+            name="full_name"
+            control={control}
+            defaultValue=""
+            render={({ field }) => (
+              <Input {...field} placeholder="Введите имя сотрудника" />
+            )}
           />
-          {errors.departureDate && <p className="text-red-500 text-xs mt-1">{errors.departureDate.message}</p>}
         </div>
 
-        <div className="space-y-2">
-          <label className="text-sm">
-            Информация о грузе
+        <div>
+          <label className="text-sm font-medium mb-2 block">
+            Номер телефона сотрудника*
           </label>
-          <Textarea
-            className="bg-[#F4F4F5] min-h-[120px]"
-            placeholder="Введите информацию о грузе"
-            {...register("cargoInfo", { required: "Это поле обязательно" })}
+          <Controller
+            name="phone"
+            control={control}
+            rules={{
+              required: true,
+              pattern: {
+                value: /^\+998 \d{2} \d{3} \d{2} \d{2}$/,
+                message: "Noto‘g‘ri raqam formati",
+              },
+            }}
+            render={({ field: { onChange, value, ...field } }) => (
+              <Input
+                {...field}
+                id="phone"
+                type="tel"
+                value={value}
+                onChange={(e) => {
+                  const formattedValue = formatUzbekistanPhoneNumber(
+                    e.target.value
+                  );
+                  onChange(formattedValue);
+                  e.target.value = formattedValue;
+                }}
+                className="font-mono"
+                placeholder="+998 __ ___ __ __"
+                aria-describedby="phone-hint"
+              />
+            )}
           />
-          {errors.cargoInfo && <p className="text-red-500 text-xs mt-1">{errors.cargoInfo.message}</p>}
         </div>
 
-        <div className="w-full flex justify-end">
-        <Button
-          type="submit"
-          className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded-md"
-        >
-          Добавить
-        </Button>
-      </div>
+        <div>
+          <label className="text-sm font-medium mb-2 block">
+            Выберите маршрут водителя*
+          </label>
+          <Controller
+            name="flight_type"
+            control={control}
+            defaultValue=""
+            render={({ field }) => (
+              <Select onValueChange={field.onChange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Выберите..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="IN_UZB">In UZB</SelectItem>
+                  <SelectItem value="OUT">Out</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          />
+        </div>
+
+        <div>
+          <label className="text-sm font-medium mb-2 block">
+            ID водительских прав
+          </label>
+          <Controller
+            name="license"
+            control={control}
+            defaultValue=""
+            render={({ field }) => (
+              <Input {...field} placeholder="Введите..." />
+            )}
+          />
+        </div>
+
+        <div>
+          <label className="text-sm font-medium mb-2 block">
+            ID паспорта водителя
+          </label>
+          <Controller
+            name="passport"
+            control={control}
+            defaultValue=""
+            render={({ field }) => (
+              <Input {...field} placeholder="Введите..." />
+            )}
+          />
+        </div>
+        <div className="flex col-span-2 justify-end gap-4 mt-8">
+          <Button
+            type="submit"
+            className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded-md"
+          >
+            Сохранить
+          </Button>
+        </div>
       </form>
     </div>
-  )
+  );
 }
-

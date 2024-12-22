@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,7 +13,15 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
 import { useRouter } from "next/router";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
+import { CurrencyInputs } from "@/components/ui-items/currency-inputs";
+import { IOilType } from "@/lib/types/oil.types";
+import { removeCommas } from "@/lib/utils";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { fetchOil, updateOil } from "@/lib/actions/oil.action";
+import { queryClient } from "@/components/ui-items/ReactQueryProvider";
+import { toast } from "react-toastify";
+import { Label } from "@/components/ui/label";
 
 interface GasEntry {
   machine: string;
@@ -22,78 +30,133 @@ interface GasEntry {
   end: string;
 }
 
-interface FormValues {
-    price_1: string
-    price_2: string
-}
-
 export default function GasManagementForm() {
-    const { register, handleSubmit} = useForm<FormValues>({
-        defaultValues: {
-            price_1: "34$",
-            price_2: "434$"
-        }
-    })
   const [entries] = useState<GasEntry[]>([
-    { machine: "Isuzu 01A113AA", quantity: "10 (литр)", start: "12.12.2024", end: "12.05.2025" },
-    { machine: "Isuzu 01A113AA", quantity: "10 (литр)", start: "12.12.2024", end: "12.05.2025" },
-    { machine: "Isuzu 01A113AA", quantity: "10 (литр)", start: "12.12.2024", end: "12.05.2025" },
-    { machine: "Isuzu 01A113AA", quantity: "10 (литр)", start: "12.12.2024", end: "12.05.2025" },
-    { machine: "Isuzu 01A113AA", quantity: "10 (литр)", start: "12.12.2024", end: "12.05.2025" },
-    { machine: "Isuzu 01A113AA", quantity: "10 (литр)", start: "12.12.2024", end: "12.05.2025" },
+    {
+      machine: "Isuzu 01A113AA",
+      quantity: "10 (литр)",
+      start: "12.12.2024",
+      end: "12.05.2025",
+    },
+    {
+      machine: "Isuzu 01A113AA",
+      quantity: "10 (литр)",
+      start: "12.12.2024",
+      end: "12.05.2025",
+    },
+    {
+      machine: "Isuzu 01A113AA",
+      quantity: "10 (литр)",
+      start: "12.12.2024",
+      end: "12.05.2025",
+    },
+    {
+      machine: "Isuzu 01A113AA",
+      quantity: "10 (литр)",
+      start: "12.12.2024",
+      end: "12.05.2025",
+    },
+    {
+      machine: "Isuzu 01A113AA",
+      quantity: "10 (литр)",
+      start: "12.12.2024",
+      end: "12.05.2025",
+    },
+    {
+      machine: "Isuzu 01A113AA",
+      quantity: "10 (литр)",
+      start: "12.12.2024",
+      end: "12.05.2025",
+    },
   ]);
-  const { id } = useRouter().query;
-  const onSubmit = (data: FormValues) => {
-    console.log(data);
-  }
+  const methods = useForm<IOilType>();
+  const { register, handleSubmit, setValue, watch, reset } = methods;
+  const payed_price_uzs = watch("payed_price_uzs")?.toString();
+  const price_uzs = watch("price_uzs")?.toString();
+  const { id } = useRouter()?.query
+
+  const { data: oilData } = useQuery<IOilType>({
+    queryKey: ["oil"],
+    queryFn: ()=> fetchOil(id as string),
+    enabled: !!id
+  });
+  useEffect(() => {
+    if (oilData) {
+      reset(oilData);
+    }
+    const payedPrice = Number(removeCommas(payed_price_uzs)) || 0;
+    const pricePerLiter = Number(removeCommas(price_uzs)) || 0;
+
+    if (pricePerLiter > 0) {
+      const result = payedPrice / pricePerLiter;
+      setValue("oil_volume", result.toFixed(2));
+    } else {
+      setValue("oil_volume", "0");
+    }
+  }, [price_uzs, payed_price_uzs, setValue, reset, oilData]);
+  const { mutate: createMutation } = useMutation({
+    mutationFn: updateOil,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["gas_stations"] });
+      toast.success(" muvaffaqiyatli qo'shildi!");
+    },
+    onError: () => {
+      toast.error("ni qo'shishda xatolik!");
+    },
+  });
+  const onSubmit = (data: IOilType) => {
+    createMutation({
+      ...data,
+      id: id as string,
+      payed_price_usd: Number(data?.payed_price_usd),
+      payed_price_uzs: Number(data?.payed_price_uzs),
+      price_uzs: Number(data?.price_uzs),
+      price_usd: Number(data?.price_usd),
+    });
+  };
   return (
     <div className="w-full container mx-auto mt-8 space-y-8">
       {/* Top Form Section */}
       <Card>
-        <CardContent className="p-6 space-y-6">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-2 gap-6">
-            <div className="space-y-2">
-                <label className="text-sm">Название масло</label>
-                <Input
-                  disabled={id ? true : false}
-                  placeholder="Название компании..."
-                />
-              </div>
+        <CardContent className="mt-8">
+          <FormProvider {...methods}>
+            <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm">Название масло</label>
+                  <Input {...register("oil_name")} placeholder="Название..." />
+                </div>
 
-              <div className="space-y-2">
-                <label className="text-sm">Оплаченная сумма</label>
-                <Input {...register("price_2",)} placeholder="Цена..." />
-              </div>
-            </div>
+                <div className="space-y-2">
+                  <label className="text-sm">Оплаченная сумма</label>
+                  <CurrencyInputs name="payed_price" />
+                </div>
 
-            <div className="grid grid-cols-2 gap-6">
-            
-              <div className="space-y-2">
-                <label className="text-sm">
-                Количество купленного масло  (литр)
-                </label>
-                <Input disabled={id ? true : false} placeholder="0" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm">Цена на масло  (литр)</label>
-                <Input {...register("price_1",)} placeholder="Цена..." />
-              </div>
-            </div>
+                <div className="space-y-2">
+                  <label className="text-sm">
+                    Количество купленного масло (литр)
+                  </label>
+                  <Input
+                    {...register("oil_volume", { required: true })}
+                    disabled
+                    placeholder="0"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm">Цена на масло (литр)</label>
+                  <CurrencyInputs name="price" />
+                </div>
 
-            <div className="flex justify-end">
-              <Button className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded">
-                Добавить
-              </Button>
-            </div>
-          </form>
-
-          <div className="grid grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <label className="text-sm">Оставшееся количество масло  (литр)</label>
-              <Input value="2300" readOnly className="bg-muted" />
-            </div>
+              <div className="flex justify-end col-span-2">
+                <Button className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded">
+                  Добавить
+                </Button>
+              </div>
+          <div >
+            <Label>Оставшееся количество масло  (литр)</Label>
+            <Input readOnly value={0} className="bg-muted" />
           </div>
+            </form>
+          </FormProvider>
         </CardContent>
       </Card>
 
@@ -102,11 +165,15 @@ export default function GasManagementForm() {
         <CardContent className="p-6">
           <Table>
             <TableHeader className="font-bold">
-            <TableRow className="border-b border-b-gray-300">
+              <TableRow className="border-b border-b-gray-300">
                 <TableHead className="font-bold">Машина</TableHead>
                 <TableHead className="font-bold">Количество</TableHead>
-                <TableHead className="font-bold">Последний дата заменa</TableHead>
-                <TableHead className="font-bold">Следующая дата замены</TableHead>
+                <TableHead className="font-bold">
+                  Последний дата заменa
+                </TableHead>
+                <TableHead className="font-bold">
+                  Следующая дата замены
+                </TableHead>
                 <TableHead className="font-bold"></TableHead>
               </TableRow>
             </TableHeader>
@@ -136,8 +203,8 @@ export default function GasManagementForm() {
       <Card>
         <CardContent className="p-6">
           <Table>
-          <TableHeader className="font-bold">
-            <TableRow className="border-b border-b-gray-300">
+            <TableHeader className="font-bold">
+              <TableRow className="border-b border-b-gray-300">
                 <TableHead className="font-bold">Оплаченная сумма</TableHead>
                 <TableHead className="font-bold">Количество</TableHead>
                 <TableHead className="font-bold">Цена</TableHead>
@@ -145,12 +212,12 @@ export default function GasManagementForm() {
               </TableRow>
             </TableHeader>
             <TableBody>
-            <TableRow className="border-b border-b-gray-300">
-            <TableCell className="font-medium">10,000,000 сум</TableCell>
+              <TableRow className="border-b border-b-gray-300">
+                <TableCell className="font-medium">10,000,000 сум</TableCell>
                 <TableCell>300(м3)</TableCell>
                 <TableCell>2500 сум</TableCell>
                 <TableCell className="text-center">
-                <Button
+                  <Button
                     variant="secondary"
                     className="bg-green-100 hover:bg-green-200 text-green-600"
                   >

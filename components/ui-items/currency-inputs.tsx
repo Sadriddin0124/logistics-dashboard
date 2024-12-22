@@ -5,8 +5,15 @@ import { useFormContext } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useQuery } from "@tanstack/react-query";
-import { getExchangeRate } from "@/lib/actions/general";
 import { ExchangeRate } from "@/lib/types/general.types";
+import { getExchangeRate } from "@/lib/actions/general";
+
+// Function to format numbers with commas
+export function splitToHundreds(num: number | undefined): string {
+  if (!num) return "";
+  const numStr = num.toString();
+  return numStr.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+}
 
 interface CurrencyInputsProps {
   name: string;
@@ -21,7 +28,7 @@ export const CurrencyInputs: React.FC<CurrencyInputsProps> = ({ name }) => {
   // Ensure EXCHANGE_RATE is a number, use a fallback value if undefined
   const EXCHANGE_RATE =
     exchange?.find((item) => item?.Ccy === "USD")?.Rate ?? 0; // fallback to 0 if undefined
-  console.log(typeof EXCHANGE_RATE);
+  const exchangeRateNumber = Number(EXCHANGE_RATE);  // Ensure it's a number
 
   const {
     register,
@@ -42,58 +49,70 @@ export const CurrencyInputs: React.FC<CurrencyInputsProps> = ({ name }) => {
       isUpdating.current = true;
 
       if (changedField === uzsName) {
-        const uzsAmount = parseFloat(value[uzsName] || "0");
-        setValue(usdName, (uzsAmount / Number(EXCHANGE_RATE)).toFixed(2), {
-          shouldValidate: true,
-        });
+        const uzsAmount = parseFloat(value[uzsName]?.replace(/,/g, "") || "0");
+        const usdValue = (uzsAmount / exchangeRateNumber).toFixed(2)
+        console.log(usdValue);
+        
+        setValue(
+          usdName,
+          splitToHundreds(Number(usdValue)),
+          { shouldValidate: true }
+        );
       } else if (changedField === usdName) {
-        const usdAmount = parseFloat(value[usdName] || "0");
-        setValue(uzsName, (usdAmount * Number(EXCHANGE_RATE)).toFixed(2), {
-          shouldValidate: true,
-        });
+        const usdAmount = parseFloat(value[usdName]?.replace(/,/g, "") || "0");
+        const uzsValue = (usdAmount * exchangeRateNumber).toFixed(2)
+        setValue(
+          uzsName,
+          splitToHundreds(Number(uzsValue)),
+          { shouldValidate: true }
+        );
       }
 
       isUpdating.current = false;
     });
     return () => subscription.unsubscribe();
-  }, [watch, setValue, uzsName, usdName, EXCHANGE_RATE]);
+  }, [watch, setValue, uzsName, usdName, exchangeRateNumber]);
 
   return (
     <div className="grid grid-cols-2 gap-4">
-      <div className="flex items-center relative">
-      <Label htmlFor={uzsName} className="absolute right-3">Сум</Label>
+      <div className="flex items-center flex-col justify-center gap-2 relative">
+        <Label htmlFor={uzsName} className="absolute right-3 top-[10px]">Сум</Label>
         <Input
           id={uzsName}
           {...register(uzsName, {
-            valueAsNumber: true,
-            validate: (value) => value >= 0 || "Miqdor musbat bo'lishi kerak",
+            validate: (value) =>
+              parseFloat(value.replace(/,/g, "")) >= 0 || "Сумма должна быть положительной",
           })}
-          type="number"
-          step="0.01"
-          min="0"
-          placeholder="Narxni so'mda kiriting"
+          type="text" // Changed to text to allow formatted numbers
+          onInput={(e) => {
+            const rawValue = e.currentTarget.value.replace(/,/g, "");
+            const parsedValue = parseFloat(rawValue); // Convert to number
+            e.currentTarget.value = splitToHundreds(parsedValue);
+          }}
         />
         {errors[uzsName] && (
-          <p className="text-red-500 text-sm">
+          <p className="text-red-500 text-sm absolute bottom-[-25px]">
             {errors[uzsName]?.message as string}
           </p>
         )}
       </div>
-      <div className="flex items-center relative">
-        <Label htmlFor={usdName} className="absolute right-3">Доллар</Label>
+      <div className="flex items-center flex-col justify-center gap-2 relative">
+        <Label htmlFor={usdName} className="absolute right-3 top-[10px]">Доллар</Label>
         <Input
           id={usdName}
           {...register(usdName, {
-            valueAsNumber: true,
-            validate: (value) => value >= 0 || "Miqdor musbat bo'lishi kerak",
+            validate: (value) =>
+              parseFloat(value.replace(/,/g, "")) >= 0 || "Сумма должна быть положительной",
           })}
-          type="number"
-          step="0.01"
-          min="0"
-          placeholder="Narxni dollarda kiriting"
+          type="text" // Changed to text to allow formatted numbers
+          onInput={(e) => {
+            const rawValue = e.currentTarget.value.replace(/,/g, "");
+            const parsedValue = parseFloat(rawValue); // Convert to number
+            e.currentTarget.value = splitToHundreds(parsedValue);
+          }}
         />
         {errors[usdName] && (
-          <p className="text-red-500 text-sm">
+          <p className="text-red-500 text-sm absolute bottom-[-25px]">
             {errors[usdName]?.message as string}
           </p>
         )}

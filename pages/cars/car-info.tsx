@@ -1,6 +1,6 @@
 "use client";
 
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm, SubmitHandler, FormProvider } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -10,321 +10,340 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { formatNumberAsPrice } from "@/lib/functions";
+// import { formatNumberAsPrice } from "@/lib/functions";
 import { AutoPartsForm } from "@/components/cars/autoparts-form";
 import { FuelLog } from "@/components/cars/fuel-log";
 import { RouteLog } from "@/components/cars/route-log";
-
-interface FormValues {
-  vehicleName: string;
-  vehicleBrand: string;
-  registrationNumber: string;
-  hasPrescription: string;
-  prescriptionNumber?: string;
-  paymentType: string;
-  leasingTerm: string;
-  fuelType: string;
-  vehiclePrice: string;
-  carSpace: string;
-}
+import { ICars } from "@/lib/types/cars.types";
+import { fetchCarById, updateCar } from "@/lib/actions/cars.action";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/router";
+import { CurrencyInputs } from "@/components/ui-items/currency-inputs";
+import { useEffect } from "react";
+import { toast } from "react-toastify";
+import { queryClient } from "@/components/ui-items/ReactQueryProvider";
 
 export default function VehicleForm() {
+  const { id } = useRouter()?.query;
+  const methods = useForm<ICars>();
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
     watch,
-  } = useForm<FormValues>({
-    defaultValues: {
-      vehicleName: "",
-      vehicleBrand: "",
-      registrationNumber: "",
-      hasPrescription: "",
-      prescriptionNumber: "",
-      paymentType: "",
-      leasingTerm: "",
-      fuelType: "",
-      vehiclePrice: "",
-      carSpace: "",
+    reset,
+  } = methods;
+  const type_of_payment = watch("type_of_payment");
+  const { data: car, isLoading } = useQuery<ICars>({
+    queryKey: ["car"],
+    queryFn: () => fetchCarById(id as string),
+    enabled: !!id,
+  });
+  console.log(watch("model"));
+
+  useEffect(() => {
+    if (!isLoading && car) {
+      // Transform the car data to match ICars
+      const transformedCarData = {
+        ...car,
+        with_trailer: car.with_trailer === true, // Convert the string "true"/"false" back to boolean
+        price_uzs: car.price_uzs.toString(), // Convert price to string
+        distance_travelled: car.distance_travelled.toString(), // Convert to string
+        leasing_period: car.leasing_period.toString(), // Convert to string
+      };
+
+      // Assert the transformed data as ICars after making the necessary type changes
+      reset(transformedCarData as unknown as ICars);
+    }
+  }, [car, isLoading, reset]);
+
+  const with_trailer = watch("with_trailer");
+  const { mutate: updateMutation } = useMutation({
+    mutationFn: updateCar,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["car"] });
+      toast.success(data?.name + " muvaffaqiyatli yangilandi!");
+    },
+    onError: () => {
+      toast.error("ni yangilashda xatolik!");
     },
   });
-  const paymentType = watch("paymentType");
-  const onSubmit: SubmitHandler<FormValues> = (data) => {
+  const onSubmit: SubmitHandler<ICars> = (data) => {
     console.log(data);
+    updateMutation(data as ICars);
   };
-  const vehiclePrice = watch("vehiclePrice");
-  const handleVehiclePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const rawValue = e.target.value.replace(/[^0-9]/g, ""); // Only allow numeric input
-    const formattedValue = formatNumberAsPrice(rawValue); // Format the value with commas
-    setValue("vehiclePrice", rawValue); // Store raw numeric value
-    e.target.value = formattedValue; // Set formatted value to input field
-  };
+
+  // const price_uzs = watch("price_uzs");
+  // const handleprice_uzsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const rawValue = e.target.value.replace(/[^0-9]/g, ""); // Only allow numeric input
+  //   const formattedValue = formatNumberAsPrice(rawValue); // Format the value with commas
+  //   setValue("price_uzs", rawValue); // Store raw numeric value
+  //   e.target.value = formattedValue; // Set formatted value to input field
+  // };
   return (
     <div>
       <div className="p-10 mt-8 container mx-auto bg-white rounded-2xl">
         <div className="w-full mx-auto p-6">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid gap-6 md:grid-cols-2">
-              <div>
-                <label
-                  htmlFor="vehicleName"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Название автомобиля*
-                </label>
-                <Input
-                  id="vehicleName"
-                  {...register("vehicleName", {
-                    required:
-                      "Название автомобиля должно содержать минимум 2 символа",
-                    minLength: {
-                      value: 2,
-                      message:
-                        "Название автомобиля должно содержать минимум 2 символа",
-                    },
-                  })}
-                  placeholder="Название автомобиля..."
-                  className="mt-1"
-                />
-                {errors.vehicleName && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.vehicleName.message}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label
-                  htmlFor="vehicleBrand"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Марка автомобиля*
-                </label>
-                <Select
-                  onValueChange={(value) => setValue("vehicleBrand", value)}
-                >
-                  <SelectTrigger id="vehicleBrand" className="mt-1">
-                    <SelectValue placeholder="Выберите марку" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="toyota">Toyota</SelectItem>
-                    <SelectItem value="honda">Honda</SelectItem>
-                    <SelectItem value="volkswagen">Volkswagen</SelectItem>
-                    <SelectItem value="bmw">BMW</SelectItem>
-                  </SelectContent>
-                </Select>
-                {errors.vehicleBrand && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.vehicleBrand.message}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className="grid gap-6 md:grid-cols-2">
-              <div>
-                <label
-                  htmlFor="registrationNumber"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Государственный номер автомобиля*
-                </label>
-                <Input
-                  id="registrationNumber"
-                  {...register("registrationNumber", {
-                    required: "Введите государственный номер автомобиля",
-                  })}
-                  placeholder="Введите номер"
-                  className="mt-1"
-                />
-                {errors.registrationNumber && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.registrationNumber.message}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label
-                  htmlFor="hasPrescription"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Есть ли прецепта*
-                </label>
-                <Select
-                  onValueChange={(value) => setValue("hasPrescription", value)}
-                >
-                  <SelectTrigger id="hasPrescription" className="mt-1">
-                    <SelectValue placeholder="Да" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="yes">Да</SelectItem>
-                    <SelectItem value="no">Нет</SelectItem>
-                  </SelectContent>
-                </Select>
-                {errors.hasPrescription && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.hasPrescription.message}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className="grid gap-6 md:grid-cols-2">
-              <div>
-                <label
-                  htmlFor="prescriptionNumber"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Государственный номер прецепта*
-                </label>
-                <Input
-                  id="prescriptionNumber"
-                  {...register("prescriptionNumber")}
-                  placeholder="Введите номер"
-                  className="mt-1"
-                />
-                {errors.prescriptionNumber && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.prescriptionNumber.message}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label
-                  htmlFor="fuelType"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Тип топлива*
-                </label>
-                <Select onValueChange={(value) => setValue("fuelType", value)}>
-                  <SelectTrigger id="fuelType" className="mt-1">
-                    <SelectValue placeholder="Газ" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="gas">Газ</SelectItem>
-                    <SelectItem value="diesel">Салярка</SelectItem>
-                  </SelectContent>
-                </Select>
-                {errors.fuelType && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.fuelType.message}
-                  </p>
-                )}
-              </div>
-            </div>
-            <div className="grid gap-6 md:grid-cols-2">
-              <div>
-                <label
-                  htmlFor="paymentType"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Тип оплаты*
-                </label>
-                <Select
-                  onValueChange={(value) => setValue("paymentType", value)}
-                >
-                  <SelectTrigger id="paymentType" className="mt-1">
-                    <SelectValue placeholder="Лизинг" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="leasing">Лизинг</SelectItem>
-                    <SelectItem value="cash">Наличные</SelectItem>
-                  </SelectContent>
-                </Select>
-                {errors.paymentType && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.paymentType.message}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label
-                  htmlFor="vehiclePrice"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Введите цену автомобиля*
-                </label>
-                <Input
-                  id="vehiclePrice"
-                  {...register("vehiclePrice", {
-                    required: "Введите цену автомобиля",
-                  })}
-                  value={formatNumberAsPrice(vehiclePrice || "")} // Format with commas
-                  placeholder="Введите оплату"
-                  type="text" // Use text for formatting
-                  onChange={handleVehiclePriceChange} // Ensure only numeric input
-                  className="mt-1"
-                />
-                {errors.vehiclePrice && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.vehiclePrice.message}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className="grid gap-6 md:grid-cols-2">
-              {paymentType !== "cash" && (
+          <FormProvider {...methods}>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <div className="grid gap-6 md:grid-cols-2">
                 <div>
                   <label
-                    htmlFor="leasingTerm"
+                    htmlFor="name"
                     className="block text-sm font-medium text-gray-700"
                   >
-                    Введите срок лизинга*
+                    Название автомобиля*
                   </label>
                   <Input
-                    id="leasingTerm"
-                    {...register("leasingTerm", {
-                      required: "Введите срок лизинга",
+                    id="name"
+                    {...register("name", {
+                      required:
+                        "Название автомобиля должно содержать минимум 2 символа",
+                      minLength: {
+                        value: 2,
+                        message:
+                          "Название автомобиля должно содержать минимум 2 символа",
+                      },
                     })}
-                    type="number"
-                    placeholder="Введите срок..."
+                    placeholder="Название автомобиля..."
                     className="mt-1"
                   />
-                  {errors.leasingTerm && (
+                  {errors.name && (
                     <p className="mt-1 text-sm text-red-600">
-                      {errors.leasingTerm.message}
+                      {errors.name.message}
                     </p>
                   )}
                 </div>
-              )}
-              <div>
-                <label
-                  htmlFor="leasingTerm"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Пройденное расстояние автомобиля (в км)*
-                </label>
-                <Input
-                  id="carSpace"
-                  {...register("carSpace", {
-                    required: "Введите срок лизинга",
-                  })}
-                  type="number"
-                  placeholder="Введите Пройденное расстояние автомобиля (в км)..."
-                  className="mt-1"
-                />
-                {errors.carSpace && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {errors.carSpace.message}
-                  </p>
-                )}
-              </div>
-            </div>
 
-            <div className="w-full flex justify-end">
-              <Button
-                type="submit"
-                className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded-md"
-              >
-                Продат автомобил
-              </Button>
-            </div>
-          </form>
+                <div>
+                  <label
+                    htmlFor="model"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Марка автомобиля*
+                  </label>
+                  <Select
+                    value={watch("model")}
+                    onValueChange={(value) => setValue("model", value)}
+                  >
+                    <SelectTrigger id="model" className="mt-1">
+                      <SelectValue placeholder="Выберите марку" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="toyota">Toyota</SelectItem>
+                      <SelectItem value="honda">Honda</SelectItem>
+                      <SelectItem value="volkswagen">Volkswagen</SelectItem>
+                      <SelectItem value="bmw">BMW</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {errors.model && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.model.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid gap-6 md:grid-cols-2">
+                <div>
+                  <label
+                    htmlFor="number"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Государственный номер автомобиля*
+                  </label>
+                  <Input
+                    id="number"
+                    {...register("number", {
+                      required: "Введите государственный номер автомобиля",
+                    })}
+                    placeholder="Введите номер"
+                    className="mt-1"
+                  />
+                  {errors.number && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.number.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="with_trailer"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Есть ли прецепта*
+                  </label>
+                  <Select
+                    value={watch("with_trailer") ? "true" : "false"}
+                    onValueChange={(value) =>
+                      setValue("with_trailer", value === "true")
+                    }
+                  >
+                    <SelectTrigger id="with_trailer" className="mt-1">
+                      <SelectValue placeholder="Есть ли прецепта" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="true">Да</SelectItem>
+                      <SelectItem value="false">Нет</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  {errors.with_trailer && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.with_trailer.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid gap-6 md:grid-cols-2">
+                <div>
+                  <label
+                    htmlFor="trailer_number"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Государственный номер прецепта*
+                  </label>
+                  <Input
+                    disabled={!with_trailer}
+                    id="trailer_number"
+                    {...register("trailer_number")}
+                    placeholder="Введите номер"
+                    className="mt-1"
+                  />
+                  {errors.trailer_number && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.trailer_number.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="fuel_type"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Тип топлива*
+                  </label>
+                  <Select
+                    value={watch("fuel_type")}
+                    onValueChange={(value) => setValue("fuel_type", value)}
+                  >
+                    <SelectTrigger id="fuel_type" className="mt-1">
+                      <SelectValue placeholder="Газ" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="GAS">Газ</SelectItem>
+                      <SelectItem value="DIESEL">Салярка</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {errors.fuel_type && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.fuel_type.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="grid gap-6 md:grid-cols-2">
+                <div>
+                  <label
+                    htmlFor="type_of_payment"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Тип оплаты*
+                  </label>
+                  <Select
+                    onValueChange={(value) =>
+                      setValue("type_of_payment", value)
+                    }
+                  >
+                    <SelectTrigger id="type_of_payment" className="mt-1">
+                      <SelectValue placeholder="Лизинг" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="leasing">Лизинг</SelectItem>
+                      <SelectItem value="cash">Наличные</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {errors.type_of_payment && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.type_of_payment.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="price_uzs"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Введите цену автомобиля*
+                  </label>
+                  <CurrencyInputs name="price" />
+                </div>
+              </div>
+
+              <div className="grid gap-6 md:grid-cols-2">
+                {type_of_payment !== "cash" && (
+                  <div>
+                    <label
+                      htmlFor="leasing_period"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Введите срок лизинга*
+                    </label>
+                    <Input
+                      id="leasing_period"
+                      {...register("leasing_period", {
+                        required: "Введите срок лизинга",
+                      })}
+                      type="number"
+                      placeholder="Введите срок..."
+                      className="mt-1"
+                    />
+                    {errors.leasing_period && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {errors.leasing_period.message}
+                      </p>
+                    )}
+                  </div>
+                )}
+                <div>
+                  <label
+                    htmlFor="distance_travelled"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Пройденное расстояние автомобиля (в км)*
+                  </label>
+                  <Input
+                    id="distance_travelled"
+                    {...register("distance_travelled", {
+                      required: "Введите срок лизинга",
+                    })}
+                    type="number"
+                    placeholder="Введите Пройденное расстояние автомобиля (в км)..."
+                    className="mt-1"
+                  />
+                  {errors.distance_travelled && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.distance_travelled.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="w-full flex justify-end">
+                <Button
+                  type="submit"
+                  className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded-md"
+                >
+                  Продат автомобил
+                </Button>
+              </div>
+            </form>
+          </FormProvider>
         </div>
       </div>
       <div className="container mx-auto py-6 space-y-6">

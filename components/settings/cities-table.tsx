@@ -1,34 +1,28 @@
+"use client"
 
-"use client";
-
-import { useEffect, useState } from "react";
-import {
-  Table,
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableCell,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { ChevronLeftIcon, ChevronRightIcon, Pencil } from "lucide-react";
-import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
-import { OilListResponse } from "@/lib/types/oil.types";
-import { fetchOils } from "@/lib/actions/oil.action";
-import { queryClient } from "@/components/ui-items/ReactQueryProvider";
+import { useEffect, useState } from 'react'
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table"
+import { Button } from "@/components/ui/button"
+import { ChevronLeftIcon, ChevronRightIcon, Pencil } from 'lucide-react'
+import { fetchGasStation } from '@/lib/actions/gas.action'
+import { useQuery } from '@tanstack/react-query'
+import { GasListResponse, IGasStation } from '@/lib/types/gas_station.types'
+import { queryClient } from '@/components/ui-items/ReactQueryProvider'
+import CreateCityModal from './cities-create-modal'
 
 
-export default function GasTable() {
+export default function CitiesTable() {
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const { data: OilList } = useQuery<OilListResponse>({
-    queryKey: ["oils", currentPage],
-    queryFn: ()=> fetchOils(currentPage),
+  const [isOpen, setIsOpen] = useState(false)
+  const [editItem, setEditItem] = useState<null | IGasStation>(null)
+  const { data: gasStations } = useQuery<GasListResponse>({
+    queryKey: ["gas_stations", currentPage],
+    queryFn: ()=> fetchGasStation(currentPage),
   });
   useEffect(() => {
     queryClient.prefetchQuery({
-      queryKey: ["oils", currentPage + 1,],
-      queryFn: ()=> fetchOils(currentPage + 1),
+      queryKey: ["gas_stations", currentPage + 1,],
+      queryFn: ()=> fetchGasStation(currentPage + 1),
     });
 }, [currentPage]);
 
@@ -36,7 +30,7 @@ const itemsPerPage = 10;
 const indexOfLastOrder = currentPage * itemsPerPage;
 const indexOfFirstOrder = (currentPage - 1) * itemsPerPage;
 
-const totalPages = Math.ceil((OilList?.count as number) / itemsPerPage);
+const totalPages = Math.ceil((gasStations?.count as number) / itemsPerPage);
 
 const handlePageChange = (page: number) => {
   if (page >= 1 && page <= totalPages) {
@@ -61,34 +55,44 @@ const getPaginationButtons = () => {
   return buttons;
 };
 const buttons = getPaginationButtons();
+const handleEdit = (item: IGasStation) => {
+  setEditItem(item)
+  setIsOpen(true)
+}
 
   return (
-    <div className="w-full mx-auto bg-white rounded-2xl min-h-screen p-8">
+    <div className="w-full">
+      <div className='w-full flex justify-between items-center'>
+        <h2 className='text-2xl font-medium'>Cities</h2>
+        <CreateCityModal  isOpen={isOpen} setIsOpen={setIsOpen} editItem={editItem} setEditItem={setEditItem}/>
+      </div>
       <Table>
         <TableHeader className="font-bold">
-          <TableRow className="border-b border-gray-200">
-            <TableHead className="font-bold">Название Масло</TableHead>
-            <TableHead className="font-bold">Остаточный масло (литр)</TableHead>
-            <TableHead className="font-bold">День последней покупки</TableHead>
+          <TableRow className='border-b border-gray-200'>
+            <TableHead className="font-bold">T/R</TableHead>
+            <TableHead className="font-bold">Название заправки</TableHead>
+            <TableHead className="font-bold">Остаточный газ</TableHead>
+            <TableHead className="font-bold">День последней оплаты</TableHead>
             <TableHead className="font-bold w-[50px]"></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {OilList?.results?.map((oil) => (
-            <TableRow key={oil?.id} className="border-b border-gray-200">
-              <TableCell>{oil?.oil_name}</TableCell>
-              <TableCell>{oil?.oil_volume}</TableCell>
-              <TableCell>{oil?.updated_at}</TableCell>
+          {gasStations?.results?.map((station, index) => (
+            <TableRow key={station.id}  className='border-b border-gray-200'>
+              <TableCell>{index + 1}</TableCell>
               <TableCell>
-                <Link href={`/warehouse/oil/oil-info?id=${oil?.id}`}>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                  >
+                {/* {station.station_name} */}
+                </TableCell>
+              <TableCell>
+                {/* {station?.purchased_volume} */}
+                </TableCell>
+              <TableCell>
+                {/* {station?.updated_at?.slice(0,10)} */}
+                </TableCell>
+              <TableCell>
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={()=> handleEdit(station)}>
                     <Pencil className="h-4 w-4" />
                   </Button>
-                </Link>
               </TableCell>
             </TableRow>
           ))}
@@ -96,7 +100,7 @@ const buttons = getPaginationButtons();
       </Table>
       <div className="mt-4 flex justify-between items-center">
         <div>
-          {OilList?.count} ta Mashinalardan {indexOfFirstOrder + 1} dan {Math.min(indexOfLastOrder, OilList?.count as number)} gacha
+          {gasStations?.count} ta Zapravkalardan {indexOfFirstOrder + 1} dan {Math.min(indexOfLastOrder, gasStations?.count as number)} gacha
         </div>
         <div className="flex space-x-2 items-center">
           <Button
@@ -134,6 +138,6 @@ const buttons = getPaginationButtons();
           </Button>
         </div>
       </div>
-      </div>
-  );
+    </div>
+  )
 }

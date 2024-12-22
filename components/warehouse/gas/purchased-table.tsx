@@ -1,42 +1,37 @@
+"use client"
 
-"use client";
-
-import { useEffect, useState } from "react";
-import {
-  Table,
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableCell,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { ChevronLeftIcon, ChevronRightIcon, Pencil } from "lucide-react";
-import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
-import { OilListResponse } from "@/lib/types/oil.types";
-import { fetchOils } from "@/lib/actions/oil.action";
-import { queryClient } from "@/components/ui-items/ReactQueryProvider";
+import { useEffect, useState } from 'react'
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table"
+import { Button } from "@/components/ui/button"
+import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
+import { fetchStationPurchased } from '@/lib/actions/gas.action'
+import { useQuery } from '@tanstack/react-query'
+import { PurchasedGasListResponse } from '@/lib/types/gas_station.types'
+import { queryClient } from '@/components/ui-items/ReactQueryProvider'
+import { useRouter } from 'next/router'
 
 
-export default function GasTable() {
+
+export default function PurchasedGasTable() {
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const { data: OilList } = useQuery<OilListResponse>({
-    queryKey: ["oils", currentPage],
-    queryFn: ()=> fetchOils(currentPage),
+  const id = useRouter()?.query.id
+  const { data: purchased } = useQuery<PurchasedGasListResponse>({
+    queryKey: ["sales", id],
+    queryFn: () => fetchStationPurchased(id as string, currentPage),
+    enabled: !!id,
   });
   useEffect(() => {
     queryClient.prefetchQuery({
-      queryKey: ["oils", currentPage + 1,],
-      queryFn: ()=> fetchOils(currentPage + 1),
+      queryKey: ["sales", id, currentPage + 1,],
+      queryFn: ()=> fetchStationPurchased(id as string, currentPage + 1),
     });
-}, [currentPage]);
+}, [currentPage, id]);
 
 const itemsPerPage = 10;
 const indexOfLastOrder = currentPage * itemsPerPage;
 const indexOfFirstOrder = (currentPage - 1) * itemsPerPage;
 
-const totalPages = Math.ceil((OilList?.count as number) / itemsPerPage);
+const totalPages = Math.ceil((purchased?.count as number) / itemsPerPage);
 
 const handlePageChange = (page: number) => {
   if (page >= 1 && page <= totalPages) {
@@ -62,41 +57,33 @@ const getPaginationButtons = () => {
 };
 const buttons = getPaginationButtons();
 
+
   return (
-    <div className="w-full mx-auto bg-white rounded-2xl min-h-screen p-8">
+    <div className="w-full mx-auto bg-white p-8 rounded-2xl min-h-[50vh]">
       <Table>
         <TableHeader className="font-bold">
-          <TableRow className="border-b border-gray-200">
-            <TableHead className="font-bold">Название Масло</TableHead>
-            <TableHead className="font-bold">Остаточный масло (литр)</TableHead>
-            <TableHead className="font-bold">День последней покупки</TableHead>
+          <TableRow className='border-b border-gray-200'>
+            <TableHead className="font-bold">T/R</TableHead>
+            <TableHead className="font-bold">Оплаченная сумма</TableHead>
+            <TableHead className="font-bold">Количество</TableHead>
+            <TableHead className="font-bold">Цена</TableHead>
             <TableHead className="font-bold w-[50px]"></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {OilList?.results?.map((oil) => (
-            <TableRow key={oil?.id} className="border-b border-gray-200">
-              <TableCell>{oil?.oil_name}</TableCell>
-              <TableCell>{oil?.oil_volume}</TableCell>
-              <TableCell>{oil?.updated_at}</TableCell>
-              <TableCell>
-                <Link href={`/warehouse/oil/oil-info?id=${oil?.id}`}>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                </Link>
-              </TableCell>
+          {purchased?.results?.map((purchased, index) => (
+            <TableRow key={purchased.id}  className='border-b border-gray-200'>
+              <TableCell>{index + 1}</TableCell>
+              <TableCell>{purchased.payed_price_usd} $ / {purchased.payed_price_uzs} сум</TableCell>
+              <TableCell>{purchased?.amount?.toFixed(2)}</TableCell>
+              <TableCell>{purchased.price_usd} $ / {purchased.price_uzs} сум</TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
       <div className="mt-4 flex justify-between items-center">
         <div>
-          {OilList?.count} ta Mashinalardan {indexOfFirstOrder + 1} dan {Math.min(indexOfLastOrder, OilList?.count as number)} gacha
+          {purchased?.count} ta Zapravkalardan {indexOfFirstOrder + 1} dan {Math.min(indexOfLastOrder, purchased?.count as number)} gacha
         </div>
         <div className="flex space-x-2 items-center">
           <Button
@@ -134,6 +121,6 @@ const buttons = getPaginationButtons();
           </Button>
         </div>
       </div>
-      </div>
-  );
+    </div>
+  )
 }

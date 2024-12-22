@@ -11,32 +11,32 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { ChevronLeftIcon, ChevronRightIcon, Pencil } from "lucide-react";
-import Link from "next/link";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { deleteCar, fetchCar } from "@/lib/actions/cars.action";
-import { CarListResponse } from "@/lib/types/cars.types";
-import { queryClient } from "../ui-items/ReactQueryProvider";
-import { DeleteAlertDialog } from "../ui-items/delete-dialog";
-import { toast } from "react-toastify";
+import { fetchGasStation } from "@/lib/actions/gas.action";
+import { useQuery } from "@tanstack/react-query";
+import { GasListResponse, IGasStation } from "@/lib/types/gas_station.types";
+import { queryClient } from "@/components/ui-items/ReactQueryProvider";
+import CreateModel from "./model-create-modal";
 
-export default function CarsTable() {
+export default function ModelsTable() {
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const { data: carsList } = useQuery<CarListResponse>({
-    queryKey: ["cars", currentPage],
-    queryFn: ()=> fetchCar(currentPage),
+  const [isOpen, setIsOpen] = useState(false)
+  const [editItem, setEditItem] = useState<null | IGasStation>(null)
+  const { data: gasStations } = useQuery<GasListResponse>({
+    queryKey: ["gas_stations", currentPage],
+    queryFn: () => fetchGasStation(currentPage),
   });
   useEffect(() => {
-      queryClient.prefetchQuery({
-        queryKey: ["cars", currentPage + 1,],
-        queryFn: ()=> fetchCar(currentPage + 1),
-      });
+    queryClient.prefetchQuery({
+      queryKey: ["gas_stations", currentPage + 1],
+      queryFn: () => fetchGasStation(currentPage + 1),
+    });
   }, [currentPage]);
 
   const itemsPerPage = 10;
   const indexOfLastOrder = currentPage * itemsPerPage;
   const indexOfFirstOrder = (currentPage - 1) * itemsPerPage;
 
-  const totalPages = Math.ceil((carsList?.count as number) / itemsPerPage);
+  const totalPages = Math.ceil((gasStations?.count as number) / itemsPerPage);
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
@@ -51,7 +51,11 @@ export default function CarsTable() {
     if (currentPage > 3) {
       buttons.push("...");
     }
-    for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
+    for (
+      let i = Math.max(2, currentPage - 1);
+      i <= Math.min(totalPages - 1, currentPage + 1);
+      i++
+    ) {
       buttons.push(i);
     }
     if (currentPage < totalPages - 2) {
@@ -60,50 +64,45 @@ export default function CarsTable() {
     buttons.push(totalPages);
     return buttons;
   };
-  const { mutate: deleteMutation } = useMutation({
-    mutationFn: deleteCar,
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["cars"] });
-      toast.success(data?.name + " muvaffaqiyatli yangilandi!");
-    },
-    onError: () => {
-      toast.error("ni yangilashda xatolik!");
-    },
-  });
   const buttons = getPaginationButtons();
-  const handleDelete = (id: string) => {
-    deleteMutation(id)
+  const handleEdit = (item: IGasStation) => {
+    setEditItem(item)
+    setIsOpen(true)
   }
   return (
-    <div className="w-full container mx-auto bg-white p-8 rounded-2xl min-h-screen">
+    <div className="w-full mx-auto">
+      <div className="w-full flex justify-between items-center">
+        <h2 className="text-2xl font-medium">Models</h2>
+        <CreateModel isOpen={isOpen} setIsOpen={setIsOpen} editItem={editItem} setEditItem={setEditItem}/>
+      </div>
       <Table>
         <TableHeader className="font-bold">
           <TableRow className="border-b border-gray-200">
-            <TableHead className="font-bold p-5">Название автомобиля</TableHead>
-            <TableHead className="font-bold">Номер автомобиля</TableHead>
-            <TableHead className="font-bold">Номер прецепта</TableHead>
-            <TableHead className="font-bold">Марка автомобиля</TableHead>
+            <TableHead className="font-bold">T/R</TableHead>
+            <TableHead className="font-bold">Название заправки</TableHead>
+            <TableHead className="font-bold">Остаточный газ</TableHead>
+            <TableHead className="font-bold">День последней оплаты</TableHead>
             <TableHead className="font-bold w-[50px]"></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {carsList?.results?.map((car, index) => (
-            <TableRow key={index} className="border-b border-gray-200">
-              <TableCell className="px-5">{car.name}</TableCell>
-              <TableCell className="px-5">{car.number}</TableCell>
-              <TableCell className="px-5">{car.trailer_number}</TableCell>
-              <TableCell className="px-5">{car.model}</TableCell>
-              <TableCell className="px-5 flex gap-1 items-center">
-                <Link href={`/cars/car-info?id=${car?.id}`}>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                  >
+          {gasStations?.results?.map((station, index) => (
+            <TableRow key={station.id} className="border-b border-gray-200">
+              <TableCell>{index + 1}</TableCell>
+              <TableCell>
+                {/* {station.station_name} */}
+
+              </TableCell>
+              <TableCell>
+                {/* {station?.purchased_volume} */}
+                </TableCell>
+              <TableCell>
+                {/* {station?.updated_at?.slice(0, 10)} */}
+                </TableCell>
+              <TableCell>
+                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={()=> handleEdit(station)}>
                     <Pencil className="h-4 w-4" />
                   </Button>
-                </Link>
-                <DeleteAlertDialog onDelete={handleDelete} id={car?.id}/>
               </TableCell>
             </TableRow>
           ))}
@@ -111,7 +110,8 @@ export default function CarsTable() {
       </Table>
       <div className="mt-4 flex justify-between items-center">
         <div>
-          {carsList?.count} ta Mashinalardan {indexOfFirstOrder + 1} dan {Math.min(indexOfLastOrder, carsList?.count as number)} gacha
+          {gasStations?.count} ta Zapravkalardan {indexOfFirstOrder + 1} dan{" "}
+          {Math.min(indexOfLastOrder, gasStations?.count as number)} gacha
         </div>
         <div className="flex space-x-2 items-center">
           <Button
@@ -125,13 +125,17 @@ export default function CarsTable() {
           </Button>
           {buttons.map((button, index) =>
             button === "..." ? (
-              <span key={index} style={{ margin: "0 5px" }}>...</span>
+              <span key={index} style={{ margin: "0 5px" }}>
+                ...
+              </span>
             ) : (
               <Button
                 key={index}
                 onClick={() => handlePageChange(button as number)}
                 disabled={button === currentPage}
-                className={button === currentPage ? "bg-[#4880FF] text-white" : "border"}
+                className={
+                  button === currentPage ? "bg-[#4880FF] text-white" : "border"
+                }
                 variant={button === currentPage ? "default" : "ghost"}
               >
                 {button || ""}
@@ -149,6 +153,6 @@ export default function CarsTable() {
           </Button>
         </div>
       </div>
-      </div>
+    </div>
   );
 }

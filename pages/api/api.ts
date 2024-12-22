@@ -30,10 +30,9 @@ $api.interceptors.response.use(
     const originalRequest = error.config;
     if (error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      // Redirect to login page
-      // if (window.location.pathname !== "/login") {
-      //   window.location.href = "/login";
-      // }
+      if (window.location.pathname !== "/login") {
+        window.location.href = "/login";
+      }
     }
     console.log(error);
     if (error.response.status === 401 && !originalRequest._retry) {

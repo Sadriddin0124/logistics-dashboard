@@ -1,168 +1,136 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
 import { useRouter } from "next/router";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
+import { IGasStation, IGasStationTotal } from "@/lib/types/gas_station.types";
+import { CurrencyInputs } from "@/components/ui-items/currency-inputs";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  addGas,
+  fetchGasStationOne,
+} from "@/lib/actions/gas.action";
+import { queryClient } from "@/components/ui-items/ReactQueryProvider";
+import { toast } from "react-toastify";
+import { removeCommas } from "@/lib/utils";
+import PurchasedGasTable from "@/components/warehouse/gas/purchased-table";
+import SalesGasTable from "@/components/warehouse/gas/gas-sales-table";
 
-interface GasEntry {
-  machine: string;
-  quantity: string;
-  price: string;
-}
 
-interface FormValues {
-  price: string;
-  purchased?: string;
-  paid: string;
-}
-
+ 
 export default function GasManagementForm() {
-  const { register, handleSubmit } = useForm<FormValues>({
-    defaultValues: {
-      price: "",
-      paid: "",
-      purchased : "",
+  const methods = useForm<IGasStation>();
+  const { handleSubmit, reset, setValue, watch, register } = methods;
+  const payed_price_uzs = watch("payed_price_uzs");
+  const price_uzs = watch("price_uzs");
+  const { id } = useRouter().query;
+  const { data: total } = useQuery<IGasStationTotal>({
+    queryKey: ["station", id],
+    queryFn: () => fetchGasStationOne(id as string),
+    enabled: !!id,
+  });
+
+  useEffect(() => {
+    const result =
+      Number(removeCommas(payed_price_uzs?.toString())) / Number(removeCommas(price_uzs?.toString()));
+    setValue("remaining_gas", Number(result.toFixed(2)) || 0);
+  }, [setValue, payed_price_uzs, price_uzs]);
+  const { mutate: updateMutation } = useMutation({
+     mutationFn: (data: { id: string; gasData: IGasStation }) =>
+          addGas(data.id, data.gasData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["gas_stations"] });
+      reset();
+      toast.success("Muvaffaqiyatli qo'shildi!");
+    },
+    onError: () => {
+      toast.error("Xatolik yuz berdi!");
     },
   });
-  const [entries] = useState<GasEntry[]>([
-    { machine: "Isuzu 01A113AA", quantity: "300(м3)", price: "2500 сум" },
-    { machine: "Isuzu 01A113AA", quantity: "300(м3)", price: "2500 сум" },
-    { machine: "Isuzu 01A113AA", quantity: "300(м3)", price: "2500 сум" },
-    { machine: "Isuzu 01A113AA", quantity: "300(м3)", price: "2500 сум" },
-    { machine: "Isuzu 01A113AA", quantity: "300(м3)", price: "2500 сум" },
-    { machine: "Isuzu 01A113AA", quantity: "300(м3)", price: "2500 сум" },
-  ]);
-  const { id } = useRouter().query;
-  const onSubmit = (data: FormValues) => {
-    console.log(data);
+  const onSubmit = (data: IGasStation) => {
+    const formData: IGasStation = {
+    amount: data?.remaining_gas,
+    price_usd: Number(removeCommas(data?.price_usd?.toString())),
+    price_uzs: Number(removeCommas(data?.price_uzs?.toString())),
+    payed_price_usd: Number(removeCommas(data?.payed_price_usd?.toString())),
+    payed_price_uzs: Number(removeCommas(data?.payed_price_uzs?.toString())),
+  }
+    updateMutation({id: id as string, gasData: formData}
+  );
   };
   return (
     <div className="w-full p-4 space-y-8 container mx-auto">
       {/* Top Form Section */}
       <Card>
         <CardContent className="p-6 space-y-6">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-2 gap-6">
-              
-              <div className="space-y-2">
-                <label className="text-sm">Название заправки</label>
-                <Input
-                  disabled={id ? true : false}
-                  placeholder="Название заправки..."
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-">Оплаченная сумма</label>
-                <Input {...register("paid")} placeholder="Цена..." />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-6">
-            <div className="space-y-2">
-                <label className="text-sm">
-                  Количество купленного газа (м3)
-                </label>
-                <Input disabled={id ? true : false} placeholder="0" />
+          <FormProvider {...methods}>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-sm">Название заправки</label>
+                  <Input
+                  value={total?.station_name}
+                    disabled={id ? true : false}
+                    placeholder="Название заправки..."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-">Оплаченная сумма</label>
+                  <CurrencyInputs name="payed_price" />
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-sm">Цена на газ (м3)</label>
-                <Input {...register("price")} placeholder="Цена..." />
-              </div>
-            </div>
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-sm">
+                    Количество купленного газа (м3)
+                  </label>
+                  <Input
+                    {...register("remaining_gas")}
+                    disabled={id ? true : false}
+                    placeholder="0"
+                  />
+                </div>
 
-            <div className="flex justify-end">
-              <Button className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded">
-                Добавить
-              </Button>
-            </div>
-          </form>
+                <div className="space-y-2">
+                  <label className="text-sm">Цена на газ (м3)</label>
+                  <CurrencyInputs name="price" />
+                </div>
+              </div>
+
+              <div className="flex justify-end">
+                <Button className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded">
+                  Добавить
+                </Button>
+              </div>
+            </form>
+          </FormProvider>
 
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="text-sm">Оставшееся количество газа (м3)</label>
-              <Input value="2300" readOnly className="bg-muted" />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm">Оставшаяся сумма платежа</label>
-              <Input value="5,650,000" readOnly className="bg-muted" />
+              <Input
+                value={total?.remaining_gas}
+                readOnly
+                className="bg-muted"
+              />
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Middle Table Section */}
       <Card>
         <CardContent className="p-6">
-          <Table>
-            <TableHeader className="font-bold">
-              <TableRow className="border-b border-b-gray-300">
-                <TableHead className="font-bold">Машина</TableHead>
-                <TableHead className="font-bold">Количество</TableHead>
-                <TableHead className="font-bold">Цена</TableHead>
-                <TableHead className="font-bold"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {entries.map((entry, index) => (
-                <TableRow key={index} className="border-b border-b-gray-300">
-                  <TableCell>{entry.machine}</TableCell>
-                  <TableCell>{entry.quantity}</TableCell>
-                  <TableCell>{entry.price}</TableCell>
-                  <TableCell>
-                    <Button
-                      variant="secondary"
-                      className="bg-red-100 hover:bg-red-200 text-red-600"
-                    >
-                      Налили
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <SalesGasTable/>
         </CardContent>
       </Card>
 
-      {/* Bottom Summary Section */}
       <Card>
         <CardContent className="p-6">
-          <Table>
-            <TableHeader className="font-bold">
-              <TableRow className="border-b border-b-gray-300">
-                <TableHead className="font-bold">Оплаченная сумма</TableHead>
-                <TableHead className="font-bold">Количество</TableHead>
-                <TableHead className="font-bold">Цена</TableHead>
-                <TableHead className="font-bold"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow>
-                <TableCell className="font-medium">10,000,000 сум</TableCell>
-                <TableCell>300(м3)</TableCell>
-                <TableCell>2500 сум</TableCell>
-                <TableCell>
-                  <Button
-                    variant="secondary"
-                    className="bg-green-100 hover:bg-green-200 text-green-600"
-                  >
-                    Куплено
-                  </Button>
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
+          <PurchasedGasTable/>
         </CardContent>
       </Card>
     </div>

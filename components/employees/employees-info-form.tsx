@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -19,6 +19,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useForm, Controller } from "react-hook-form";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { fetchEmployee, updateEmployee } from "@/lib/actions/employees.action";
+import { useRouter } from "next/router";
+import { IEmployee } from "@/lib/types/employee.types";
+import { queryClient } from "../ui-items/ReactQueryProvider";
+import { toast } from "react-toastify";
 
 interface Trip {
   vehicle: string;
@@ -34,16 +40,28 @@ interface Payment {
   date: string;
 }
 interface FormValues {
-  driverName: string;
-  drivingLicenseId: string;
-  phoneNumber: string;
-  route: string;
-  passportId: string;
+  full_name: string;
+  license: string;
+  phone: string;
+  flight_type: string;
+  passport: string;
   balance: string;
 }
 
+function areObjectsEqual(obj1: IEmployee, obj2: IEmployee): boolean {
+  for (const key in obj1) {
+    if (obj1[key as keyof IEmployee] !== obj2[key as keyof IEmployee]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+
+
 export default function EmployeesInfoForm() {
-  const [trips] = React.useState<Trip[]>([
+  const { id } = useRouter()?.query
+  const [trips] = useState<Trip[]>([
     {
       vehicle: "Sonnatilla Sh.N.",
       price: 2300,
@@ -53,17 +71,52 @@ export default function EmployeesInfoForm() {
     },
   ]);
 
-  const [payments] = React.useState<Payment[]>([
+  const [payments] = useState<Payment[]>([
     {
       administrator: "Sonnatilla Sh.N.",
       amount: 2300,
       date: "12.12.2024",
     },
   ]);
-  const { control, handleSubmit, reset, watch } = useForm<FormValues>();
+  const { control, handleSubmit, reset, watch, getValues } = useForm<FormValues>();
+  const [isChanged, setIsChanged] = useState(false);
+
   const balance = watch("balance")
+  const { data: employee } = useQuery<IEmployee>({
+    queryKey: ["employee"],
+    queryFn: ()=> fetchEmployee(id as string),
+  });
+  useEffect(()=> {
+    if (employee) {
+      reset(employee)
+    }
+  },[employee, reset])
+  useEffect(() => {
+    const subscription = watch((_, { name, type }) => {
+      const currentValues = getValues();
+      const hasChanged = !areObjectsEqual(employee as IEmployee, currentValues);
+      setIsChanged(hasChanged);
+      if (name) {
+        console.log(`${name} changed (${type})`);
+      }
+    });
+
+    console.log(isChanged);
+    return () => subscription.unsubscribe();
+  }, [employee, watch, getValues, isChanged]);
+  const { mutate: updateMutation } = useMutation({
+    mutationFn: updateEmployee,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["employee"] });
+      reset();
+      toast.success(" muvaffaqiyatli qo'shildi!");
+    },
+    onError: () => {
+      toast.error("ni qo'shishda xatolik!");
+    },
+  });
   const onSubmit = (data: FormValues) => {
-    console.log(data); // Handle form submission
+    updateMutation({...data, id: id as string}); 
   };
   return (
     <div className="container mx-auto space-y-8 mt-8 ">
@@ -76,9 +129,8 @@ export default function EmployeesInfoForm() {
             Полное имя водителя*
           </label>
           <Controller
-            name="driverName"
+            name="full_name"
             control={control}
-            defaultValue=""
             render={({ field }) => (
               <Input {...field} placeholder="Введите имя сотрудника" />
             )}
@@ -90,7 +142,7 @@ export default function EmployeesInfoForm() {
             Номер телефона сотрудника*
           </label>
           <Controller
-            name="phoneNumber"
+            name="phone"
             control={control}
             defaultValue=""
             render={({ field }) => (
@@ -107,7 +159,7 @@ export default function EmployeesInfoForm() {
             Выберите маршрут водителя*
           </label>
           <Controller
-            name="route"
+            name="flight_type"
             control={control}
             defaultValue=""
             render={({ field }) => (
@@ -116,9 +168,8 @@ export default function EmployeesInfoForm() {
                   <SelectValue placeholder="Выберите..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="route1">Маршрут 1</SelectItem>
-                  <SelectItem value="route2">Маршрут 2</SelectItem>
-                  <SelectItem value="route3">Маршрут 3</SelectItem>
+                  <SelectItem value="IN_UZB">IN_UZB</SelectItem>
+                  <SelectItem value="OUT">OUT</SelectItem>
                 </SelectContent>
               </Select>
             )}
@@ -130,7 +181,7 @@ export default function EmployeesInfoForm() {
             ID водительских прав
           </label>
           <Controller
-            name="drivingLicenseId"
+            name="license"
             control={control}
             defaultValue=""
             render={({ field }) => (
@@ -144,7 +195,7 @@ export default function EmployeesInfoForm() {
             ID паспорта водителя
           </label>
           <Controller
-            name="passportId"
+            name="passport"
             control={control}
             defaultValue=""
             render={({ field }) => (
@@ -161,19 +212,12 @@ export default function EmployeesInfoForm() {
           >
             Удалить сотрудника
           </Button>
-          <Button type="submit" className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded-md">Сохранить</Button>
+          <Button disabled={!isChanged} type="submit" className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded-md">Сохранить</Button>
         </div>
 
         <div>
           <label className="text-sm font-medium mb-2 block">Баланс водителя</label>
-          <Controller
-            name="balance"
-            control={control}
-            defaultValue=""
-            render={({ field }) => (
-              <Input {...field} placeholder="Введите баланс водителя..." />
-            )}
-          />
+          <Input value={employee?.balance || "0"} readOnly placeholder="Введите баланс водителя..." className="bg-muted"/>
         </div>
 
       </form>

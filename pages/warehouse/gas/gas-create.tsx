@@ -1,80 +1,119 @@
-"use client";
-
+import React, { useEffect, useState } from "react";
+import { useForm, FormProvider } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { FormProvider, useForm } from "react-hook-form";
-import { useEffect } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { CurrencyInputs } from "@/components/ui-items/currency-inputs";
+import { addGas, createGasStation } from "@/lib/actions/gas.action";
+import { queryClient } from "@/components/ui-items/ReactQueryProvider";
+import { toast } from "react-toastify";
+import { removeCommas } from "@/lib/utils";
+import { IGasStation } from "@/lib/types/gas_station.types";
 
 interface FormValues {
-  gas_price: string;
-  gas_price_usd: string;
-  gas_price_uzs: string;
-  purchased_volume_usd?: number;
-  purchased_volume_uzs?: number;
-  purchased_volume?: number;
-  paid_amount: string;
-  paid_amount_usd: string;
-  paid_amount_uzs: string;
+  name?: string;
+  remaining_gas?: number;
+  price_usd: string;
+  price_uzs: string;
+  payed_price_usd: string;
+  payed_price_uzs: string;
+  amount: string
 }
 
 export default function GasManagementForm() {
-  const methods = useForm<FormValues>({
-    defaultValues: {
-      gas_price: "",
-      paid_amount: "",
-      purchased_volume: 0,
-    },
-  });
+  const methods = useForm<FormValues>();
   const { register, handleSubmit, watch, setValue } = methods;
-  const paid_amount_uzs = watch("paid_amount_uzs");
-  const gas_price_uzs = watch("gas_price_uzs");
+  const [addGasData, setAddGasData] = useState<IGasStation | null>(null);
+  const payed_price_uzs = watch("payed_price_uzs");
+  const price_uzs = watch("price_uzs");
+console.log(payed_price_uzs);
 
   useEffect(() => {
-    const result = Number(paid_amount_uzs) / Number(gas_price_uzs);
-    setValue("purchased_volume_uzs", result || 0);
-  }, [
-    gas_price_uzs,
-    paid_amount_uzs,
-    setValue,
-  ]);
-  //   const { id } = useRouter().query;
+      const result =
+        Number(removeCommas(payed_price_uzs)) /
+        Number(removeCommas(price_uzs));
+      setValue("remaining_gas", result);
+  }, [price_uzs, payed_price_uzs, setValue]);
+
+  const { mutate: addMutation } = useMutation({
+    mutationFn: (data: { id: string; gasData: IGasStation }) =>
+      addGas(data.id, data.gasData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["gas_stations"] });
+    },
+    onError: () => {
+      toast.error("Xatolik yuz berdi!");
+    },
+  });
+
+  const { mutate: createMutation } = useMutation({
+    mutationFn: createGasStation,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["gas_stations"] });
+      addMutation({
+        id: data.id,
+        gasData: addGasData as IGasStation,
+      });
+      console.log(addGasData);
+      
+      toast.success("Muvaffaqiyatli qo'shildi!");
+    },
+    onError: () => {
+      toast.error("Xatolik yuz berdi!");
+    },
+  });
+
   const onSubmit = (data: FormValues) => {
-    console.log(data);
+    const formData: IGasStation = {
+      price_usd: Number(removeCommas(data?.price_usd)),
+      price_uzs: Number(removeCommas(data?.price_uzs)),
+      payed_price_usd: Number(removeCommas(data?.payed_price_usd)),
+      payed_price_uzs: Number(removeCommas(data?.payed_price_uzs)),
+    };
+    setAddGasData({
+      amount: data?.remaining_gas as number,
+      ...formData,
+    } as IGasStation);
+    createMutation({ ...formData, name: data?.name });
+    console.log(formData);
+    
   };
+
   return (
     <div className="w-full p-4 space-y-8 container mx-auto">
-      {/* Top Form Section */}
       <Card>
         <CardContent className="p-6 space-y-6">
           <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-sm">Название заправки</label>
-                  <Input placeholder="Название заправки..." />
+                  <label className="mb-2">Название заправки</label>
+                  <Input
+                    {...register("name", { required: true })}
+                    placeholder="Название заправки..."
+                  />
                 </div>
+
                 <div className="space-y-2">
                   <label className="text-">Оплаченная сумма</label>
-                  <CurrencyInputs name="paid_amount" />
+                  <CurrencyInputs name="payed_price" />
                 </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-sm">
                     Количество купленного газа (м3)
                   </label>
                   <Input
-                    {...register("purchased_volume_uzs")}
+                    readOnly
+                    {...register("remaining_gas")}
                     placeholder="0"
+                    className="bg-muted"
                   />
                 </div>
 
                 <div className="space-y-2">
                   <label className="text-sm">Цена на газ (м3)</label>
-                  <CurrencyInputs name="gas_price" />
+                  <CurrencyInputs name="price" />
                 </div>
               </div>
 
@@ -85,17 +124,6 @@ export default function GasManagementForm() {
               </div>
             </form>
           </FormProvider>
-
-          {/* <div className="grid grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <label className="text-sm">Оставшееся количество газа (м3)</label>
-              <Input value="2300" readOnly className="bg-muted" />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm">Оставшаяся сумма платежа</label>
-              <Input value="5,650,000" readOnly className="bg-muted" />
-            </div>
-          </div> */}
         </CardContent>
       </Card>
     </div>

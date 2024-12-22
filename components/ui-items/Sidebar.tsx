@@ -12,6 +12,7 @@ import {
   ClipboardList,
   Menu,
   Package,
+  Settings,
   Users,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
@@ -50,6 +51,10 @@ const menuItems: MenuItem[] = [
         title: "Топливо (Саларка)",
         href: "/warehouse/diesel",
       },
+      {
+        title: "Залить топливо (соляркa)",
+        href: "/warehouse/diesel/diesel-fill",
+      },
     ],
   },
   {
@@ -72,6 +77,13 @@ const menuItems: MenuItem[] = [
     icon: <CarFront />,
     key: "cars",
     href: "/cars",
+  },
+  {
+    id: "6",
+    title: "Настройки",
+    icon: <Settings />,
+    key: "settings",
+    href: "/settings",
   },
 ];
 
@@ -100,7 +112,7 @@ export const AppSidebar: React.FC<SideBarProps> = ({
     <aside className="fixed top-0 left-0 h-full z-50">
       <Sidebar
         className={`${
-          subItemStatus ? "w-[600px]" : " w-[310px]"
+          subItemStatus ? "w-[600px]" : " w-[300px]"
         } transition-none`}
         style={{ background: "transparent" }}
       >
@@ -110,7 +122,7 @@ export const AppSidebar: React.FC<SideBarProps> = ({
           }`}
         >
           <div className="bg-white shadow-lg w-full h-full flex flex-col gap-1">
-            <div className="flex w-full mb-3 justify-start py-3 px-6 items-center gap-[100px]">
+            <div className="flex w-full mb-3 justify-start py-3 px-6 items-center gap-[90px]">
               <div className="text-[20px] font-[800] flex items-center">
                 <span className="text-[#4880FF]">Logi</span>
                 <span>Track</span>
