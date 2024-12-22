@@ -33,7 +33,7 @@ console.log(payed_price_uzs);
       const result =
         Number(removeCommas(payed_price_uzs)) /
         Number(removeCommas(price_uzs));
-      setValue("remaining_gas", result);
+      setValue("remaining_gas", result || 0);
   }, [price_uzs, payed_price_uzs, setValue]);
 
   const { mutate: addMutation } = useMutation({
