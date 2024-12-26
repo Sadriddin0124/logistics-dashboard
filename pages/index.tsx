@@ -246,24 +246,20 @@
 // };
 "use client";
 
-import { CurrencyInputs } from "@/components/ui-items/currency-inputs";
+import Cars from "@/components/statistics/cars";
+import { ExpenseStats } from "@/components/statistics/expense-stats";
+import IncomeOutcomeGraph from "@/components/statistics/linegraph";
 import React from "react";
-import { useForm, FormProvider } from "react-hook-form";
 
 const FormWrapper: React.FC = () => {
-  const methods = useForm({
-    defaultValues: {
-      price_uzs: "",
-      price_usd: "",
-    },
-  });
-
   return (
-    <FormProvider {...methods}>
-      <form className="space-y-4">
-        <CurrencyInputs name="price" />
-      </form>
-    </FormProvider>
+    <div>
+      <ExpenseStats />
+      <div className=" grid grid-cols-2 gap-4">
+        <IncomeOutcomeGraph />
+        <Cars />
+      </div>
+    </div>
   );
 };
 

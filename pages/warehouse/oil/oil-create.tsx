@@ -4,54 +4,91 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { FormProvider, useForm } from "react-hook-form";
-import { IOilType } from "@/lib/types/oil.types";
+import { IOil, IOilType } from "@/lib/types/oil.types";
 import { CurrencyInputs } from "@/components/ui-items/currency-inputs";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { removeCommas } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
-import { createOil } from "@/lib/actions/oil.action";
+import { createOil, createOilPurchase } from "@/lib/actions/oil.action";
 import { queryClient } from "@/components/ui-items/ReactQueryProvider";
 import { toast } from "react-toastify";
+import { useRouter } from "next/router";
 // import { useRouter } from "next/router";
 
 export default function GasManagementForm() {
-  const methods = useForm<IOilType>();
+  const methods = useForm<IOil>();
   const { register, handleSubmit, setValue, watch, reset } = methods;
-  const payed_price_uzs = watch("payed_price_uzs")?.toString();
+  const amount_uzs = watch("amount_uzs")?.toString();
   const price_uzs = watch("price_uzs")?.toString();
-  // const router = useRouter()
-  // const { id } = router?.query
-  // const { push } = router
+  const router = useRouter();
+  const [oilId, setOilId] = useState<string>("");
+  const [addOilData, setAddOilData] = useState<IOilType | null>(null);
+  const [status, setStatus] = useState<string>("");
+
+  const { push } = router;
   useEffect(() => {
-    const payedPrice = Number(removeCommas(payed_price_uzs)) || 0;
-    const pricePerLiter = Number(removeCommas(price_uzs)) || 0;
+    const payedPrice = Number(removeCommas(amount_uzs as string)) || 0;
+    const pricePerLiter = Number(removeCommas(price_uzs as string)) || 0;
+    console.log(payedPrice);
+    console.log(pricePerLiter);
 
     if (pricePerLiter > 0) {
       const result = payedPrice / pricePerLiter;
-      setValue("oil_volume", result.toFixed(2));
+      console.log(result);
+      if (result < 1) {
+        setStatus("gaz narxi to'langan summadan baland bo'lmasligi kerak");
+      }
+
+      setValue("oil_volume", Number(result.toFixed(2)));
     } else {
-      setValue("oil_volume", "0");
+      setValue("oil_volume", 0);
     }
-  }, [price_uzs, payed_price_uzs, setValue]);
+  }, [price_uzs, amount_uzs, setValue]);
+  const { mutate: addMutation } = useMutation({
+    mutationFn: (data: { id: string; oilData: IOilType }) =>
+      createOilPurchase(data.id, data.oilData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["gas_stations"] });
+      push(`/warehouse/oil/oil-info?id=${oilId}`);
+      reset();
+    },
+    onError: () => {
+      toast.error("Xatolik yuz berdi!");
+    },
+  });
   const { mutate: createMutation } = useMutation({
     mutationFn: createOil,
-    onSuccess: () => {
-      reset()
+    onSuccess: (data) => {
+      setOilId(data?.id);
+      addMutation({
+        id: data?.id,
+        oilData: addOilData as IOilType,
+      });
+      reset();
       queryClient.invalidateQueries({ queryKey: ["gas_stations"] });
-      // push(`/warehouse/oil/oil-info?id=${data?.id}`)
       toast.success(" muvaffaqiyatli qo'shildi!");
     },
     onError: () => {
       toast.error("ni qo'shishda xatolik!");
     },
   });
-  const onSubmit = (data: IOilType) => {
-    createMutation({...data, 
-        payed_price_usd: Number(data?.payed_price_usd),
-        payed_price_uzs: Number(data?.payed_price_uzs),
-        price_uzs: Number(data?.price_uzs),
-        price_usd: Number(data?.price_usd)
-    })
+
+  const onSubmit = (data: IOil) => {
+    const formData = {
+      amount_usd: Number(removeCommas(data?.amount_usd)),
+      amount_uzs: Number(removeCommas(data?.amount_uzs)),
+      price_uzs: Number(removeCommas(data?.price_uzs)),
+      price_usd: Number(removeCommas(data?.price_usd)),
+    };
+
+    createMutation({
+      oil_name: data?.oil_name,
+      oil_volume: 0,
+    });
+    setAddOilData({
+      oil_volume: data?.oil_volume,
+      ...formData,
+    });
   };
 
   return (
@@ -69,7 +106,7 @@ export default function GasManagementForm() {
 
                 <div className="space-y-2">
                   <label className="text-sm">Оплаченная сумма</label>
-                  <CurrencyInputs name="payed_price" />
+                  <CurrencyInputs name="amount" />
                 </div>
               </div>
 
@@ -79,7 +116,10 @@ export default function GasManagementForm() {
                     Количество купленного масло (литр)
                   </label>
                   <Input
-                    {...register("oil_volume", { required: true })}
+                    {...register("oil_volume", {
+                      required: true,
+                      valueAsNumber: true,
+                    })}
                     disabled
                     placeholder="0"
                   />
@@ -87,6 +127,7 @@ export default function GasManagementForm() {
                 <div className="space-y-2">
                   <label className="text-sm">Цена на масло (литр)</label>
                   <CurrencyInputs name="price" />
+                  {status && <p className="text-sm text-red-500">{status}</p>}
                 </div>
               </div>
 

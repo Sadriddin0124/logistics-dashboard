@@ -11,24 +11,26 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { ChevronLeftIcon, ChevronRightIcon, Pencil } from "lucide-react";
-import { fetchGasStation } from "@/lib/actions/gas.action";
-import { useQuery } from "@tanstack/react-query";
-import { GasListResponse, IGasStation } from "@/lib/types/gas_station.types";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient } from "@/components/ui-items/ReactQueryProvider";
 import CreateModel from "./model-create-modal";
+import { deleteModel, fetchModels } from "@/lib/actions/cars.action";
+import { IModel, ModelListResponse } from "@/lib/types/cars.types";
+import { DeleteAlertDialog } from "../ui-items/delete-dialog";
+import { toast } from "react-toastify";
 
 export default function ModelsTable() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isOpen, setIsOpen] = useState(false)
-  const [editItem, setEditItem] = useState<null | IGasStation>(null)
-  const { data: gasStations } = useQuery<GasListResponse>({
-    queryKey: ["gas_stations", currentPage],
-    queryFn: () => fetchGasStation(currentPage),
+  const [editItem, setEditItem] = useState<null | IModel>(null)
+  const { data:  models} = useQuery<ModelListResponse>({
+    queryKey: ["models", currentPage],
+    queryFn: () => fetchModels(currentPage),
   });
   useEffect(() => {
     queryClient.prefetchQuery({
-      queryKey: ["gas_stations", currentPage + 1],
-      queryFn: () => fetchGasStation(currentPage + 1),
+      queryKey: ["models", currentPage + 1],
+      queryFn: () => fetchModels(currentPage + 1),
     });
   }, [currentPage]);
 
@@ -36,7 +38,7 @@ export default function ModelsTable() {
   const indexOfLastOrder = currentPage * itemsPerPage;
   const indexOfFirstOrder = (currentPage - 1) * itemsPerPage;
 
-  const totalPages = Math.ceil((gasStations?.count as number) / itemsPerPage);
+  const totalPages = Math.ceil((models?.count as number) / itemsPerPage);
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
@@ -65,44 +67,49 @@ export default function ModelsTable() {
     return buttons;
   };
   const buttons = getPaginationButtons();
-  const handleEdit = (item: IGasStation) => {
+  const handleEdit = (item: IModel) => {
     setEditItem(item)
     setIsOpen(true)
   }
+  const { mutate: deleteMutation } = useMutation({
+    mutationFn: deleteModel,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["models"] });
+      toast.success(" muvaffaqiyatli qo'shildi!");
+    },
+    onError: () => {
+      toast.error("ni qo'shishda xatolik!");
+    },
+  });
+  const handleDelete = (id: string) => {
+    deleteMutation(id)
+  }
   return (
-    <div className="w-full mx-auto">
+    <div className="w-full mx-auto min-h-[50vh]">
       <div className="w-full flex justify-between items-center">
-        <h2 className="text-2xl font-medium">Models</h2>
+        <h2 className="text-2xl font-medium">Марки автомобилей</h2>
         <CreateModel isOpen={isOpen} setIsOpen={setIsOpen} editItem={editItem} setEditItem={setEditItem}/>
       </div>
       <Table>
         <TableHeader className="font-bold">
           <TableRow className="border-b border-gray-200">
-            <TableHead className="font-bold">T/R</TableHead>
-            <TableHead className="font-bold">Название заправки</TableHead>
-            <TableHead className="font-bold">Остаточный газ</TableHead>
-            <TableHead className="font-bold">День последней оплаты</TableHead>
+            <TableHead className="font-bold"></TableHead>
+            <TableHead className="font-bold">Имя</TableHead>
             <TableHead className="font-bold w-[50px]"></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {gasStations?.results?.map((station, index) => (
-            <TableRow key={station.id} className="border-b border-gray-200">
+          {models?.results?.map((model, index) => (
+            <TableRow key={model.id} className="border-b border-gray-200">
               <TableCell>{index + 1}</TableCell>
               <TableCell>
-                {/* {station.station_name} */}
-
+                {model?.name}
               </TableCell>
-              <TableCell>
-                {/* {station?.purchased_volume} */}
-                </TableCell>
-              <TableCell>
-                {/* {station?.updated_at?.slice(0, 10)} */}
-                </TableCell>
-              <TableCell>
-                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={()=> handleEdit(station)}>
+              <TableCell className="flex gap-1 items-center">
+                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={()=> handleEdit(model)}>
                     <Pencil className="h-4 w-4" />
                   </Button>
+                  <DeleteAlertDialog id={model?.id as string} onDelete={handleDelete} type="small"/>
               </TableCell>
             </TableRow>
           ))}
@@ -110,8 +117,8 @@ export default function ModelsTable() {
       </Table>
       <div className="mt-4 flex justify-between items-center">
         <div>
-          {gasStations?.count} ta Zapravkalardan {indexOfFirstOrder + 1} dan{" "}
-          {Math.min(indexOfLastOrder, gasStations?.count as number)} gacha
+        Итого: {models?.count || 0} с {indexOfFirstOrder + 1} до{" "}
+        {Math.min(indexOfLastOrder, models?.count as number) || 0}
         </div>
         <div className="flex space-x-2 items-center">
           <Button

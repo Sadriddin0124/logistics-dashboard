@@ -1,3 +1,6 @@
+import { IFinance } from "./finance.types";
+import { PaginationResponse } from "./gas_station.types";
+
 export interface IEmployee {
     id?: string
   full_name: string;
@@ -5,7 +8,7 @@ export interface IEmployee {
   phone: string;
   flight_type: string;
   passport: string;
-  balance: string;
+  balance_uzs: string;
 }
 
 
@@ -15,3 +18,5 @@ export interface EmployeesListResponse {
   previous: string | null;
   results: IEmployee[];
 }
+
+export type PaginatedExpenseLog = PaginationResponse<IFinance>

@@ -18,12 +18,15 @@ export interface IGasStation {
   price_uzs: number;
   payed_price_usd: number;
   payed_price_uzs: number;
-  amount?: number
+  amount?: number;
+  created_at?: string;
+  updated_at?: string;
+  station?: IGasStation
 }
 
 export interface IGasStationTotal {
   id?: string;
-  station_name: string;
+  name: string;
   remaining_gas: number;
   updated_at?: string;
 }
@@ -38,9 +41,10 @@ export interface GasListResponse {
 export interface AnotherStation {
   id?: string;
   car: string;
+  name: string;
   purchased_volume: number;
-  payed_price_uzs: number;
-  payed_price_usd: number;
+  payed_price_uzs: number | string;
+  payed_price_usd: number | string;
 }
 
 export interface AnotherStationList {
@@ -49,6 +53,7 @@ export interface AnotherStationList {
   purchased_volume: number;
   payed_price_uzs: number;
   payed_price_usd: number;
+  created_at?: string
 }
 
 export interface AnotherStationListResponse {
@@ -77,9 +82,20 @@ export interface PaginationResponse<T> {
   results: T[];
 }
 
-export interface IUser {
-  id: string;
-  name: string;
+export interface IStationSales {
+  id?: string;
+  station: string;
+  car: string;
+  amount: number;
+}
+
+export interface IStationSalesFetch {
+  id?: string;
+  station: IGasStation;
+  car: ICars;
+  amount: number;
+  created_at?: string
 }
 
 export type PurchasedGasListResponse = PaginationResponse<IGasStation>;
+export type SoldGasListResponse = PaginationResponse<IStationSalesFetch>;

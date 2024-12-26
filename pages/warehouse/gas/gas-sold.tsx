@@ -5,20 +5,22 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { createGasStation, createStation, fetchGasStationName } from "@/lib/actions/gas.action";
+import {
+  createStationSales,
+  fetchAllGasStation,
+} from "@/lib/actions/gas.action";
 import { queryClient } from "@/components/ui-items/ReactQueryProvider";
 import { toast } from "react-toastify";
-import { removeCommas } from "@/lib/utils";
-import { StationCars } from "@/lib/types/gas_station.types";
 import { useRouter } from "next/router";
+import { ICars } from "@/lib/types/cars.types";
+import { fetchCarNoPage, updateCarDistance } from "@/lib/actions/cars.action";
+import { IGasStation } from "@/lib/types/gas_station.types";
 
 interface FormValues {
   station: string;
-  price_usd: string;
-  price_uzs: string;
-  purchased_volume: number;
-  payed_price_usd: string;
-  payed_price_uzs: string;
+  amount: number;
+  next_gas_distance: number;
+  car: string;
 }
 
 interface Option {
@@ -26,80 +28,95 @@ interface Option {
   label: string;
 }
 
-
 export default function GasSold() {
   const methods = useForm<FormValues>();
-  const { register, handleSubmit, watch, setValue } = methods;
-  const payed_price_uzs = watch("payed_price_uzs");
-  const price_uzs = watch("price_uzs");
-  const [stationOptions, setStationOptions] = useState<Option[]>([]);
+  const {
+    register,
+    handleSubmit,
+    // formState: { errors },
+  } = methods;
+  const [carOptions, setCarOptions] = useState<Option[]>([]);
   const [selectedStation, setSelectedStation] = useState<Option | null>(null);
-  const [stationValue, setStation] = useState<string>("");
-  const { push } = useRouter()
-  const { data: stationNames } = useQuery<StationCars[]>({
-    queryKey: ["stationNames"],
-    queryFn: fetchGasStationName,
+  const [selectedCar, setSelectedCar] = useState<Option | null>(null);
+  const [stationOptions, setStationOptions] = useState<Option[]>([]);
+  const [remaining, setRemaining] = useState(0);
+  const [distance, setDistance] = useState(0);
+  const { push } = useRouter();
+  const { data: cars } = useQuery<ICars[]>({
+    queryKey: ["cars"],
+    queryFn: fetchCarNoPage,
+  });
+  const { data: stations } = useQuery<IGasStation[]>({
+    queryKey: ["all_stations"],
+    queryFn: fetchAllGasStation,
   });
   useEffect(() => {
-    if (stationNames) {
-      const stationOption = stationNames?.map(station=> {
+    if (cars && stations) {
+      const carOption = cars
+        ?.filter((car) => car?.fuel_type === "GAS")
+        ?.map((car) => {
+          return {
+            label: `${car?.name} ${car?.number}`,
+            value: car?.id,
+          };
+        });
+      const distance = cars?.find(
+        (item) => item?.id === selectedCar?.value
+      )?.distance_travelled;
+      setDistance(distance as number);
+      const stationOption = stations?.map((station) => {
         return {
           label: station?.name,
-          value: station?.id
-        }
-      })
-      setStationOptions(stationOption as Option[])
-      console.log(stationOption);
+          value: station?.id,
+        };
+      });
+      const remaining_gas = stations?.find(
+        (item) => item?.id === selectedStation?.value
+      )?.remaining_gas;
+      setRemaining(remaining_gas as number);
+      setCarOptions(carOption as Option[]);
+      setStationOptions(stationOption as Option[]);
     }
-    
-    const result = Number(removeCommas(payed_price_uzs)) / Number(removeCommas(price_uzs));
-    setValue("purchased_volume", Number(result.toFixed(2)) || 0);
-  }, [price_uzs, payed_price_uzs, setValue, stationNames]);
+  }, [cars, stations, selectedStation, selectedCar]);
 
   const { mutate: createMutation } = useMutation({
-    mutationFn: createGasStation,
+    mutationFn: createStationSales,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["gas_stations"] });
-      push(`/warehouse/gas/gas-info?id=${selectedStation?.value}`)
-      setSelectedStation(null)
+      push(`/warehouse/gas/`);
+      setSelectedStation(null);
       toast.success("Muvaffaqiyatli qo'shildi!");
     },
     onError: () => {
       toast.error("Xatolik yuz berdi!");
     },
   });
-
-
-
-  const { mutate: createGasMutation } = useMutation({
-    mutationFn: createStation,
-    onSuccess: (data) => {
+  const { mutate: updateMutation } = useMutation({
+    mutationFn: updateCarDistance,
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["gas_stations"] });
-      setSelectedStation({label: data?.name, value: data?.id})
+      setSelectedStation(null);
+    },
+    onError: () => {
+      toast.error("Xatolik yuz berdi!");
     },
   });
 
   const onSubmit = (data: FormValues) => {
-    console.log(data);
-    
+
     createMutation({
       ...data,
-      name: selectedStation?.value as string,
-      price_usd: Number(removeCommas(data?.price_usd.toString())),
-            price_uzs: Number(removeCommas(data?.price_uzs.toString())),
-            payed_price_usd: Number(removeCommas(data?.payed_price_usd.toString())),
-            payed_price_uzs: Number(removeCommas(data?.payed_price_uzs.toString())),
+      car: selectedCar?.value as string,
+      station: selectedStation?.value as string,
     });
+    updateMutation({id: selectedCar?.value as string, distance_travelled: data?.next_gas_distance})
   };
 
   const handleSelectStation = (newValue: SingleValue<Option>) => {
     setSelectedStation(newValue);
   };
-
-  const handleAddStation = () => {
-    if (stationValue) {
-      createGasMutation(stationValue);
-    }
+  const handleSelectCar = (newValue: SingleValue<Option>) => {
+    setSelectedCar(newValue);
   };
 
   return (
@@ -112,12 +129,10 @@ export default function GasSold() {
                 <div className="space-y-2">
                   <label className="mb-2">Выберите автомобиль</label>
                   <Select
-                    options={stationOptions}
-                    value={selectedStation}
-                    onChange={handleSelectStation}
-                    onBlur={handleAddStation} 
-                    onInputChange={(value)=> setStation(value)}
-                    placeholder="Isuzu 01A111AA"
+                    options={carOptions}
+                    value={selectedCar}
+                    onChange={handleSelectCar}
+                    placeholder="Выберите автомобиль"
                     noOptionsMessage={() => "Type to add new option..."}
                     isClearable
                   />
@@ -126,7 +141,22 @@ export default function GasSold() {
                   <label className="text-sm">
                     Количество купленного газа (м3)
                   </label>
-                  <Input readOnly {...register("purchased_volume")} placeholder="0" />
+                  <Input
+                  type="number"
+                    {...register("amount", {
+                      valueAsNumber: true,
+                      required: "This field is required",
+                      validate: (value) =>
+                        value <= remaining ||
+                        `Value must not exceed ${remaining}`,
+                    })}
+                    placeholder="0"
+                  />
+                  {methods.formState.errors.amount && (
+                    <p className="text-red-500 text-sm">
+                      {methods.formState.errors.amount.message as string}
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <label className="mb-2">Выберите заправку</label>
@@ -134,12 +164,30 @@ export default function GasSold() {
                     options={stationOptions}
                     value={selectedStation}
                     onChange={handleSelectStation}
-                    onBlur={handleAddStation} 
-                    onInputChange={(value)=> setStation(value)}
-                    placeholder="Выберите..."
+                    placeholder="Выберите заправку..."
                     noOptionsMessage={() => "Type to add new option..."}
                     isClearable
                   />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm">
+                     car distance
+                  </label>
+                  <Input
+                    {...register("next_gas_distance", {
+                      valueAsNumber: true,
+                      required: "This field is required",
+                      validate: (value) =>
+                        value >= distance ||
+                        `Value must bigger than ${distance}`,
+                    })}
+                    placeholder="0"
+                  />
+                  {methods.formState.errors.next_gas_distance && (
+                    <p className="text-red-500 text-sm">
+                      {methods.formState.errors.next_gas_distance.message as string}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -149,6 +197,12 @@ export default function GasSold() {
                 </Button>
               </div>
             </form>
+            <div className="grid grid-cols-2 gap-4 ">
+            <div className="space-y-2">
+              <label className="text-sm">Газ в базе (м3)</label>
+              <Input value={remaining || 0} placeholder="0" readOnly className="bg-muted"/>
+            </div>
+            </div>
           </FormProvider>
         </CardContent>
       </Card>

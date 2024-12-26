@@ -77,8 +77,8 @@ const buttons = getPaginationButtons();
           {OilList?.results?.map((oil) => (
             <TableRow key={oil?.id} className="border-b border-gray-200">
               <TableCell>{oil?.oil_name}</TableCell>
-              <TableCell>{oil?.oil_volume}</TableCell>
-              <TableCell>{oil?.updated_at}</TableCell>
+              <TableCell>{oil?.oil_volume?.toFixed(2)}</TableCell>
+              <TableCell>{oil?.updated_at?.slice(0,10)}</TableCell>
               <TableCell>
                 <Link href={`/warehouse/oil/oil-info?id=${oil?.id}`}>
                   <Button
@@ -96,7 +96,7 @@ const buttons = getPaginationButtons();
       </Table>
       <div className="mt-4 flex justify-between items-center">
         <div>
-          {OilList?.count} ta Mashinalardan {indexOfFirstOrder + 1} dan {Math.min(indexOfLastOrder, OilList?.count as number)} gacha
+        Итого: {OilList?.count} с {indexOfFirstOrder + 1} до {Math.min(indexOfLastOrder, OilList?.count as number) || 0}
         </div>
         <div className="flex space-x-2 items-center">
           <Button

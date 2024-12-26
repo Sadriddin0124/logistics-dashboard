@@ -19,12 +19,28 @@ const Breadcrumb = () => {
       value: "O Топливо (Газ)",
     },
     {
+      key: "gas-other",
+      value: "Заправка бензином на другой заправке",
+    },
+    {
+      key: "gas-sold",
+      value: "O Топливо (Газ)",
+    },
+    {
       key: "oil",
       value: "Масло для автомобилей",
     },
     {
       key: "oil-info",
       value: "O Масло для автомобилей",
+    },
+    {
+      key: "oil-exchange",
+      value: "",
+    },
+    {
+      key: "oil-recycled",
+      value: "",
     },
   ];
 

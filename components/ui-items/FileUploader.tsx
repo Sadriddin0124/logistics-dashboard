@@ -3,7 +3,6 @@
 import { Dispatch, SetStateAction, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Upload, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { uploadImage } from "@/lib/actions";
 import { ImageType } from "@/lib/types/file.types";
@@ -90,14 +89,13 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
         className="hidden"
         disabled={uploading}
       />
-      <Button
+      <div
         onClick={handleButtonClick}
-        disabled={uploading}
-        className="w-full bg-blue-500 hover:bg-blue-400"
+        className={`w-full bg-blue-500 flex p-2 cursor-pointer items-center justify-center text-white rounded-md hover:bg-blue-400 ${uploading ? "opacity-40" : ""}`}
       >
         <Upload className="mr-2 h-4 w-4" />
         {uploading ? "Uploading..." : "Choose File & Upload"}
-      </Button>
+      </div>
       {(uploading || uploadProgress > 0) && (
         <Progress value={uploadProgress} className="w-full" />
       )}

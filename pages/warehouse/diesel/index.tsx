@@ -1,32 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
-import { useRouter } from "next/router";
 import { FormProvider, useForm } from "react-hook-form";
 import Select, { SingleValue } from "react-select";
 import { CurrencyInputs } from "@/components/ui-items/currency-inputs";
-import { IDieselType } from "@/lib/types/diesel.types";
-import { useMutation } from "@tanstack/react-query";
-import { createDiesel } from "@/lib/actions/diesel.action";
+import {
+  IDieselPaginated,
+  IDieselType,
+  IDieselTypeForPagination,
+} from "@/lib/types/diesel.types";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { createDiesel, fetchDiesel } from "@/lib/actions/diesel.action";
 import { queryClient } from "@/components/ui-items/ReactQueryProvider";
 import { toast } from "react-toastify";
-
-interface GasEntry {
-  machine: string;
-  quantity: string;
-  price: string;
-}
+import { fetchCarNoPage } from "@/lib/actions/cars.action";
+import { ICars } from "@/lib/types/cars.types";
+import { removeCommas } from "@/lib/utils";
+import PurchasedDiesel from "@/components/warehouse/diesel/purchased";
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import TableSkeleton from "@/components/ui-items/SkeletonTable";
 
 
 export interface Option {
@@ -34,45 +29,91 @@ export interface Option {
   value: string;
 }
 
-const carList: Option[] = [
-  { value: "", label: "+ Добавить" },
-  { value: "2", label: "Honda Civic" },
-  { value: "3", label: "Tesla Model 3" },
-  { value: "4", label: "Ford Mustang" },
-  { value: "5", label: "Toyota Camry" },
-];
-
 export default function GasManagementForm() {
   const methods = useForm<IDieselType>();
   const { register, handleSubmit, setValue, reset } = methods;
-  const [carOptions] = useState<Option[]>(carList);
+  const [carOptions, setCarOptions] = useState<Option[]>([]);
   const [selectedCar, setSelectedCar] = useState<Option | null>(null);
-  const [entries] = useState<GasEntry[]>([
-    { machine: "Isuzu 01A113AA", quantity: "10 (литр)", price: "2500 сум" },
-    { machine: "Isuzu 01A113AA", quantity: "10 (литр)", price: "2500 сум" },
-    { machine: "Isuzu 01A113AA", quantity: "10 (литр)", price: "2500 сум" },
-    { machine: "Isuzu 01A113AA", quantity: "10 (литр)", price: "2500 сум" },
-    { machine: "Isuzu 01A113AA", quantity: "10 (литр)", price: "2500 сум" },
-    { machine: "Isuzu 01A113AA", quantity: "10 (литр)", price: "2500 сум" },
-  ]);
-  const { id } = useRouter().query;
+  const { data: cars } = useQuery<ICars[]>({
+    queryKey: ["cars"],
+    queryFn: fetchCarNoPage,
+  });
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const { data: diesel, isLoading } = useQuery<IDieselPaginated>({
+    queryKey: ["diesel", currentPage],
+    queryFn: () => fetchDiesel(currentPage),
+  });
+  useEffect(() => {
+    queryClient.prefetchQuery({
+      queryKey: ["diesel", currentPage + 1],
+      queryFn: () => fetchDiesel(currentPage + 1),
+    });
+  }, [currentPage]);
+
+  const itemsPerPage = 10;
+  const indexOfLastOrder = currentPage * itemsPerPage;
+  const indexOfFirstOrder = (currentPage - 1) * itemsPerPage;
+
+  const totalPages = Math.ceil((diesel?.count as number) / itemsPerPage);
+
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  const getPaginationButtons = () => {
+    const buttons: (number | string)[] = [];
+    if (totalPages <= 1) return buttons;
+    buttons.push(1);
+    if (currentPage > 3) {
+      buttons.push("...");
+    }
+    for (
+      let i = Math.max(2, currentPage - 1);
+      i <= Math.min(totalPages - 1, currentPage + 1);
+      i++
+    ) {
+      buttons.push(i);
+    }
+    if (currentPage < totalPages - 2) {
+      buttons.push("...");
+    }
+    buttons.push(totalPages);
+    return buttons;
+  };
+  const buttons = getPaginationButtons();
+
+  useEffect(() => {
+    const carOption = cars?.filter(car=> car?.fuel_type === "DIESEL")?.map((car) => {
+      return {
+        label: `${car?.name} ${car?.number}`,
+        value: car?.id,
+      };
+    });
+    setCarOptions(carOption as Option[]);
+  }, [cars]);
   const { mutate: createMutation } = useMutation({
     mutationFn: createDiesel,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["diesel"] });
-      reset()
+      reset();
       toast.success(" muvaffaqiyatli qo'shildi!");
     },
     onError: () => {
       toast.error("ni qo'shishda xatolik!");
-    }
+    },
   });
   const onSubmit = (data: IDieselType) => {
-    createMutation(data);
+    // price_usd: Number(removeCommas(data?.price_usd?.toString())),
+    createMutation({
+      ...data,
+      price_uzs: Number(removeCommas(data?.price_uzs?.toString())),
+    });
   };
   const handleSelectCar = (newValue: SingleValue<Option>) => {
     setSelectedCar(newValue);
-    setValue("car", newValue?.value as string)
+    setValue("car", newValue?.value as string);
   };
   return (
     <div className="w-full container mx-auto mt-8 space-y-8">
@@ -86,32 +127,48 @@ export default function GasManagementForm() {
             >
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="mb-2">Выберите </label>
+                  <label className="mb-2">Выберите</label>
                   <Select
+                    {...register("car", {
+                      required: "Это поле обязательно для заполнения",
+                    })}
                     options={carOptions}
                     value={selectedCar}
                     onChange={handleSelectCar}
                     placeholder={"Isuzu 01A111AA"}
-                    noOptionsMessage={() => "Type to add new option..."}
+                    noOptionsMessage={() =>
+                      "Введите текст, чтобы добавить новую опцию..."
+                    }
                   />
+                  {methods.formState.errors.car && (
+                    <p className="text-red-500 text-sm">
+                      {methods.formState.errors.car.message}
+                    </p>
+                  )}
                 </div>
-                {selectedCar?.value === "" && (
-                  <div className="space-y-2">
-                    <label className="text-sm">Добавить марку автомобиля</label>
-                    <Input {...register("car")} disabled={id ? true : false} placeholder="" />
-                  </div>
-                )}
               </div>
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-sm">Цена на cаларка (литр)</label>
-                  <CurrencyInputs name="price"/>
+                  <CurrencyInputs name="price" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm">
                     Количество купленного cаларка (литр)
                   </label>
-                  <Input {...register("oil_volume", {required: true, valueAsNumber: true})} placeholder="0" type="number"/>
+                  <Input
+                    {...register("volume", {
+                      required: true,
+                      valueAsNumber: true,
+                    })}
+                    placeholder="0"
+                    type="number"
+                  />
+                  {methods.formState.errors.volume && (
+                    <p className="text-red-500 text-sm">
+                      {methods.formState.errors.volume.message}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -128,73 +185,78 @@ export default function GasManagementForm() {
               <label className="text-sm">
                 Оставшееся количество cаларка (литр)
               </label>
-              <Input value="2300" readOnly className="bg-muted" />
+              <Input
+                value={diesel?.results[0]?.remaining_volume?.volume}
+                readOnly
+                className="bg-muted"
+              />
             </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Middle Table Section */}
-      <Card>
-        <CardContent className="p-6">
-          <Table>
-            <TableHeader className="font-bold">
-              <TableRow className="border-b border-b-gray-300">
-                <TableHead className="font-bold">Машина</TableHead>
-                <TableHead className="font-bold">Количество</TableHead>
-                <TableHead className="font-bold">Цена</TableHead>
-                <TableHead className="font-bold"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {entries.map((entry, index) => (
-                <TableRow key={index} className="border-b border-b-gray-300">
-                  <TableCell>{entry.machine}</TableCell>
-                  <TableCell>{entry.quantity}</TableCell>
-                  <TableCell>{entry.price}</TableCell>
-                  <TableCell>
-                    <Button
-                      variant="secondary"
-                      className="bg-red-100 hover:bg-red-200 text-red-600"
-                    >
-                      Налили
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+     
 
       {/* Bottom Summary Section */}
       <Card>
         <CardContent className="p-6">
-          <Table>
-            <TableHeader className="font-bold">
-              <TableRow className="border-b border-b-gray-300">
-                <TableHead className="font-bold">Оплаченная сумма</TableHead>
-                <TableHead className="font-bold">Количество</TableHead>
-                <TableHead className="font-bold">Цена</TableHead>
-                <TableHead className="font-bold"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow>
-                <TableCell className="font-medium">10,000,000 сум</TableCell>
-                <TableCell>10 (литр)</TableCell>
-                <TableCell>2500 сум</TableCell>
-                <TableCell>
-                  <Button
-                    variant="secondary"
-                    className="bg-green-100 hover:bg-green-200 text-green-600"
-                  >
-                    Куплено
-                  </Button>
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
+          <div className="bg-white rounded-2xl">
+            {isLoading ? (
+              <TableSkeleton />
+            ) : (
+              <PurchasedDiesel
+                data={(diesel?.results as IDieselTypeForPagination[]) || []}
+              />
+            )}
+            <div className="mt-4 flex justify-between items-center">
+              <div>
+              Итого: {diesel?.count} с {indexOfFirstOrder + 1} до {Math.min(indexOfLastOrder, diesel?.count as number) || 0}
+
+              </div>
+              <div className="flex space-x-2 items-center">
+                <Button
+                  variant="outline"
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="w-10 h-10 p-0"
+                >
+                  <ChevronLeftIcon className="w-4 h-4" />
+                  <span className="sr-only">Previous page</span>
+                </Button>
+                {buttons.map((button, index) =>
+                  button === "..." ? (
+                    <span key={index} style={{ margin: "0 5px" }}>
+                      ...
+                    </span>
+                  ) : (
+                    <Button
+                      key={index}
+                      onClick={() => handlePageChange(button as number)}
+                      disabled={button === currentPage}
+                      className={
+                        button === currentPage
+                          ? "bg-[#4880FF] text-white"
+                          : "border"
+                      }
+                      variant={button === currentPage ? "default" : "ghost"}
+                    >
+                      {button || ""}
+                    </Button>
+                  )
+                )}
+                <Button
+                  variant="outline"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="w-10 h-10 p-0"
+                >
+                  <ChevronRightIcon className="w-4 h-4" />
+                  <span className="sr-only">Next page</span>
+                </Button>
+              </div>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>

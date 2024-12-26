@@ -10,12 +10,19 @@ import {
   BarChart2,
   CarFront,
   ClipboardList,
+  DollarSign,
   Menu,
   Package,
   Settings,
   Users,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+import { ExchangeRate } from "@/lib/types/general.types";
+import { getExchangeRate } from "@/lib/actions/general";
+import { CurrencyStatus } from "./currency-status";
+import { Button } from "../ui/button";
+import { useRouter } from "next/router";
 
 type MenuItem = {
   id?: string;
@@ -31,7 +38,8 @@ const menuItems: MenuItem[] = [
     id: "1",
     title: "Отчеты",
     icon: <BarChart2 />,
-    key: "report",
+    key: "",
+  href: "/",
   },
   {
     id: "2",
@@ -54,6 +62,10 @@ const menuItems: MenuItem[] = [
       {
         title: "Залить топливо (соляркa)",
         href: "/warehouse/diesel/diesel-fill",
+      },
+      {
+        title: "Автозапчасти",
+        href: "/auto-parts",
       },
     ],
   },
@@ -79,6 +91,26 @@ const menuItems: MenuItem[] = [
     href: "/cars",
   },
   {
+    id: "7",
+    title: "Приход и расход",
+    icon: <DollarSign />,
+    key: "expenses",
+    children: [
+      {
+        title: "Добавить приход",
+        href: "/expenses/income",
+      },
+      {
+        title: "Добавить расход",
+        href: "/expenses/outcome?id=PAY_SALARY",
+      },
+      {
+        title: "История прихода и расхода",
+        href: "/expenses",
+      },
+    ],
+  },
+  {
     id: "6",
     title: "Настройки",
     icon: <Settings />,
@@ -100,6 +132,7 @@ export const AppSidebar: React.FC<SideBarProps> = ({
 }) => {
   const [activeSubItem, setActiveSubItem] = useState<MenuItem[]>([]);
   const pathname = usePathname();
+  const { push } = useRouter()
   const handleLink = (item: MenuItem) => {
     setActiveSubItem(item.children as MenuItem[]);
     if (item?.children) {
@@ -108,6 +141,16 @@ export const AppSidebar: React.FC<SideBarProps> = ({
       setSubItemStatus(false);
     }
   };
+  const { data: exchange } = useQuery<ExchangeRate[]>({
+    queryKey: ["exchange"],
+    queryFn: getExchangeRate,
+  });
+  const EXCHANGE_RATE = exchange?.find((item) => item?.Ccy === "USD");
+  const logOut = () => {
+    localStorage.removeItem("refreshToken")
+    localStorage.removeItem("accessToken")
+    push("/login")
+  }
   return (
     <aside className="fixed top-0 left-0 h-full z-50">
       <Sidebar
@@ -121,7 +164,7 @@ export const AppSidebar: React.FC<SideBarProps> = ({
             subItemStatus ? "grid-cols-2" : ""
           }`}
         >
-          <div className="bg-white shadow-lg w-full h-full flex flex-col gap-1">
+          <div className="bg-white shadow-lg w-full h-full justify-start flex flex-col gap-1">
             <div className="flex w-full mb-3 justify-start py-3 px-6 items-center gap-[90px]">
               <div className="text-[20px] font-[800] flex items-center">
                 <span className="text-[#4880FF]">Logi</span>
@@ -131,8 +174,8 @@ export const AppSidebar: React.FC<SideBarProps> = ({
                 className="relative py-2  w-12 h-8 rounded-md px-3 hover:bg-slate-100 ease-linear duration-200"
                 onClick={() => setSideBar((prev) => !prev)}
               >
-            <SidebarTrigger className="absolute top-0 w-full h-full left-0 opacity-0" />
-            <Menu size="icon"/>
+                <SidebarTrigger className="absolute top-0 w-full h-full left-0 opacity-0" />
+                <Menu size="icon" />
               </div>
             </div>
             {menuItems?.map((item, index) => {
@@ -159,6 +202,14 @@ export const AppSidebar: React.FC<SideBarProps> = ({
                 </div>
               );
             })}
+            <div className="h-full flex flex-col items-end justify-end gap-2 p-6">
+              <Button onClick={logOut} className="w-full mt-10">Выйти</Button>
+            <CurrencyStatus
+              currency={EXCHANGE_RATE?.Ccy as string}
+              value={EXCHANGE_RATE?.Rate as string}
+              change={EXCHANGE_RATE?.Diff as string}
+            />
+            </div>
           </div>
           {subItemStatus && (
             <div className="bg-white rounded-xl box_shadow p-8 overflow-hidden w-full h-[80%] mt-[30%] flex flex-col gap-1">

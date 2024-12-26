@@ -8,27 +8,32 @@ import { useQuery } from "@tanstack/react-query";
 import { ExchangeRate } from "@/lib/types/general.types";
 import { getExchangeRate } from "@/lib/actions/general";
 
-// Function to format numbers with commas
-export function splitToHundreds(num: number | undefined): string {
-  if (!num) return "";
-  const numStr = num.toString();
-  return numStr.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
-}
+// Utility function to format numbers with commas
+export const formatNumberWithCommas = (value: number | string): string => {
+  if (!value || isNaN(Number(value))) return "";
+  return Number(value).toLocaleString("en-US");
+};
+
+// Utility function to parse and validate numbers
+const parseAndValidateNumber = (value: string | number): number | null => {
+  const sanitizedValue =
+    typeof value === "string" ? parseFloat(value.replace(/,/g, "")) : value;
+  return !isNaN(sanitizedValue) && sanitizedValue >= 0 ? sanitizedValue : null;
+};
 
 interface CurrencyInputsProps {
   name: string;
+  required?: boolean;
+  disabled?: boolean;
 }
-
-export const CurrencyInputs: React.FC<CurrencyInputsProps> = ({ name }) => {
+export const CurrencyInputs: React.FC<CurrencyInputsProps> = ({ name, required, disabled }) => {
   const { data: exchange } = useQuery<ExchangeRate[]>({
     queryKey: ["exchange"],
     queryFn: getExchangeRate,
   });
 
-  // Ensure EXCHANGE_RATE is a number, use a fallback value if undefined
   const EXCHANGE_RATE =
-    exchange?.find((item) => item?.Ccy === "USD")?.Rate ?? 0; // fallback to 0 if undefined
-  const exchangeRateNumber = Number(EXCHANGE_RATE);  // Ensure it's a number
+    exchange?.find((item) => item?.Ccy === "USD")?.Rate ?? null;
 
   const {
     register,
@@ -40,83 +45,50 @@ export const CurrencyInputs: React.FC<CurrencyInputsProps> = ({ name }) => {
   const isUpdating = useRef(false);
 
   const uzsName = `${name}_uzs`;
-  const usdName = `${name}_usd`;
+  const uzsValue = watch(uzsName); // Watch only the specific field
 
   useEffect(() => {
-    const subscription = watch((value, { name: changedField }) => {
-      if (isUpdating.current) return;
+    if (!EXCHANGE_RATE) return;
 
+    const uzsAmount = parseAndValidateNumber(uzsValue);
+    if (uzsAmount !== null && !isUpdating.current) {
       isUpdating.current = true;
 
-      if (changedField === uzsName) {
-        const uzsAmount = parseFloat(value[uzsName]?.replace(/,/g, "") || "0");
-        const usdValue = (uzsAmount / exchangeRateNumber).toFixed(2)
-        console.log(usdValue);
-        
-        setValue(
-          usdName,
-          splitToHundreds(Number(usdValue)),
-          { shouldValidate: true }
-        );
-      } else if (changedField === usdName) {
-        const usdAmount = parseFloat(value[usdName]?.replace(/,/g, "") || "0");
-        const uzsValue = (usdAmount * exchangeRateNumber).toFixed(2)
-        setValue(
-          uzsName,
-          splitToHundreds(Number(uzsValue)),
-          { shouldValidate: true }
-        );
-      }
+      setValue(uzsName, formatNumberWithCommas(uzsAmount), {
+        shouldValidate: true,
+      });
 
       isUpdating.current = false;
-    });
-    return () => subscription.unsubscribe();
-  }, [watch, setValue, uzsName, usdName, exchangeRateNumber]);
+    }
+  }, [uzsValue, EXCHANGE_RATE, uzsName, setValue]);
 
   return (
-    <div className="grid grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 gap-4">
       <div className="flex items-center flex-col justify-center gap-2 relative">
-        <Label htmlFor={uzsName} className="absolute right-3 top-[10px]">Сум</Label>
+        <Label htmlFor={uzsName} className="absolute right-3 top-[10px]">
+          Сум
+        </Label>
         <Input
+        disabled={disabled}
           id={uzsName}
           {...register(uzsName, {
             validate: (value) =>
-              parseFloat(value.replace(/,/g, "")) >= 0 || "Сумма должна быть положительной",
+              required || parseAndValidateNumber(value) !== null || "Сумма должна быть положительной",
           })}
-          type="text" // Changed to text to allow formatted numbers
+          type="text"
           onInput={(e) => {
             const rawValue = e.currentTarget.value.replace(/,/g, "");
-            const parsedValue = parseFloat(rawValue); // Convert to number
-            e.currentTarget.value = splitToHundreds(parsedValue);
+            const parsedValue = parseFloat(rawValue);
+            e.currentTarget.value = formatNumberWithCommas(parsedValue);
           }}
         />
         {errors[uzsName] && (
-          <p className="text-red-500 text-sm absolute bottom-[-25px]">
+          <p className="text-red-500 text-sm self-start absolute bottom-[-25px]">
             {errors[uzsName]?.message as string}
-          </p>
-        )}
-      </div>
-      <div className="flex items-center flex-col justify-center gap-2 relative">
-        <Label htmlFor={usdName} className="absolute right-3 top-[10px]">Доллар</Label>
-        <Input
-          id={usdName}
-          {...register(usdName, {
-            validate: (value) =>
-              parseFloat(value.replace(/,/g, "")) >= 0 || "Сумма должна быть положительной",
-          })}
-          type="text" // Changed to text to allow formatted numbers
-          onInput={(e) => {
-            const rawValue = e.currentTarget.value.replace(/,/g, "");
-            const parsedValue = parseFloat(rawValue); // Convert to number
-            e.currentTarget.value = splitToHundreds(parsedValue);
-          }}
-        />
-        {errors[usdName] && (
-          <p className="text-red-500 text-sm absolute bottom-[-25px]">
-            {errors[usdName]?.message as string}
           </p>
         )}
       </div>
     </div>
   );
 };
+

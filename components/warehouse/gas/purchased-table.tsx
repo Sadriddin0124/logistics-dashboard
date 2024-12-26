@@ -16,13 +16,13 @@ export default function PurchasedGasTable() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const id = useRouter()?.query.id
   const { data: purchased } = useQuery<PurchasedGasListResponse>({
-    queryKey: ["sales", id],
+    queryKey: ["purchased", id],
     queryFn: () => fetchStationPurchased(id as string, currentPage),
     enabled: !!id,
   });
   useEffect(() => {
     queryClient.prefetchQuery({
-      queryKey: ["sales", id, currentPage + 1,],
+      queryKey: ["purchased", id, currentPage + 1,],
       queryFn: ()=> fetchStationPurchased(id as string, currentPage + 1),
     });
 }, [currentPage, id]);
@@ -66,6 +66,7 @@ const buttons = getPaginationButtons();
             <TableHead className="font-bold">T/R</TableHead>
             <TableHead className="font-bold">Оплаченная сумма</TableHead>
             <TableHead className="font-bold">Количество</TableHead>
+            <TableHead className="font-bold">Date</TableHead>
             <TableHead className="font-bold">Цена</TableHead>
             <TableHead className="font-bold w-[50px]"></TableHead>
           </TableRow>
@@ -74,16 +75,22 @@ const buttons = getPaginationButtons();
           {purchased?.results?.map((purchased, index) => (
             <TableRow key={purchased.id}  className='border-b border-gray-200'>
               <TableCell>{index + 1}</TableCell>
-              <TableCell>{purchased.payed_price_usd} $ / {purchased.payed_price_uzs} сум</TableCell>
+              <TableCell>{purchased.payed_price_uzs} сум</TableCell>
               <TableCell>{purchased?.amount?.toFixed(2)}</TableCell>
-              <TableCell>{purchased.price_usd} $ / {purchased.price_uzs} сум</TableCell>
+              <TableCell>{purchased?.created_at?.slice(0,10)}</TableCell>
+              <TableCell>{purchased.price_uzs} сум</TableCell>
+              <TableCell>
+                <Button variant="secondary" size="sm" className='bg-green-100 text-green-400'>
+                Куплено
+                </Button>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
       <div className="mt-4 flex justify-between items-center">
         <div>
-          {purchased?.count} ta Zapravkalardan {indexOfFirstOrder + 1} dan {Math.min(indexOfLastOrder, purchased?.count as number)} gacha
+        Итого: {purchased?.count} с {indexOfFirstOrder + 1} до {Math.min(indexOfLastOrder, purchased?.count as number) || 0}
         </div>
         <div className="flex space-x-2 items-center">
           <Button

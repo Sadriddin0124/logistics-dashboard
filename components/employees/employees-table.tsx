@@ -20,45 +20,49 @@ import { EmployeesListResponse } from "@/lib/types/employee.types";
 export default function EmployeesTable() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const { data: employeeList } = useQuery<EmployeesListResponse>({
-    queryKey: ["employees"],
-    queryFn: ()=> fetchEmployees(currentPage),
+    queryKey: ["employees", currentPage],
+    queryFn: () => fetchEmployees(currentPage),
   });
   useEffect(() => {
     queryClient.prefetchQuery({
-      queryKey: ["employees", currentPage + 1,],
-      queryFn: ()=> fetchEmployees(currentPage + 1),
+      queryKey: ["employees", currentPage + 1],
+      queryFn: () => fetchEmployees(currentPage + 1),
     });
-}, [currentPage]);
+  }, [currentPage]);
 
-const itemsPerPage = 10;
-const indexOfLastOrder = currentPage * itemsPerPage;
-const indexOfFirstOrder = (currentPage - 1) * itemsPerPage;
+  const itemsPerPage = 10;
+  const indexOfLastOrder = currentPage * itemsPerPage;
+  const indexOfFirstOrder = (currentPage - 1) * itemsPerPage;
 
-const totalPages = Math.ceil((employeeList?.count as number) / itemsPerPage);
+  const totalPages = Math.ceil((employeeList?.count as number) / itemsPerPage);
 
-const handlePageChange = (page: number) => {
-  if (page >= 1 && page <= totalPages) {
-    setCurrentPage(page);
-  }
-};
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
 
-const getPaginationButtons = () => {
-  const buttons: (number | string)[] = [];
-  if (totalPages <= 1) return buttons;
-  buttons.push(1);
-  if (currentPage > 3) {
-    buttons.push("...");
-  }
-  for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
-    buttons.push(i);
-  }
-  if (currentPage < totalPages - 2) {
-    buttons.push("...");
-  }
-  buttons.push(totalPages);
-  return buttons;
-};
-const buttons = getPaginationButtons();
+  const getPaginationButtons = () => {
+    const buttons: (number | string)[] = [];
+    if (totalPages <= 1) return buttons;
+    buttons.push(1);
+    if (currentPage > 3) {
+      buttons.push("...");
+    }
+    for (
+      let i = Math.max(2, currentPage - 1);
+      i <= Math.min(totalPages - 1, currentPage + 1);
+      i++
+    ) {
+      buttons.push(i);
+    }
+    if (currentPage < totalPages - 2) {
+      buttons.push("...");
+    }
+    buttons.push(totalPages);
+    return buttons;
+  };
+  const buttons = getPaginationButtons();
 
   return (
     <div className="w-full container mx-auto bg-white rounded-2xl min-h-screen p-8">
@@ -79,11 +83,7 @@ const buttons = getPaginationButtons();
               <TableCell>{employee?.phone}</TableCell>
               <TableCell>
                 <Link href={`/employees/employee-info?id=${employee?.id}`}>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                  >
+                  <Button variant="ghost" size="icon" className="h-8 w-8">
                     <Pencil className="h-4 w-4" />
                   </Button>
                 </Link>
@@ -94,7 +94,8 @@ const buttons = getPaginationButtons();
       </Table>
       <div className="mt-4 flex justify-between items-center">
         <div>
-          {employeeList?.count} ta Haydovchilardan {indexOfFirstOrder + 1} dan {Math.min(indexOfLastOrder, employeeList?.count as number)} gacha
+          Итого: {employeeList?.count || 0} с {indexOfFirstOrder + 1} до{" "}
+          {Math.min(indexOfLastOrder, employeeList?.count as number) || 0}{" "}
         </div>
         <div className="flex space-x-2 items-center">
           <Button
@@ -108,13 +109,17 @@ const buttons = getPaginationButtons();
           </Button>
           {buttons.map((button, index) =>
             button === "..." ? (
-              <span key={index} style={{ margin: "0 5px" }}>...</span>
+              <span key={index} style={{ margin: "0 5px" }}>
+                ...
+              </span>
             ) : (
               <Button
                 key={index}
                 onClick={() => handlePageChange(button as number)}
                 disabled={button === currentPage}
-                className={button === currentPage ? "bg-[#4880FF] text-white" : "border"}
+                className={
+                  button === currentPage ? "bg-[#4880FF] text-white" : "border"
+                }
                 variant={button === currentPage ? "default" : "ghost"}
               >
                 {button || ""}
@@ -132,6 +137,6 @@ const buttons = getPaginationButtons();
           </Button>
         </div>
       </div>
-      </div>
+    </div>
   );
 }

@@ -12,20 +12,25 @@ import {
 import { Input } from "@/components/ui/input";
 import Select, { SingleValue } from "react-select";
 import { CurrencyInputs } from "@/components/ui-items/currency-inputs";
-import { useMutation } from "@tanstack/react-query";
-import { createCar } from "@/lib/actions/cars.action";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  createCar,
+  createModel,
+  fetchAllModels,
+} from "@/lib/actions/cars.action";
 import { toast } from "react-toastify";
 import { queryClient } from "@/components/ui-items/ReactQueryProvider";
 import { removeCommas } from "@/lib/utils";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Option } from "../warehouse/diesel";
-import { createStation } from "@/lib/actions/gas.action";
+import { IModel } from "@/lib/types/cars.types";
+import { useRouter } from "next/router";
 
 interface FormValues {
   name: string;
   model: string;
   number: string;
-  with_trailer: string;
+  with_trailer: string | boolean;
   trailer_number?: null | string;
   type_of_payment: string;
   leasing_period: string;
@@ -36,24 +41,42 @@ interface FormValues {
 }
 
 export default function VehicleForm() {
-  const methods = useForm<FormValues>();
+  const methods = useForm<FormValues>({
+    defaultValues: {
+      with_trailer: "false",
+      type_of_payment: "CASH"
+    },
+  });
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
     watch,
-    reset,
   } = methods;
-  const [modelOptions] = useState<Option[]>([]);
+  const [modelOptions, setModelOptions] = useState<Option[]>([]);
   const [selectedModel, setSelectedModel] = useState<Option | null>(null);
-  const [stationValue, setModel] = useState<string>("");
+  const [model, setModel] = useState<string>("");
   const type_of_payment = watch("type_of_payment");
+  const { push } = useRouter()
+  const { data: models } = useQuery<IModel[]>({
+    queryKey: ["models_all"],
+    queryFn: () => fetchAllModels(),
+  });
+  useEffect(() => {
+    const modelOptions = models?.map((model) => {
+      return {
+        label: model?.name,
+        value: model?.id,
+      };
+    });
+    setModelOptions(modelOptions as Option[]);
+  }, [models, setValue]);
   const { mutate: createMutation } = useMutation({
     mutationFn: createCar,
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["cars"] });
-      reset();
+      push(`/cars/car-info?id=${data?.id}`);
       toast.success(" muvaffaqiyatli qo'shildi!");
     },
     onError: () => {
@@ -61,36 +84,37 @@ export default function VehicleForm() {
     },
   });
   const onSubmit: SubmitHandler<FormValues> = (data) => {
-    console.log(data);
     const formData = {
       ...data,
-      with_trailer: data?.with_trailer === "true" ? true : false,
+      with_trailer: data?.with_trailer === "false" ? false :  true,
+      type_of_payment: data?.type_of_payment || "CASH",
       leasing_period: Number(data?.leasing_period),
       distance_travelled: Number(data?.distance_travelled),
-      price_usd: Number(removeCommas(data?.price_usd?.toString())),
+      // price_usd: Number(removeCommas(data?.price_usd?.toString())),
       price_uzs: Number(removeCommas(data?.price_uzs?.toString())),
-      // price_usd: data?.price_usd.toString(),
-      // price_uzs: data?.price_uzs.toString()
     };
-    createMutation({...formData, model: selectedModel?.value as string});
+    createMutation({ ...formData, model: selectedModel?.value as string });
   };
 
   const with_trailer = watch("with_trailer");
+  
   const handleSelectModel = (newValue: SingleValue<Option>) => {
     setSelectedModel(newValue);
+    setValue("model", newValue?.value as string)
   };
-  const { mutate: createGasMutation } = useMutation({
-    mutationFn: createStation,
+  const { mutate: createModelMutation } = useMutation({
+    mutationFn: createModel,
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["gas_stations"] });
+      queryClient.invalidateQueries({ queryKey: ["models_all"] });
       setSelectedModel({ label: data?.name, value: data?.id });
     },
   });
   const handleAddModel = () => {
-    if (stationValue) {
-      createGasMutation(stationValue);
+    if (model) {
+      createModelMutation({ name: model });
     }
   };
+
   return (
     <div>
       <div className="p-10 mx-auto container mt-8 bg-white rounded-2xl">
@@ -134,15 +158,21 @@ export default function VehicleForm() {
                     Марка автомобиля*
                   </label>
                   <Select
+                  {...register("model", {required: "Required"})}
                     options={modelOptions}
                     value={selectedModel}
                     onChange={handleSelectModel}
                     onBlur={handleAddModel}
                     onInputChange={(value) => setModel(value)}
-                    placeholder="BMW"
+                    placeholder="Марка автомобиля"
                     noOptionsMessage={() => "Type to add new option..."}
                     isClearable
                   />
+                  {errors.model && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.model.message}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -161,6 +191,10 @@ export default function VehicleForm() {
                     })}
                     placeholder="Введите номер"
                     className="mt-1"
+                    onChange={(e)=> {
+                      const value = e.target.value
+                      setValue("number", value.toUpperCase())
+                    }}
                   />
                   {errors.number && (
                     <p className="mt-1 text-sm text-red-600">
@@ -177,10 +211,15 @@ export default function VehicleForm() {
                     Есть ли прецепта*
                   </label>
                   <Selector
+                    {...register("with_trailer", {
+                      required: false
+                      // "Поле обязательно для выбора",
+                    })} // Set required validation here
+                    defaultValue="false"
                     onValueChange={(value) => setValue("with_trailer", value)}
                   >
                     <SelectTrigger id="with_trailer" className="mt-1">
-                      <SelectValue placeholder="Да" />
+                      <SelectValue placeholder="Есть ли прецепта" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="true">Да</SelectItem>
@@ -206,9 +245,13 @@ export default function VehicleForm() {
                   <Input
                     disabled={with_trailer === "false" ? true : false}
                     id="trailer_number"
-                    {...register("trailer_number")}
+                    {...register("trailer_number", {required: with_trailer === "true" ? "required" : false})}
                     placeholder="Введите номер"
                     className="mt-1"
+                    onChange={(e)=> {
+                      const value = e.target.value
+                      setValue("trailer_number", value.toUpperCase())
+                    }}
                   />
                   {errors.trailer_number && (
                     <p className="mt-1 text-sm text-red-600">
@@ -225,7 +268,10 @@ export default function VehicleForm() {
                     Тип топлива*
                   </label>
                   <Selector
-                    onValueChange={(value) => setValue("fuel_type", value)}
+                    {...register("fuel_type", {
+                      required: "Тип топлива обязательный", // Optionally set it as required
+                    })}
+                    onValueChange={(value) => setValue("fuel_type", value)} // Ensure that the form state is updated when the value changes
                   >
                     <SelectTrigger id="fuel_type" className="mt-1">
                       <SelectValue placeholder="Газ" />
@@ -251,9 +297,13 @@ export default function VehicleForm() {
                     Тип оплаты*
                   </label>
                   <Selector
+                    {...register("type_of_payment", {
+                      // required: "Тип оплаты обязателен",
+                    })} // Set required validation here
                     onValueChange={(value) =>
                       setValue("type_of_payment", value)
                     }
+                    defaultValue="CASH"
                   >
                     <SelectTrigger id="type_of_payment" className="mt-1">
                       <SelectValue placeholder="Лизинг" />
@@ -277,51 +327,32 @@ export default function VehicleForm() {
                   >
                     Введите цену автомобиля*
                   </label>
-                  {/* <Input
-            id="price"
-            {...register("price", {
-              required: "Введите цену автомобиля",
-            })}
-            value={formatNumberAsPrice(price || "")} // Format with commas
-            placeholder="Введите оплату"
-            type="text" // Use text for formatting
-            onChange={handlepriceChange} // Ensure only numeric input
-            className="mt-1"
-          /> */}
                   <CurrencyInputs name="price" />
-                  {errors?.price_uzs && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {errors?.price_uzs.message}
-                    </p>
-                  )}
                 </div>
               </div>
 
               <div className="grid gap-6 md:grid-cols-2">
-                {type_of_payment !== "CASH" && (
-                  <div>
-                    <label
-                      htmlFor="leasing_period"
-                      className="block text-sm font-medium text-gray-700"
-                    >
-                      Введите срок лизинга*
-                    </label>
-                    <Input
-                      id="leasing_period"
-                      {...register("leasing_period", {
-                        required: "Введите срок лизинга",
-                      })}
-                      type="number"
-                      placeholder="Введите срок..."
-                      className="mt-1"
-                    />
-                    {errors.leasing_period && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {errors.leasing_period.message}
-                      </p>
-                    )}
-                  </div>
-                )}
+                <div>
+                  <label
+                    htmlFor="leasing_period"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Введите срок лизинга*(в месяцах)
+                  </label>
+                  <Input
+                    id="leasing_period"
+                    {...register("leasing_period", {required: watch("type_of_payment") === "LEASING" ? "Required" : false})}
+                    type="number"
+                    placeholder="Введите срок..."
+                    className="mt-1"
+                    disabled={type_of_payment === "CASH" ? true : false}
+                  />
+                  {errors.leasing_period && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.leasing_period.message}
+                    </p>
+                  )}
+                </div>
                 <div>
                   <label
                     htmlFor="leasing_period"

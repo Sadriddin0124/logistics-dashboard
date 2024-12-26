@@ -5,25 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import {
-  createGasStation,
-  createStation,
-  fetchGasStationName,
-} from "@/lib/actions/gas.action";
 import { queryClient } from "@/components/ui-items/ReactQueryProvider";
 import { toast } from "react-toastify";
-import { removeCommas } from "@/lib/utils";
-import { StationCars } from "@/lib/types/gas_station.types";
-import { useRouter } from "next/router";
-
-interface FormValues {
-  station: string;
-  price_usd: string;
-  price_uzs: string;
-  purchased_volume: number;
-  payed_price_usd: string;
-  payed_price_uzs: string;
-}
+import { fetchCarNoPage } from "@/lib/actions/cars.action";
+import { ICars } from "@/lib/types/cars.types";
+import { createDieselSale, fetchDiesel } from "@/lib/actions/diesel.action";
+import { IDieselPaginated, IDieselSale } from "@/lib/types/diesel.types";
+import SaleDiesel from "@/components/warehouse/diesel/sale";
 
 interface Option {
   value: string;
@@ -31,41 +19,44 @@ interface Option {
 }
 
 export default function DieselFill() {
-  const methods = useForm<FormValues>();
-  const { register, handleSubmit, watch, setValue } = methods;
-  const payed_price_uzs = watch("payed_price_uzs");
-  const price_uzs = watch("price_uzs");
-  const [stationOptions, setStationOptions] = useState<Option[]>([]);
-  const [selectedStation, setSelectedStation] = useState<Option | null>(null);
-  const [stationValue, setStation] = useState<string>("");
-  const { push } = useRouter();
-  const { data: stationNames } = useQuery<StationCars[]>({
-    queryKey: ["stationNames"],
-    queryFn: fetchGasStationName,
-  });
-  useEffect(() => {
-    if (stationNames) {
-      const stationOption = stationNames?.map((station) => {
-        return {
-          label: station?.name,
-          value: station?.id,
-        };
-      });
-      setStationOptions(stationOption as Option[]);
-      console.log(stationOption);
-    }
+  const methods = useForm<IDieselSale>();
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    formState: { errors },
+  } = methods;
+  const [carOptions, setCarOptions] = useState<Option[]>([]);
+  const [selectedCar, setSelectedCar] = useState<Option | null>(null);
 
-    const result =
-      Number(removeCommas(payed_price_uzs)) / Number(removeCommas(price_uzs));
-    setValue("purchased_volume", Number(result.toFixed(2)) || 0);
-  }, [price_uzs, payed_price_uzs, setValue, stationNames]);
+  const { data: cars } = useQuery<ICars[]>({
+    queryKey: ["cars"],
+    queryFn: fetchCarNoPage,
+  });
+
+  const { data: diesel } = useQuery<IDieselPaginated>({
+    queryKey: ["diesel"],
+    queryFn: () => fetchDiesel(1),
+  });
+
+  useEffect(() => {
+    if (cars) {
+      const carOption = cars?.filter(item=> item?.fuel_type === "DIESEL")?.map((car) => ({
+        label: `${car?.name} ${car?.number}`,
+        value: car?.id,
+      }));
+      setCarOptions(carOption as Option[]);
+    }
+  }, [cars]);
 
   const { mutate: createMutation } = useMutation({
-    mutationFn: createGasStation,
+    mutationFn: createDieselSale,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["gas_stations"] });
-      push(`/warehouse/gas/gas-info?id=${selectedStation?.value}`);
-      setSelectedStation(null);
+      queryClient.invalidateQueries({ queryKey: ["diesel"] });
+      queryClient.invalidateQueries({ queryKey: ["diesel_sale"] });
+      setSelectedCar(null);
+      reset();
       toast.success("Muvaffaqiyatli qo'shildi!");
     },
     onError: () => {
@@ -73,36 +64,16 @@ export default function DieselFill() {
     },
   });
 
-  const { mutate: createGasMutation } = useMutation({
-    mutationFn: createStation,
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["gas_stations"] });
-      setSelectedStation({ label: data?.name, value: data?.id });
-    },
-  });
-
-  const onSubmit = (data: FormValues) => {
-    console.log(data);
-
-    createMutation({
-      ...data,
-      name: selectedStation?.value as string,
-      price_usd: Number(removeCommas(data?.price_usd.toString())),
-      price_uzs: Number(removeCommas(data?.price_uzs.toString())),
-      payed_price_usd: Number(removeCommas(data?.payed_price_usd.toString())),
-      payed_price_uzs: Number(removeCommas(data?.payed_price_uzs.toString())),
-    });
+  const onSubmit = (data: IDieselSale) => {
+    createMutation(data);
   };
 
-  const handleSelectStation = (newValue: SingleValue<Option>) => {
-    setSelectedStation(newValue);
+  const handleSelectCar = (newValue: SingleValue<Option>) => {
+    setSelectedCar(newValue);
+    setValue("car", newValue?.value as string);
   };
 
-  const handleAddStation = () => {
-    if (stationValue) {
-      createGasMutation(stationValue);
-    }
-  };
+  const diesel_volume = diesel?.results?.[0]?.remaining_volume;
 
   return (
     <div className="w-full p-4 space-y-8 container mx-auto">
@@ -114,11 +85,10 @@ export default function DieselFill() {
                 <div className="space-y-2">
                   <label className="mb-2">Выберите автомобиль</label>
                   <Select
-                    options={stationOptions}
-                    value={selectedStation}
-                    onChange={handleSelectStation}
-                    onBlur={handleAddStation}
-                    onInputChange={(value) => setStation(value)}
+                  {...register("car", {required: true})}
+                    options={carOptions}
+                    value={selectedCar}
+                    onChange={handleSelectCar}
                     placeholder="Isuzu 01A111AA"
                     noOptionsMessage={() => "Type to add new option..."}
                     isClearable
@@ -129,29 +99,45 @@ export default function DieselFill() {
                     Введите количество залитого топлива
                   </label>
                   <Input
-                    readOnly
-                    {...register("purchased_volume")}
+                    {...register("volume", {
+                      required: "Обязательно для заполнения",
+                      validate: (value) =>
+                        parseFloat(value) > (Number(diesel_volume) || 0)
+                          ? "Количество превышает остаток топлива"
+                          : true,
+                    })}
                     placeholder="0"
                   />
+                  {errors.volume && (
+                    <p className="text-red-500 text-sm">
+                      {errors.volume.message}
+                    </p>
+                  )}
                 </div>
                 <div className="flex justify-end col-span-2">
-                  <Button className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded">
+                  <Button
+                    className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded"
+                    type="submit"
+                  >
                     Добавить
                   </Button>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm">
-                    Оставшееся количество cаларка (литр){" "}
-                  </label>
-                  <Input
-                    readOnly
-                    {...register("purchased_volume")}
-                    placeholder="0"
-                  />
                 </div>
               </div>
             </form>
           </FormProvider>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm">
+                Оставшееся количество cаларка (литр)
+              </label>
+              <Input readOnly placeholder="0" value={diesel_volume?.volume as number} />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardContent className="p-6">
+          <SaleDiesel />
         </CardContent>
       </Card>
     </div>

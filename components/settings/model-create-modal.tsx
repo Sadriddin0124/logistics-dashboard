@@ -8,30 +8,53 @@ import { Label } from "@/components/ui/label"
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { IGasStation } from '@/lib/types/gas_station.types'
+import { useMutation } from '@tanstack/react-query'
+import { createModel, updateModel } from '@/lib/actions/cars.action'
+import { queryClient } from '../ui-items/ReactQueryProvider'
+import { toast } from 'react-toastify'
+import { IModel } from '@/lib/types/cars.types'
 
 type FormData = {
   name: string
-  goingPrice: number
-  returnPrice: number
 }
 
-export default function CreateModel({isOpen, setIsOpen, editItem, setEditItem}: {editItem: null | IGasStation, setEditItem: Dispatch<SetStateAction<null | IGasStation>>, isOpen: boolean, setIsOpen: Dispatch<SetStateAction<boolean>>}) {
+export default function CreateModel({isOpen, setIsOpen, editItem, setEditItem}: {editItem: null | IModel, setEditItem: Dispatch<SetStateAction<null | IModel>>, isOpen: boolean, setIsOpen: Dispatch<SetStateAction<boolean>>}) {
   const { register, handleSubmit, formState: { errors }, reset } = useForm<FormData>()
     useEffect(()=> {
         if (editItem) {
             reset(editItem)
         }
     },[reset, editItem])
+    const { mutate: createMutation } = useMutation({
+      mutationFn: createModel,
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["models"] });
+        reset();
+        toast.success(" muvaffaqiyatli qo'shildi!");
+      },
+      onError: () => {
+        toast.error("ni qo'shishda xatolik!");
+      },
+    });
+    const { mutate: updateMutation } = useMutation({
+      mutationFn: updateModel,
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["models"] });
+        reset();
+        toast.success(" muvaffaqiyatli qo'shildi!");
+        setEditItem(null)
+      },
+      onError: () => {
+        toast.error("ni qo'shishda xatolik!");
+      },
+    });
   const onSubmit = (data: FormData) => {
     if (editItem) {
-        setEditItem(null)
+      updateMutation({id: editItem?.id as string, ...data})
     }else {
-        console.log(data)
+        createMutation(data)
     }
     setIsOpen(false)
     reset()
@@ -41,22 +64,19 @@ export default function CreateModel({isOpen, setIsOpen, editItem, setEditItem}: 
     <div className="p-4">
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <Button className='bg-[#4880FF] text-white hover:bg-blue-600'>Open Model Form</Button>
+          <Button className='bg-[#4880FF] text-white hover:bg-blue-600'>Добавить бренд</Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Travel Information</DialogTitle>
-          </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">Имя</Label>
               <Input
                 id="name"
                 {...register("name", { required: "Name is required" })}
               />
               {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
             </div>
-            <Button type="submit" className='bg-[#4880FF] text-white hover:bg-blue-600'>Submit</Button>
+            <Button type="submit" className='bg-[#4880FF] text-white hover:bg-blue-600'>Сохранять</Button>
           </form>
         </DialogContent>
       </Dialog>

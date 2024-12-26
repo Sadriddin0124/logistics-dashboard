@@ -5,25 +5,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import {
-  createGasStation,
-  createStation,
-  fetchGasStationName,
-} from "@/lib/actions/gas.action";
+import {} from "@/lib/actions/gas.action";
 import { queryClient } from "@/components/ui-items/ReactQueryProvider";
 import { toast } from "react-toastify";
-import { removeCommas } from "@/lib/utils";
-import { StationCars } from "@/lib/types/gas_station.types";
+import { IOilExchange, IOilType } from "@/lib/types/oil.types";
+import { createOilExchange, fetchWholeOils } from "@/lib/actions/oil.action";
+import { fetchCarNoPage, updateCarDistance } from "@/lib/actions/cars.action";
+import { ICars } from "@/lib/types/cars.types";
 import { useRouter } from "next/router";
-
-interface FormValues {
-  station: string;
-  price_usd: string;
-  price_uzs: string;
-  purchased_volume: number;
-  payed_price_usd: string;
-  payed_price_uzs: string;
-}
 
 interface Option {
   value: string;
@@ -31,79 +20,84 @@ interface Option {
 }
 
 export default function OilExchange() {
-  const methods = useForm<FormValues>();
-  const { register, handleSubmit, watch, setValue } = methods;
-  const payed_price_uzs = watch("payed_price_uzs");
-  const price_uzs = watch("price_uzs");
-  const [stationOptions, setStationOptions] = useState<Option[]>([]);
-  const [selectedStation, setSelectedStation] = useState<Option | null>(null);
-  const [stationValue, setStation] = useState<string>("");
+  const methods = useForm<IOilExchange>();
+  const { register, handleSubmit, setValue, formState: {errors} } = methods;
+  const [stationOptions, setOilOptions] = useState<Option[]>([]);
+  const [selectedOil, setSelectedOil] = useState<Option | null>(null);
+  const [carOptions, setCarOptions] = useState<Option[]>([]);
+  const [selectedCar, setSelectedCar] = useState<Option | null>(null);
   const { push } = useRouter();
-  const { data: stationNames } = useQuery<StationCars[]>({
-    queryKey: ["stationNames"],
-    queryFn: fetchGasStationName,
+  const { data: cars } = useQuery<ICars[]>({
+    queryKey: ["cars"],
+    queryFn: fetchCarNoPage,
   });
+  const { data: oil } = useQuery<IOilType[]>({
+    queryKey: ["all_oil"],
+    queryFn: fetchWholeOils,
+  });
+  const oil_recycle_distance = methods.watch("oil_recycle_distance");
+
   useEffect(() => {
-    if (stationNames) {
-      const stationOption = stationNames?.map((station) => {
+    if (cars && oil) {
+      const carOption = cars?.map((car) => {
         return {
-          label: station?.name,
-          value: station?.id,
+          label: `${car?.name} ${car?.number}`,
+          value: car?.id,
         };
       });
-      setStationOptions(stationOption as Option[]);
-      console.log(stationOption);
+      const oilOption = oil?.map((oil) => {
+        return {
+          label: oil?.oil_name,
+          value: oil?.id,
+        };
+      });
+      setCarOptions(carOption as Option[]);
+      setOilOptions(oilOption as Option[]);
+      const car = cars?.find(
+        (item) => item?.id === selectedCar?.value
+      )?.distance_travelled;
+      setValue("oil_recycle_distance", car as number);
     }
-
-    const result =
-      Number(removeCommas(payed_price_uzs)) / Number(removeCommas(price_uzs));
-    setValue("purchased_volume", Number(result.toFixed(2)) || 0);
-  }, [price_uzs, payed_price_uzs, setValue, stationNames]);
+  }, [cars, oil, selectedCar, setValue]);
 
   const { mutate: createMutation } = useMutation({
-    mutationFn: createGasStation,
+    mutationFn: createOilExchange,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["gas_stations"] });
-      push(`/warehouse/gas/gas-info?id=${selectedStation?.value}`);
-      setSelectedStation(null);
+      queryClient.invalidateQueries({ queryKey: ["gas_oil"] });
+      push(`/warehouse/oil/`);
+      setSelectedOil(null);
       toast.success("Muvaffaqiyatli qo'shildi!");
     },
     onError: () => {
       toast.error("Xatolik yuz berdi!");
     },
   });
-
-  const { mutate: createGasMutation } = useMutation({
-    mutationFn: createStation,
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["gas_stations"] });
-      setSelectedStation({ label: data?.name, value: data?.id });
+  const { mutate: updateMutation } = useMutation({
+    mutationFn: updateCarDistance,
+    onError: () => {
+      toast.error("Xatolik yuz berdi!");
     },
   });
-
-  const onSubmit = (data: FormValues) => {
+  const onSubmit = (data: IOilExchange) => {
     console.log(data);
 
     createMutation({
       ...data,
-      name: selectedStation?.value as string,
-      price_usd: Number(removeCommas(data?.price_usd.toString())),
-      price_uzs: Number(removeCommas(data?.price_uzs.toString())),
-      payed_price_usd: Number(removeCommas(data?.payed_price_usd.toString())),
-      payed_price_uzs: Number(removeCommas(data?.payed_price_uzs.toString())),
+      car: selectedCar?.value as string,
+      oil: selectedOil?.value as string,
+      next_oil_recycle_distance:
+        data?.next_oil_recycle_distance + data?.oil_recycle_distance,
     });
+    updateMutation({id: selectedCar?.value as string, distance_travelled: data?.oil_recycle_distance, next_oil_recycle_distance: data?.next_oil_recycle_distance})
   };
 
-  const handleSelectStation = (newValue: SingleValue<Option>) => {
-    setSelectedStation(newValue);
+  const handleSelectOil = (newValue: SingleValue<Option>) => {
+    setSelectedOil(newValue);
   };
 
-  const handleAddStation = () => {
-    if (stationValue) {
-      createGasMutation(stationValue);
-    }
+  const handleSelectCar = (newValue: SingleValue<Option>) => {
+    setSelectedCar(newValue);
   };
-
   return (
     <div className="w-full p-4 space-y-8 container mx-auto">
       <Card>
@@ -114,11 +108,9 @@ export default function OilExchange() {
                 <div className="space-y-2">
                   <label className="mb-2">Выберите автомобиль</label>
                   <Select
-                    options={stationOptions}
-                    value={selectedStation}
-                    onChange={handleSelectStation}
-                    onBlur={handleAddStation}
-                    onInputChange={(value) => setStation(value)}
+                    options={carOptions}
+                    value={selectedCar}
+                    onChange={handleSelectCar}
                     placeholder="Isuzu 01A111AA"
                     noOptionsMessage={() => "Type to add new option..."}
                     isClearable
@@ -127,8 +119,10 @@ export default function OilExchange() {
                 <div className="space-y-2">
                   <label className="text-sm">Данный объем масла в литрах</label>
                   <Input
-                    readOnly
-                    {...register("purchased_volume")}
+                    {...register("remaining_oil", {
+                      valueAsNumber: true,
+                      required: true,
+                    })}
                     placeholder="0"
                   />
                 </div>
@@ -136,10 +130,8 @@ export default function OilExchange() {
                   <label className="mb-2">Выберите масло</label>
                   <Select
                     options={stationOptions}
-                    value={selectedStation}
-                    onChange={handleSelectStation}
-                    onBlur={handleAddStation}
-                    onInputChange={(value) => setStation(value)}
+                    value={selectedOil}
+                    onChange={handleSelectOil}
                     placeholder="Выберите..."
                     noOptionsMessage={() => "Type to add new option..."}
                     isClearable
@@ -150,10 +142,42 @@ export default function OilExchange() {
                     Введите объем переработанного масла
                   </label>
                   <Input
-                    readOnly
-                    {...register("purchased_volume")}
+                    {...register("amount", { required: true })}
+                    placeholder="0"
+                    onChange={(e) => {
+                      const value = parseFloat(e.target.value);
+                      setValue("amount", isNaN(value) ? 0 : value); // Set 0 if value is invalid
+                    }}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm">
+                    Previous oil distance
+                  </label>
+                  <Input
+                    {...register("oil_recycle_distance", {
+                      valueAsNumber: true,
+                      required: true,
+                    })}
                     placeholder="0"
                   />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm">
+                    Next oil distance
+                  </label>
+                  <Input
+                    {...register("next_oil_recycle_distance", {
+                      valueAsNumber: true,
+                      required: "This field is required.",
+                      validate: (value) =>
+                        value < oil_recycle_distance
+                      ? "Next oil recycle distance must be greater than the current distance."
+                          : true
+                    })}
+                    placeholder="0"
+                  />
+                  {errors?.next_oil_recycle_distance && <p className="text-sm text-red-500">{errors?.next_oil_recycle_distance?.message}</p>}
                 </div>
               </div>
 

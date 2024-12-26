@@ -3,6 +3,7 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "./Sidebar";
 import Header from "../header/Header";
 import { usePathname } from "next/navigation";
+import Loading from "./loader";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -12,7 +13,10 @@ export default function Layout({ children }: LayoutProps) {
   const pathname = usePathname();
   const [sideBar, setSideBar] = useState<boolean>(false);
   const [subItemStatus, setSubItemStatus] = useState<boolean>(false);
-
+  const [load, setLoad] = useState(false)
+  setTimeout(() => {
+    setLoad(false)
+  }, 1000);
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full">
@@ -40,11 +44,14 @@ export default function Layout({ children }: LayoutProps) {
           <div className="flex flex-col w-full gap-3">
             {pathname !== "/login" && (
               <div className="flex h-16 items-center gap-2 border-b">
-                <Header setSideBar={setSideBar} sideBar={sideBar}/>
+                <Header setSideBar={setSideBar} sideBar={sideBar} />
               </div>
             )}
           </div>
-          <main className="p-4">{children}</main>
+          {load ? <Loading/> :
+           ""}
+           <main className={`${load ? "fixed z-[-1]" : ""} p-4`}>{children}</main>
+
         </SidebarInset>
       </div>
     </SidebarProvider>

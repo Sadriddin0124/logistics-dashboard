@@ -10,6 +10,7 @@ import { queryClient } from "@/components/ui-items/ReactQueryProvider";
 import { toast } from "react-toastify";
 import { removeCommas } from "@/lib/utils";
 import { IGasStation } from "@/lib/types/gas_station.types";
+import { useRouter } from "next/router";
 
 interface FormValues {
   name?: string;
@@ -25,15 +26,21 @@ export default function GasManagementForm() {
   const methods = useForm<FormValues>();
   const { register, handleSubmit, watch, setValue } = methods;
   const [addGasData, setAddGasData] = useState<IGasStation | null>(null);
+  const [status, setStatus] = useState<string>("")
   const payed_price_uzs = watch("payed_price_uzs");
   const price_uzs = watch("price_uzs");
-console.log(payed_price_uzs);
-
+  const [gasId, setGasId] = useState<string>("")
+  const { push } = useRouter()
   useEffect(() => {
       const result =
         Number(removeCommas(payed_price_uzs)) /
         Number(removeCommas(price_uzs));
-      setValue("remaining_gas", result || 0);
+        if (price_uzs && payed_price_uzs) {
+          setValue("remaining_gas", Number(result.toFixed(2)) || 0);
+        }
+        if (result < 1) {
+          setStatus("gaz narxi to'langan summadan baland bo'lmasligi kerak")
+        }
   }, [price_uzs, payed_price_uzs, setValue]);
 
   const { mutate: addMutation } = useMutation({
@@ -41,6 +48,7 @@ console.log(payed_price_uzs);
       addGas(data.id, data.gasData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["gas_stations"] });
+      push(`/warehouse/gas/gas-info?id=${gasId}`)
     },
     onError: () => {
       toast.error("Xatolik yuz berdi!");
@@ -51,6 +59,7 @@ console.log(payed_price_uzs);
     mutationFn: createGasStation,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["gas_stations"] });
+      setGasId(data?.id)
       addMutation({
         id: data.id,
         gasData: addGasData as IGasStation,
@@ -114,6 +123,7 @@ console.log(payed_price_uzs);
                 <div className="space-y-2">
                   <label className="text-sm">Цена на газ (м3)</label>
                   <CurrencyInputs name="price" />
+                  {status && <p className="text-sm text-red-500">{status}</p>}
                 </div>
               </div>
 

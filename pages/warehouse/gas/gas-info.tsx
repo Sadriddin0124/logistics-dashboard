@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,40 +9,46 @@ import { FormProvider, useForm } from "react-hook-form";
 import { IGasStation, IGasStationTotal } from "@/lib/types/gas_station.types";
 import { CurrencyInputs } from "@/components/ui-items/currency-inputs";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import {
-  addGas,
-  fetchGasStationOne,
-} from "@/lib/actions/gas.action";
+import { addGas, deleteStation, fetchGasStationOne } from "@/lib/actions/gas.action";
 import { queryClient } from "@/components/ui-items/ReactQueryProvider";
 import { toast } from "react-toastify";
 import { removeCommas } from "@/lib/utils";
 import PurchasedGasTable from "@/components/warehouse/gas/purchased-table";
 import SalesGasTable from "@/components/warehouse/gas/gas-sales-table";
+import { ForceDeleteDialog } from "@/components/ui-items/force-delete";
 
-
- 
 export default function GasManagementForm() {
   const methods = useForm<IGasStation>();
   const { handleSubmit, reset, setValue, watch, register } = methods;
+  const [status, setStatus] = useState<string>("")
   const payed_price_uzs = watch("payed_price_uzs");
   const price_uzs = watch("price_uzs");
-  const { id } = useRouter().query;
+  const router = useRouter()
+  const { id } = router.query;
   const { data: total } = useQuery<IGasStationTotal>({
     queryKey: ["station", id],
     queryFn: () => fetchGasStationOne(id as string),
     enabled: !!id,
-  });
+  }); 
 
   useEffect(() => {
     const result =
-      Number(removeCommas(payed_price_uzs?.toString())) / Number(removeCommas(price_uzs?.toString()));
+      Number(removeCommas(payed_price_uzs?.toString())) /
+      Number(removeCommas(price_uzs?.toString()));
+      if (price_uzs && payed_price_uzs) {
     setValue("remaining_gas", Number(result.toFixed(2)) || 0);
+      }
+      if (result < 1) {
+        setStatus("gaz narxi to'langan summadan baland bo'lmasligi kerak")
+      }
+      
   }, [setValue, payed_price_uzs, price_uzs]);
-  const { mutate: updateMutation } = useMutation({
-     mutationFn: (data: { id: string; gasData: IGasStation }) =>
-          addGas(data.id, data.gasData),
+  const { mutate: updateMutation, isPending } = useMutation({
+    mutationFn: (data: { id: string; gasData: IGasStation }) =>
+      addGas(data.id, data.gasData),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["gas_stations"] });
+      queryClient.invalidateQueries({ queryKey: ["station"] });
+      queryClient.invalidateQueries({ queryKey: ["purchased"] });
       reset();
       toast.success("Muvaffaqiyatli qo'shildi!");
     },
@@ -52,15 +58,28 @@ export default function GasManagementForm() {
   });
   const onSubmit = (data: IGasStation) => {
     const formData: IGasStation = {
-    amount: data?.remaining_gas,
-    price_usd: Number(removeCommas(data?.price_usd?.toString())),
-    price_uzs: Number(removeCommas(data?.price_uzs?.toString())),
-    payed_price_usd: Number(removeCommas(data?.payed_price_usd?.toString())),
-    payed_price_uzs: Number(removeCommas(data?.payed_price_uzs?.toString())),
-  }
-    updateMutation({id: id as string, gasData: formData}
-  );
+      amount: data?.remaining_gas,
+      price_usd: Number(removeCommas(data?.price_usd?.toString())),
+      price_uzs: Number(removeCommas(data?.price_uzs?.toString())),
+      payed_price_usd: Number(removeCommas(data?.payed_price_usd?.toString())),
+      payed_price_uzs: Number(removeCommas(data?.payed_price_uzs?.toString())),
+    };
+    updateMutation({ id: id as string, gasData: formData });
   };
+  const { mutate: deleteMutation } = useMutation({
+    mutationFn: deleteStation,
+   onSuccess: () => {
+     queryClient.invalidateQueries({ queryKey: ["gas_stations"] });
+     router.push("/warehouse/gas")
+     toast.success("Muvaffaqiyatli qo'shildi!");
+   },
+   onError: () => {
+     toast.error("Xatolik yuz berdi!");
+   },
+ });
+ const handleDelete = (id: string) => {
+  deleteMutation(id)
+ }
   return (
     <div className="w-full p-4 space-y-8 container mx-auto">
       {/* Top Form Section */}
@@ -72,7 +91,7 @@ export default function GasManagementForm() {
                 <div className="space-y-2">
                   <label className="text-sm">Название заправки</label>
                   <Input
-                  value={total?.station_name}
+                    value={total?.name}
                     disabled={id ? true : false}
                     placeholder="Название заправки..."
                   />
@@ -98,12 +117,17 @@ export default function GasManagementForm() {
                 <div className="space-y-2">
                   <label className="text-sm">Цена на газ (м3)</label>
                   <CurrencyInputs name="price" />
+                  {status && <p className="text-sm text-red-500">{status}</p>}
                 </div>
               </div>
 
-              <div className="flex justify-end">
-                <Button className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded">
-                  Добавить
+              <div className="flex justify-end gap-4">
+                <ForceDeleteDialog id={id as string} onDelete={handleDelete} total={total?.remaining_gas as number} type="Установите сумму 0"/>
+                <Button
+                  disabled={isPending}
+                  className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded"
+                >
+                  {isPending ? "Zagruska" : "Добавить"}
                 </Button>
               </div>
             </form>
@@ -113,7 +137,7 @@ export default function GasManagementForm() {
             <div className="space-y-2">
               <label className="text-sm">Оставшееся количество газа (м3)</label>
               <Input
-                value={total?.remaining_gas}
+                value={total?.remaining_gas?.toFixed(2)}
                 readOnly
                 className="bg-muted"
               />
@@ -122,15 +146,15 @@ export default function GasManagementForm() {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardContent className="p-6">
-          <SalesGasTable/>
-        </CardContent>
-      </Card>
 
       <Card>
         <CardContent className="p-6">
-          <PurchasedGasTable/>
+          <PurchasedGasTable />
+        </CardContent>
+      </Card>
+      <Card>
+        <CardContent className="p-6">
+          <SalesGasTable />
         </CardContent>
       </Card>
     </div>

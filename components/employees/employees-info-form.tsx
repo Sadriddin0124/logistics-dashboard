@@ -10,45 +10,31 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { useForm, Controller } from "react-hook-form";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { fetchEmployee, updateEmployee } from "@/lib/actions/employees.action";
+import {
+  deleteEmployee,
+  fetchEmployee,
+  updateEmployee,
+} from "@/lib/actions/employees.action";
 import { useRouter } from "next/router";
 import { IEmployee } from "@/lib/types/employee.types";
 import { queryClient } from "../ui-items/ReactQueryProvider";
 import { toast } from "react-toastify";
+import { DeleteAlertDialog } from "../ui-items/delete-dialog";
+import { EmployeeFlightTable } from "./employee.flight";
+import { EmployeeExpensesTable } from "./employe-expenses";
 
-interface Trip {
-  vehicle: string;
-  price: number;
-  departureDate: string;
-  arrivalDate: string;
-  cargo: string;
-}
-
-interface Payment {
-  administrator: string;
-  amount: number;
-  date: string;
-}
 interface FormValues {
   full_name: string;
   license: string;
   phone: string;
   flight_type: string;
   passport: string;
-  balance: string;
+  balance_uzs: string;
 }
 
-function areObjectsEqual(obj1: IEmployee, obj2: IEmployee): boolean {
+export function areObjectsEqual(obj1: IEmployee, obj2: IEmployee): boolean {
   for (const key in obj1) {
     if (obj1[key as keyof IEmployee] !== obj2[key as keyof IEmployee]) {
       return false;
@@ -57,40 +43,28 @@ function areObjectsEqual(obj1: IEmployee, obj2: IEmployee): boolean {
   return true;
 }
 
-
-
 export default function EmployeesInfoForm() {
-  const { id } = useRouter()?.query
-  const [trips] = useState<Trip[]>([
-    {
-      vehicle: "Sonnatilla Sh.N.",
-      price: 2300,
-      departureDate: "12.12.2024",
-      arrivalDate: "12.12.2024",
-      cargo: "Ishimliklar",
-    },
-  ]);
-
-  const [payments] = useState<Payment[]>([
-    {
-      administrator: "Sonnatilla Sh.N.",
-      amount: 2300,
-      date: "12.12.2024",
-    },
-  ]);
-  const { control, handleSubmit, reset, watch, getValues } = useForm<FormValues>();
-  const [isChanged, setIsChanged] = useState(false);
-
-  const balance = watch("balance")
+  const router = useRouter();
+  const { id } = router?.query;
+  
   const { data: employee } = useQuery<IEmployee>({
     queryKey: ["employee"],
-    queryFn: ()=> fetchEmployee(id as string),
+    queryFn: () => fetchEmployee(id as string),
   });
-  useEffect(()=> {
+  const { control, handleSubmit, reset, watch, getValues } =
+    useForm<FormValues>({
+      defaultValues: {
+        flight_type: employee?.flight_type
+      }
+    });
+  const [isChanged, setIsChanged] = useState(false);
+
+  const balance = watch("balance_uzs");
+  useEffect(() => {
     if (employee) {
-      reset(employee)
+      reset(employee);
     }
-  },[employee, reset])
+  }, [employee, reset]);
   useEffect(() => {
     const subscription = watch((_, { name, type }) => {
       const currentValues = getValues();
@@ -116,7 +90,21 @@ export default function EmployeesInfoForm() {
     },
   });
   const onSubmit = (data: FormValues) => {
-    updateMutation({...data, id: id as string}); 
+    updateMutation({ ...data, id: id as string });
+  };
+  const { mutate: deleteMutation } = useMutation({
+    mutationFn: deleteEmployee,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["employees"] });
+      toast.success(" muvaffaqiyatli qo'shildi!");
+      router.push("/employees");
+    },
+    onError: () => {
+      toast.error("ni qo'shishda xatolik!");
+    },
+  });
+  const handleDelete = (id: string) => {
+    deleteMutation(id as string);
   };
   return (
     <div className="container mx-auto space-y-8 mt-8 ">
@@ -155,21 +143,22 @@ export default function EmployeesInfoForm() {
         </div>
 
         <div>
-          <label className="text-sm font-medium mb-2 block">
-            Выберите маршрут водителя*
-          </label>
+          <label className="text-sm font-medium">Выберите регион*</label>
+
           <Controller
             name="flight_type"
             control={control}
-            defaultValue=""
+            
             render={({ field }) => (
-              <Select onValueChange={field.onChange}>
+              <Select value={field?.value} onValueChange={field.onChange}>
                 <SelectTrigger>
                   <SelectValue placeholder="Выберите..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="IN_UZB">IN_UZB</SelectItem>
-                  <SelectItem value="OUT">OUT</SelectItem>
+                  <SelectItem value="OUT">За территории Узбекистана</SelectItem>
+                  <SelectItem value="IN_UZB">
+                    На территории Узбекистана.
+                  </SelectItem>
                 </SelectContent>
               </Select>
             )}
@@ -204,74 +193,47 @@ export default function EmployeesInfoForm() {
           />
         </div>
         <div className="flex col-span-2 justify-end gap-4 mt-8">
+          {balance === "0.00" || balance === null && (
+            <DeleteAlertDialog
+              id={id as string}
+              onDelete={handleDelete}
+              type="big"
+            />
+          )}
           <Button
-            type="button"
+            disabled={!isChanged}
+            type="submit"
             className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded-md"
-            onClick={() => reset()} // Reset form fields
-            disabled={balance !== "0" ? true  : false}
           >
-            Удалить сотрудника
+            Сохранить
           </Button>
-          <Button disabled={!isChanged} type="submit" className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded-md">Сохранить</Button>
         </div>
 
         <div>
-          <label className="text-sm font-medium mb-2 block">Баланс водителя</label>
-          <Input value={employee?.balance || "0"} readOnly placeholder="Введите баланс водителя..." className="bg-muted"/>
+          <label className="text-sm font-medium mb-2 block">
+            Баланс водителя
+          </label>
+          <Input
+            value={employee?.balance_uzs || "0"}
+            readOnly
+            placeholder="Введите баланс водителя..."
+            className="bg-muted"
+          />
         </div>
-
       </form>
 
       <div className="space-y-6">
         <div className=" p-8 rounded-2xl bg-white min-h-[50vh]">
           <h3 className="text-lg font-medium mb-4">История рейсов</h3>
           <div className="border rounded-lg">
-            <Table>
-              <TableHeader>
-                <TableRow className="border-b border-b-gray-200">
-                  <TableHead>Автомобиль</TableHead>
-                  <TableHead>Цена</TableHead>
-                  <TableHead>Дата отправления</TableHead>
-                  <TableHead>Дата приезда</TableHead>
-                  <TableHead>Груз</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {trips.map((trip, index) => (
-                  <TableRow key={index} className="border-b border-b-gray-200">
-                    <TableCell>{trip.vehicle}</TableCell>
-                    <TableCell>${trip.price}</TableCell>
-                    <TableCell>{trip.departureDate}</TableCell>
-                    <TableCell>{trip.arrivalDate}</TableCell>
-                    <TableCell>{trip.cargo}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <EmployeeFlightTable />
           </div>
         </div>
 
         <div className=" p-8 rounded-2xl bg-white min-h-[50vh]">
           <h3 className="text-lg font-medium mb-4">История платежей</h3>
           <div className="border rounded-lg">
-            <Table>
-              <TableHeader>
-                <TableRow className="border-b border-b-gray-200">
-                  <TableHead>Администратор</TableHead>
-                  <TableHead>Сумма</TableHead>
-                  <TableHead>Дата</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {payments.map((payment, index) => (
-                  <TableRow key={index} className="border-b border-b-gray-200">
-                    <TableCell>{payment.administrator}</TableCell>
-                    <TableCell>${payment.amount}</TableCell>
-                    <TableCell>{payment.date}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <EmployeeExpensesTable />
           </div>
         </div>
       </div>

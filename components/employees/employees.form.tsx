@@ -17,20 +17,20 @@ import { useMutation } from "@tanstack/react-query";
 import { createEmployee } from "@/lib/actions/employees.action";
 import { queryClient } from "../ui-items/ReactQueryProvider";
 import { toast } from "react-toastify";
-import {
-  formatPhoneNumber,
-  formatUzbekistanPhoneNumber,
-} from "@/lib/functions";
+
+import { useRouter } from "next/router";
 
 export default function EmployeesInfoForm() {
   const { control, handleSubmit } = useForm<IEmployee>({
     defaultValues: {
-      phone: "+998"
+      phone: ""
     }
   });
+  const { push } = useRouter()
   const { mutate: createMutation } = useMutation({
     mutationFn: createEmployee,
     onSuccess: () => {
+      push(`/employees`)
       queryClient.invalidateQueries({ queryKey: ["employees"] });
       toast.success(" muvaffaqiyatli qo'shildi!");
     },
@@ -39,7 +39,7 @@ export default function EmployeesInfoForm() {
     },
   });
   const onSubmit = (data: IEmployee) => {
-    createMutation({ ...data, phone: formatPhoneNumber(data?.phone) });
+    createMutation({ ...data });
   };
   return (
     <div className="container mx-auto space-y-8 mt-8 ">
@@ -54,7 +54,6 @@ export default function EmployeesInfoForm() {
           <Controller
             name="full_name"
             control={control}
-            defaultValue=""
             render={({ field }) => (
               <Input {...field} placeholder="Введите имя сотрудника" />
             )}
@@ -68,30 +67,8 @@ export default function EmployeesInfoForm() {
           <Controller
             name="phone"
             control={control}
-            rules={{
-              required: true,
-              pattern: {
-                value: /^\+998 \d{2} \d{3} \d{2} \d{2}$/,
-                message: "Noto‘g‘ri raqam formati",
-              },
-            }}
-            render={({ field: { onChange, value, ...field } }) => (
-              <Input
-                {...field}
-                id="phone"
-                type="tel"
-                value={value}
-                onChange={(e) => {
-                  const formattedValue = formatUzbekistanPhoneNumber(
-                    e.target.value
-                  );
-                  onChange(formattedValue);
-                  e.target.value = formattedValue;
-                }}
-                className="font-mono"
-                placeholder="+998 __ ___ __ __"
-                aria-describedby="phone-hint"
-              />
+            render={({ field }) => (
+              <Input {...field} placeholder="Введите номер сотрудника" />
             )}
           />
         </div>
@@ -110,8 +87,10 @@ export default function EmployeesInfoForm() {
                   <SelectValue placeholder="Выберите..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="IN_UZB">In UZB</SelectItem>
-                  <SelectItem value="OUT">Out</SelectItem>
+                <SelectItem value="OUT">За территории Узбекистана</SelectItem>
+                <SelectItem value="IN_UZB">
+                  На территории Узбекистана.
+                </SelectItem>
                 </SelectContent>
               </Select>
             )}

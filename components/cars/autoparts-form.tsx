@@ -1,21 +1,193 @@
-"use client";
-
-import { useState } from "react";
+import { useForm, useFieldArray, FormProvider } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { X } from "lucide-react";
-import { AutoPart } from "@/lib/types/cars.types";
+import { ChevronLeftIcon, ChevronRightIcon, X } from "lucide-react";
+import { useRouter } from "next/router";
+import { createAutoDetail, deleteAutoDetail, fetchAutoDetails } from "@/lib/actions/cars.action";
+import { queryClient } from "../ui-items/ReactQueryProvider";
+import { toast } from "react-toastify";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { PaginatedCarDetail } from "@/lib/types/cars.types";
+import { useEffect, useState } from "react";
+import { Input } from "../ui/input";
+import { removeCommas } from "@/lib/utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { formatNumberWithCommas } from "../ui-items/currency-inputs";
+interface FormValues {
+  id?: string;
+  name: string;
+  id_detail: string;
+  in_sklad: boolean,
+  price_uzs: string;
+}
 
 export function AutoPartsForm() {
-  const [part, setPart] = useState<AutoPart>({ name: "", id: "" });
+  const methods = useForm<{ parts: FormValues[] }>({
+    defaultValues: {
+      parts: [
+        {
+          name: "",
+          id_detail: "",
+          in_sklad: false,
+          price_uzs: "",
+        },
+      ],
+    },
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle form submission
-    console.log("Submitted:", part);
-    setPart({ name: "", id: "" });
+  const {
+    control,
+    handleSubmit,
+    register,
+    watch, // Watch for dynamic field changes
+    formState: { errors },
+  } = methods;
+
+  const [deletePrice, setDeletePrice] = useState<string>("");
+  const [deleteId, setDeleteId] = useState<string>("");
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [index, setIndex] = useState<number>(10)
+  const router = useRouter();
+  const { id } = router.query;
+    const { data: carDetails } = useQuery<PaginatedCarDetail>({
+    queryKey: ["car_details", currentPage, id],
+    queryFn: () => fetchAutoDetails(currentPage, id as string),
+  });
+  useEffect(() => {
+    queryClient.prefetchQuery({
+      queryKey: ["car_details", currentPage + 1, id],
+      queryFn: () => fetchAutoDetails(currentPage + 1, id as string),
+    });
+  }, [currentPage, id]);
+
+  const { fields, append, remove, prepend } = useFieldArray({
+    control,
+    name: "parts",
+    keyName: "_key",
+  });
+
+  useEffect(() => {
+    if (carDetails?.results?.length) {
+      const existingIds = methods.getValues("parts").map((part) => part.id);
+      carDetails.results.forEach((detail) => {
+        if (!existingIds.includes(detail.id)) {
+          prepend({
+            id: detail.id,
+            name: detail.name,
+            in_sklad: detail?.in_sklad,
+            id_detail: detail.id_detail,
+            price_uzs: String(detail.price_uzs),
+          });
+        }
+      });
+    }
+  }, [carDetails, prepend, methods]);
+
+
+
+  const { mutate: createMutation } = useMutation({
+    mutationFn: createAutoDetail,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["car_details"] });
+      methods.reset();
+    },
+    onError: () => {
+      toast.error("Ошибка при сохранении!");
+    },
+  });
+
+  const onSubmit = (data: { parts: FormValues[] }) => {
+    const formData = data.parts.map((item) => ({
+      ...item,
+      price_uzs: Number(removeCommas(item?.price_uzs)),
+      car: id as string,
+    }));
+    console.log(data?.parts);
+    
+    createMutation(formData);
   };
+
+  const watchedFields = watch("parts");
+
+  const isLastFieldValid = () => {
+    const lastField = watchedFields?.[watchedFields.length - 1];
+    return (
+      lastField?.id_detail?.trim() &&
+      lastField?.name?.trim() &&
+      lastField?.price_uzs?.trim()
+    );
+  };
+  const handleDelete = (item: FormValues, index: number) => {
+    if(item?.id) {
+      setDeleteOpen(true)
+      setDeleteId(item?.id)
+      setIndex(index)
+    }else {
+      remove(index)
+    }
+  };
+  console.log(fields);
+    const { mutate: deleteMutation } = useMutation({
+      mutationFn: deleteAutoDetail,
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["car_details", currentPage] });
+        remove(index);
+        toast.success("Удаление выполнено успешно!");
+      setDeleteOpen(false)
+      },
+      onError: () => {
+        toast.error("Ошибка при удалении!");
+      },
+    });
+  
+  const onDelete = () => {
+    const payload = {
+      id: [deleteId],
+      sell_price: deletePrice,
+    }
+    deleteMutation(payload)
+  };
+  const itemsPerPage = 10;
+  const indexOfLastOrder = currentPage * itemsPerPage;
+  const indexOfFirstOrder = (currentPage - 1) * itemsPerPage;
+
+  const totalPages = Math.ceil((carDetails?.count as number) / itemsPerPage);
+
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  const getPaginationButtons = () => {
+    const buttons: (number | string)[] = [];
+    if (totalPages <= 1) return buttons;
+    buttons.push(1);
+    if (currentPage > 3) {
+      buttons.push("...");
+    }
+    for (
+      let i = Math.max(2, currentPage - 1);
+      i <= Math.min(totalPages - 1, currentPage + 1);
+      i++
+    ) {
+      buttons.push(i);
+    }
+    if (currentPage < totalPages - 2) {
+      buttons.push("...");
+    }
+    buttons.push(totalPages);
+    return buttons;
+  };
+  const buttons = getPaginationButtons();
 
   return (
     <Card className="rounded-2xl">
@@ -23,41 +195,158 @@ export function AutoPartsForm() {
         <CardTitle>Запчасти для автомобиля</CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="flex flex-col">
-          <div className="flex items-end gap-4">
-            <div className="flex-1">
-              <label className="text-sm mb-2 block">Название запчасти</label>
-              <Input
-                value={part.name}
-                onChange={(e) => setPart({ ...part, name: e.target.value })}
-                placeholder="Введите название запчасти..."
-              />
+        <FormProvider {...methods}>
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
+            {fields.map((item, index) => (
+              <div key={item.id} className="flex items-start gap-4 mb-4">
+                <div className="flex-1">
+                  <label className="text-sm mb-2 block">
+                    Название запчасти
+                  </label>
+                  <Input
+                    {...register(`parts.${index}.name`, { required: true })}
+                    defaultValue={item.name}
+                    placeholder="Введите название запчасти..."
+                  />
+                  {errors.parts?.[index]?.name && (
+                    <span className="text-red-500 text-xs">
+                      Поле обязательно для заполнения
+                    </span>
+                  )}
+                </div>
+                <div className="flex-1 relative">
+                  <label className="text-sm mb-2 block">ID запчасти</label>
+                  <Input
+                    {...register(`parts.${index}.id_detail`, )}
+                    defaultValue={item.id_detail}
+                    placeholder="Введите ID запчасти..."
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="text-sm mb-2 block">Цена</label>
+                  <Input
+                    {...register(`parts.${index}.price_uzs`, )}
+                    defaultValue={item.id_detail}
+                    placeholder="Цена..."
+                    onInput={(e) => {
+                      const rawValue = e.currentTarget.value.replace(/,/g, "");
+                      const parsedValue = parseFloat(rawValue);
+                      e.currentTarget.value = formatNumberWithCommas(parsedValue);
+                    }}
+                  />
+                </div>
+
+                <div className=" self-end">
+                <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+                    <Button
+                      variant="ghost"
+                      type="button"
+                      onClick={() => handleDelete(item, index)}
+                    >
+                      <X />
+                    </Button>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Введите цену, чтобы отключить машину</DialogTitle>
+                    </DialogHeader>
+                    <div className="flex flex-col gap-4">
+                      <div className="space-y-2">
+                        <label
+                          htmlFor="amount"
+                          className="block text-sm font-medium"
+                        >
+                          Сумма
+                        </label>
+                        <Input
+                          value={deletePrice}
+                          onChange={(e) => setDeletePrice(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                    <DialogFooter >
+                      <DialogTrigger><Button variant={"outline"}>Назад</Button></DialogTrigger>
+                      <Button
+                        onClick={onDelete}
+                        className="bg-blue-500 text-white hover:bg-blue-600 rounded-md"
+                      >
+                        Утилизировать
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+                </div>
+              </div>
+            ))}
+            <div className="flex gap-2 w-full justify-end mt-9">
+              <Button
+                type="button"
+                className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded-md"
+                onClick={() => {
+                  append({
+                    name: "",
+                    id_detail: "",
+                    price_uzs: "",
+                    in_sklad: false,
+                  });
+                }}
+                disabled={!isLastFieldValid()} // Disable based on last field validation
+              >
+                Добавить новую запчасть
+              </Button>
+              <Button
+                type="submit"
+                className="bg-[#4880FF] text-white hover:bg-blue-600 w-[200px] rounded-md"
+              >
+                Сохранять
+              </Button>
             </div>
-            <div className="flex-1 relative">
-              <label className="text-sm mb-2 block">ID запчасти</label>
-              <Input
-                value={part.id}
-                onChange={(e) => setPart({ ...part, id: e.target.value })}
-                placeholder="Введите ID запчасти..."
-              />
-            </div>
-            <Button variant="ghost" onClick={()=>setPart({id: "", name: ""})}><X/></Button>
-          </div>
-          <div className="flex gap-2 w-full justify-end mt-9">
-            <Button
-              type="button"
-              className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded-md"
-            >
-              Добавить новую запчасть
-            </Button>
-            <Button
-              type="submit"
-              className="bg-[#4880FF] text-white hover:bg-blue-600 w-[200px] rounded-md"
-            >
-              Добавить
-            </Button>
-          </div>
-        </form>
+          </form>
+        </FormProvider>
+        <div className="mt-4 flex justify-between items-center">
+        <div>
+        Итого: {carDetails?.count || 0} с {indexOfFirstOrder + 1} до{" "}
+        {Math.min(indexOfLastOrder, carDetails?.count as number) || 0}
+        </div>
+        <div className="flex space-x-2 items-center">
+          <Button
+            variant="outline"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="w-10 h-10 p-0"
+          >
+            <ChevronLeftIcon className="w-4 h-4" />
+            <span className="sr-only">Предыдущая страница</span>
+          </Button>
+          {buttons.map((button, index) =>
+            button === "..." ? (
+              <span key={index} style={{ margin: "0 5px" }}>
+                ...
+              </span>
+            ) : (
+              <Button
+                key={index}
+                onClick={() => handlePageChange(button as number)}
+                disabled={button === currentPage}
+                className={
+                  button === currentPage ? "bg-[#4880FF] text-white" : "border"
+                }
+                variant={button === currentPage ? "default" : "ghost"}
+              >
+                {button || ""}
+              </Button>
+            )
+          )}
+          <Button
+            variant="outline"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="w-10 h-10 p-0"
+          >
+            <ChevronRightIcon className="w-4 h-4" />
+            <span className="sr-only">Следующая страница</span>
+          </Button>
+        </div>
+      </div>
       </CardContent>
     </Card>
   );

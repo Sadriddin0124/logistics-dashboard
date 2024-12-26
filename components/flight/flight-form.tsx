@@ -1,7 +1,7 @@
-import { FormProvider, useForm } from "react-hook-form";
+import { Controller, FormProvider, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
-  Select,
+  Select as Selector,
   SelectContent,
   SelectItem,
   SelectTrigger,
@@ -13,71 +13,121 @@ import { useEffect, useState } from "react";
 import { ImageType } from "@/lib/types/file.types";
 import { FileUploader } from "../ui-items/FileUploader";
 import { CurrencyInputs } from "../ui-items/currency-inputs";
-type FormValues = {
-  region: string;
-  city: string;
-  route: number;
-  car: string;
-  driver: number;
-  departure_date: string;
-  arrival_date: string;
-  price_uzs: number;
-  price_usd: number;
-  driver_expenses_uzs: number;
-  driver_expenses_usd: number;
-  cargo_info: string;
-  status: string;
-};
+import { IFlightData } from "@/lib/types/flight.types";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { queryClient } from "../ui-items/ReactQueryProvider";
+import { toast } from "react-toastify";
+import { createFlight } from "@/lib/actions/flight.action";
+import { Option } from "@/pages/warehouse/diesel";
+import { fetchCarNoPage } from "@/lib/actions/cars.action";
+import { ICars } from "@/lib/types/cars.types";
+import Select, { SingleValue } from "react-select";
+import { IRegion } from "@/lib/types/regions.types";
+import { fetchRegionsAll } from "@/lib/actions/region.action";
+import { IEmployee } from "@/lib/types/employee.types";
+import { fetchEmployeesAll } from "@/lib/actions/employees.action";
+import { removeCommas } from "@/lib/utils";
+import { useRouter } from "next/router";
 
 export default function FlightForm() {
-  const methods = useForm<FormValues>({
-    defaultValues: {
-      region: "",
-      city: "",
-      route: 0, // Changed to a number
-      car: "", // Changed to "car" instead of "vehicle"
-      driver: 0, // Changed to a number
-      departure_date: "", // Changed to "departure_date"
-      arrival_date: "", // Changed to "arrival_date"
-      price_uzs: 0, // Changed to "price_uzs"
-      price_usd: 0, // Changed to "price_usd"
-      driver_expenses_uzs: 0, // Changed to "driver_expenses_uzs"
-      driver_expenses_usd: 0, // Changed to "driver_expenses_usd"
-      cargo_info: "", // Changed to "cargo_info"
-      status: "ACTIVE", // Changed to "status"
-    },
-  });
-  const { register, handleSubmit, setValue, watch } = methods;
+  const methods = useForm<IFlightData>();
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = methods;
   const [image, setImage] = useState<ImageType>({ id: "", file: "" });
-  const region = watch("region");
+  const [driverOptions, setDriverOptions] = useState<Option[]>([]);
+  const [selectedDriver, setSelectedDriver] = useState<Option | null>(null);
+  const [carOptions, setCarOptions] = useState<Option[]>([]);
+  const [selectedCar, setSelectedCar] = useState<Option | null>(null);
+  const flight_type = watch("flight_type");
+  const route = watch("route");
 
+  const { push } = useRouter();
+  const { data: cars } = useQuery<ICars[]>({
+    queryKey: ["cars"],
+    queryFn: fetchCarNoPage,
+  });
+  const { data: regions } = useQuery<IRegion[]>({
+    queryKey: ["regions"],
+    queryFn: fetchRegionsAll,
+  });
+  const { data: employeeList } = useQuery<IEmployee[]>({
+    queryKey: ["employees-all"],
+    queryFn: fetchEmployeesAll,
+  });
   useEffect(() => {
-    if (region === "На территории Узбекистана.") {
-      setValue("city", "");
-      setValue("route", 0); // Set default value to 0 (or another appropriate default)
+    const driverOption = employeeList
+      ?.filter((driver) => driver?.flight_type === flight_type)
+      ?.map((driver) => {
+        return {
+          label: driver?.full_name,
+          value: driver?.id,
+        };
+      });
+    const carOption = cars?.map((car) => {
+      return {
+        label: `${car?.name} ${car?.number}`,
+        value: car?.id,
+      };
+    });
+    setCarOptions(carOption as Option[]);
+    setDriverOptions(driverOption as Option[]);
+  }, [cars, employeeList, flight_type]);
+  useEffect(() => {
+    if (flight_type === "IN_UZB") {
+      setValue("region", "");
+      setValue("route", ""); // Set default value to 0 (or another appropriate default)
       setValue("departure_date", "");
       setValue("arrival_date", "");
       setValue("car", "");
-      setValue("driver", 0);
-      setValue("price_uzs", 0);
-      setValue("price_usd", 0);
-      setValue("driver_expenses_uzs", 0);
-      setValue("driver_expenses_usd", 0);
+      setValue("driver", "");
+      setValue("price_uzs", "");
+      setValue("driver_expenses_uzs", "");
       setValue("cargo_info", "");
-      setValue("status", "ACTIVE");
     }
-  }, [region, setValue]);
-
-  const onSubmit = (data: FormValues) => {
-    console.log(data);
-    // Handle form submission
+    const region = watch("region")
+    const item =  regions?.find(item=> item?.id === region)
+    setValue("price_uzs", item?.price1.toString())
+  }, [flight_type, setValue, image, regions, watch]);
+  const { mutate: createMutation } = useMutation({
+    mutationFn: createFlight,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["recycled"] });
+      toast.success(" muvaffaqiyatli qo'shildi!");
+      push(`/flight`);
+    },
+    onError: () => {
+      toast.error("ni qo'shishda xatolik!");
+    },
+  });
+  const onSubmit = (data: IFlightData) => {
+    createMutation({
+      ...data,
+      upload: image?.id,
+      driver_expenses_uzs: Number(
+        removeCommas(data?.driver_expenses_uzs as string)
+      ),
+      arrival_date: data?.arrival_date || "2024-12-26",
+      price_uzs: Number(removeCommas(data?.price_uzs as string)),
+      // upload: image?.id
+    });
   };
 
   const handleSelectChange = (value: string, name: string) => {
     setValue(name as "region", value);
   };
-console.log(image);
-
+  const handleSelectCar = (newValue: SingleValue<Option>) => {
+    setSelectedCar(newValue);
+    setValue("car", newValue?.value as string);
+  };
+  const handleSelectDriver = (newValue: SingleValue<Option>) => {
+    setSelectedDriver(newValue);
+    setValue("driver", newValue?.value as string);
+  };
   return (
     <FormProvider {...methods}>
       <form
@@ -88,84 +138,108 @@ console.log(image);
           {/* Region Selection */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Выберите регион*</label>
-            <Select
-              defaultValue="За территории Узбекистана"
-              onValueChange={(value) => handleSelectChange(value, "region")}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Выберите..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="За территории Узбекистана">
-                  За территории Узбекистана
-                </SelectItem>
-                <SelectItem value="На территории Узбекистана.">
-                  На территории Узбекистана.
-                </SelectItem>
-              </SelectContent>
-            </Select>
+            <Controller
+              name="flight_type"
+              control={methods.control}
+              rules={{ required: "Поле обязательно для заполнения." }}
+              render={({ field }) => (
+                <Selector onValueChange={field.onChange} value={field.value}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Выберите..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="OUT">
+                      За территории Узбекистана
+                    </SelectItem>
+                    <SelectItem value="IN_UZB">
+                      На территории Узбекистана
+                    </SelectItem>
+                  </SelectContent>
+                </Selector>
+              )}
+            />
+            {errors?.flight_type && (
+              <p className="text-red-500">{errors?.flight_type?.message}</p>
+            )}
           </div>
 
           {/* Car Selection */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Выберите автомобиль*</label>
-            <Select onValueChange={(value) => handleSelectChange(value, "car")}>
-              <SelectTrigger>
-                <SelectValue placeholder="Выберите..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="car1">Автомобиль 1</SelectItem>
-                <SelectItem value="car2">Автомобиль 2</SelectItem>
-              </SelectContent>
-            </Select>
+            <Select
+              {...register("car", { required: "Required" })}
+              options={carOptions}
+              value={selectedCar}
+              onChange={handleSelectCar}
+              placeholder={"Isuzu 01A111AA"}
+              noOptionsMessage={() => "Type to add new option..."}
+            />
+            {errors?.car && (
+              <p className="text-red-500">{errors?.car?.message}</p>
+            )}
           </div>
 
           {/* City Selection */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Выберите область*</label>
-            <Select
-              onValueChange={(value) => handleSelectChange(value, "city")}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Выберите..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="city1">Область 1</SelectItem>
-                <SelectItem value="city2">Область 2</SelectItem>
-              </SelectContent>
-            </Select>
+            <Controller
+              name="region"
+              control={methods.control}
+              rules={{ required: "Поле обязательно для заполнения." }}
+              render={({ field }) => (
+                <Selector onValueChange={field.onChange} value={field.value}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Выберите..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {regions?.filter(item=> item?.flight_type === flight_type)?.map((region) => (
+                      <SelectItem key={region.id} value={region.id as string}>
+                        {region.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Selector>
+              )}
+            />
+            {errors?.region && (
+              <p className="text-red-500">{errors?.region?.message}</p>
+            )}
           </div>
 
           {/* Driver Selection */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Выберите водителя*</label>
             <Select
-              onValueChange={(value) => handleSelectChange(value, "driver")}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Выберите..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="driver1">Водитель 1</SelectItem>
-                <SelectItem value="driver2">Водитель 2</SelectItem>
-              </SelectContent>
-            </Select>
+              {...register("driver", { required: "Required" })}
+              options={driverOptions}
+              value={selectedDriver}
+              onChange={handleSelectDriver}
+              placeholder={"Выберите водителя"}
+              noOptionsMessage={() => "Выберите регион*"}
+            />
+            {errors?.driver && (
+              <p className="text-red-500">{errors?.driver?.message}</p>
+            )}
           </div>
 
           {/* Route Selection */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Маршрут*</label>
-            <Select
+            <Selector
               onValueChange={(value) => handleSelectChange(value, "route")}
+              {...register("route", { required: "Route is required" })}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Выберите..." />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={"0"}>Маршрут 1</SelectItem>
-                <SelectItem value={"1"}>Маршрут 2</SelectItem>
+                <SelectItem value={"GONE_TO"}>Туда</SelectItem>
+                <SelectItem value={"BEEN_TO"}>Туда и обратно</SelectItem>
               </SelectContent>
-            </Select>
+            </Selector>
+            {errors?.route && (
+              <p className="text-red-500">{errors?.route?.message}</p>
+            )}
           </div>
 
           {/* Trip Price */}
@@ -174,6 +248,9 @@ console.log(image);
               Введите стоимость рейса*
             </label>
             <CurrencyInputs name="price" />
+            {/* {errors?.price_uzs && (
+              <p className="text-red-500">{errors?.price_uzs?.message}</p>
+            )} */}
           </div>
 
           {/* Departure Date */}
@@ -182,14 +259,20 @@ console.log(image);
             <Input
               type="date"
               placeholder="Введите дату"
-              {...register("departure_date", { required: true })}
+              {...register("departure_date", { required: "Required" })}
             />
+            {errors?.departure_date && (
+              <p className="text-red-500">{errors?.departure_date?.message}</p>
+            )}
           </div>
 
           {/* Spending */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Расходы водителя*</label>
             <CurrencyInputs name="driver_expenses" />
+            {/* {errors?.driver_expenses_uzs && (
+              <p className="text-red-500">{errors?.driver_expenses_uzs?.message}</p>
+            )} */}
           </div>
 
           {/* Arrival Date */}
@@ -200,9 +283,26 @@ console.log(image);
             <Input
               type="date"
               placeholder="Введите дату"
-              {...register("arrival_date", { required: true })}
+              {...register("arrival_date", {
+                required: route === "BEEN_TO" ? "Required" : false,
+              })}
             />
+            {errors?.arrival_date && (
+              <p className="text-red-500">{errors?.arrival_date?.message}</p>
+            )}
           </div>
+          {flight_type === "OUT" && <div className="space-y-2">
+            <label className="text-sm font-medium">Расход на питание*</label>
+            <Input
+              placeholder="Введите rasxod"
+              {...register("other_expenses", {
+                required: flight_type === "OUT" ? "Required" : false,
+              })}
+            />
+            {errors?.other_expenses && (
+              <p className="text-red-500">{errors?.other_expenses?.message}</p>
+            )}
+          </div>}
         </div>
 
         {/* Cargo Information */}
@@ -216,19 +316,13 @@ console.log(image);
         </div>
 
         {/* Expenses */}
-        {region !== "На территории Узбекистана." && (
+        {flight_type !== "IN_UZB" && (
           <div className="grid grid-cols-2 gap-6">
             <FileUploader image={image} setImage={setImage} type=".xlsx" />
           </div>
         )}
 
         <div className="w-full flex justify-end gap-6">
-          <Button
-            type="submit"
-            className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded-md"
-          >
-            Завершить рейс
-          </Button>
           <Button
             type="submit"
             className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded-md"

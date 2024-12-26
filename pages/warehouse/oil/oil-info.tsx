@@ -3,158 +3,149 @@
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
 import { useRouter } from "next/router";
 import { FormProvider, useForm } from "react-hook-form";
 import { CurrencyInputs } from "@/components/ui-items/currency-inputs";
-import { IOilType } from "@/lib/types/oil.types";
+import { IOil, IOilType } from "@/lib/types/oil.types";
 import { removeCommas } from "@/lib/utils";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { fetchOil, updateOil } from "@/lib/actions/oil.action";
+import { createOilPurchase, deleteOil, fetchOil } from "@/lib/actions/oil.action";
 import { queryClient } from "@/components/ui-items/ReactQueryProvider";
 import { toast } from "react-toastify";
 import { Label } from "@/components/ui/label";
-
-interface GasEntry {
-  machine: string;
-  quantity: string;
-  start: string;
-  end: string;
-}
+import PurchasedOilTable from "@/components/warehouse/oil/oil-purchased-table";
+import RecycledOilTable from "@/components/warehouse/oil/oil-recycled-table";
+import { ForceDeleteDialog } from "@/components/ui-items/force-delete";
 
 export default function GasManagementForm() {
-  const [entries] = useState<GasEntry[]>([
-    {
-      machine: "Isuzu 01A113AA",
-      quantity: "10 (литр)",
-      start: "12.12.2024",
-      end: "12.05.2025",
-    },
-    {
-      machine: "Isuzu 01A113AA",
-      quantity: "10 (литр)",
-      start: "12.12.2024",
-      end: "12.05.2025",
-    },
-    {
-      machine: "Isuzu 01A113AA",
-      quantity: "10 (литр)",
-      start: "12.12.2024",
-      end: "12.05.2025",
-    },
-    {
-      machine: "Isuzu 01A113AA",
-      quantity: "10 (литр)",
-      start: "12.12.2024",
-      end: "12.05.2025",
-    },
-    {
-      machine: "Isuzu 01A113AA",
-      quantity: "10 (литр)",
-      start: "12.12.2024",
-      end: "12.05.2025",
-    },
-    {
-      machine: "Isuzu 01A113AA",
-      quantity: "10 (литр)",
-      start: "12.12.2024",
-      end: "12.05.2025",
-    },
-  ]);
-  const methods = useForm<IOilType>();
-  const { register, handleSubmit, setValue, watch, reset } = methods;
-  const payed_price_uzs = watch("payed_price_uzs")?.toString();
-  const price_uzs = watch("price_uzs")?.toString();
-  const { id } = useRouter()?.query
+  const methods = useForm<IOil>();
+  const { register, handleSubmit, setValue, watch } = methods;
+  const amount_uzs = watch("amount_uzs");
+  const price_uzs = watch("price_uzs");
+  const router = useRouter()
+  const { id } = router.query;
+  const [status, setStatus] = useState<string>("");
 
   const { data: oilData } = useQuery<IOilType>({
     queryKey: ["oil"],
-    queryFn: ()=> fetchOil(id as string),
-    enabled: !!id
+    queryFn: () => fetchOil(id as string),
+    enabled: !!id,
   });
+
   useEffect(() => {
     if (oilData) {
-      reset(oilData);
+      setValue("oil_name", oilData?.oil_name);
     }
-    const payedPrice = Number(removeCommas(payed_price_uzs)) || 0;
-    const pricePerLiter = Number(removeCommas(price_uzs)) || 0;
-
+    const payedPrice = Number(removeCommas(amount_uzs as string)) || 0;
+    const pricePerLiter = Number(removeCommas(price_uzs as string)) || 0;
     if (pricePerLiter > 0) {
       const result = payedPrice / pricePerLiter;
-      setValue("oil_volume", result.toFixed(2));
+      setValue("oil_volume", Number(result.toFixed(2)));
+      if (result < 1) {
+        setStatus("gaz narxi to'langan summadan baland bo'lmasligi kerak")
+      }
     } else {
-      setValue("oil_volume", "0");
+      setValue("oil_volume", 0);
     }
-  }, [price_uzs, payed_price_uzs, setValue, reset, oilData]);
+  }, [price_uzs, amount_uzs, setValue, oilData]);
+
   const { mutate: createMutation } = useMutation({
-    mutationFn: updateOil,
+    mutationFn: (data: { id: string; oilData: IOilType }) =>
+      createOilPurchase(data.id, data.oilData),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["gas_stations"] });
+      queryClient.invalidateQueries({ queryKey: ["oil"] });
+      queryClient.invalidateQueries({ queryKey: ["oil_purchases"] });
       toast.success(" muvaffaqiyatli qo'shildi!");
     },
     onError: () => {
       toast.error("ni qo'shishda xatolik!");
     },
   });
-  const onSubmit = (data: IOilType) => {
+
+  const onSubmit = (data: IOil) => {
+    const formData = {
+      oil_volume: data?.oil_volume,
+      // amount_usd: Number(removeCommas(data?.amount_usd)),
+      amount_uzs: Number(removeCommas(data?.amount_uzs)),
+      price_uzs: Number(removeCommas(data?.price_uzs)),
+      // price_usd: Number(removeCommas(data?.price_usd)),
+    };
     createMutation({
-      ...data,
       id: id as string,
-      payed_price_usd: Number(data?.payed_price_usd),
-      payed_price_uzs: Number(data?.payed_price_uzs),
-      price_uzs: Number(data?.price_uzs),
-      price_usd: Number(data?.price_usd),
+      oilData: formData as IOilType,
     });
   };
+    const { mutate: deleteMutation } = useMutation({
+      mutationFn: deleteOil,
+     onSuccess: () => {
+       queryClient.invalidateQueries({ queryKey: ["oil"] });
+       router.push("/warehouse/oil")
+       toast.success("Muvaffaqiyatli qo'shildi!");
+     },
+     onError: () => {
+       toast.error("Xatolik yuz berdi!");
+     },
+   });
+   const handleDelete = (id: string) => {
+    deleteMutation(id)
+   }
   return (
     <div className="w-full container mx-auto mt-8 space-y-8">
       {/* Top Form Section */}
       <Card>
         <CardContent className="mt-8">
           <FormProvider {...methods}>
-            <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm">Название масло</label>
-                  <Input {...register("oil_name")} placeholder="Название..." />
-                </div>
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="grid grid-cols-2 gap-4"
+            >
+              <div className="space-y-2">
+                <label className="text-sm">Название масло</label>
+                <Input {...register("oil_name")} placeholder="Название..." />
+              </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm">Оплаченная сумма</label>
-                  <CurrencyInputs name="payed_price" />
-                </div>
+              <div className="space-y-2">
+                <label className="text-sm">Оплаченная сумма</label>
+                <CurrencyInputs name="amount" />
+              </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm">
-                    Количество купленного масло (литр)
-                  </label>
-                  <Input
-                    {...register("oil_volume", { required: true })}
-                    disabled
-                    placeholder="0"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm">Цена на масло (литр)</label>
-                  <CurrencyInputs name="price" />
-                </div>
+              <div className="space-y-2">
+                <label className="text-sm">
+                  Количество купленного масло (литр)
+                </label>
+                <Input
+                  {...register("oil_volume", { required: true })}
+                  disabled
+                  placeholder="0"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm">Цена на масло (литр)</label>
+                <CurrencyInputs name="price" />
+                {status && <p className="text-sm text-red-500">{status}</p>}
+              </div>
 
-              <div className="flex justify-end col-span-2">
+              <div className="flex justify-end gap-2 col-span-2">
+                <ForceDeleteDialog
+                  id={id as string}
+                  onDelete={handleDelete}
+                  total={oilData?.oil_volume as number}
+                  type="Установите сумму 0"
+                />
+
                 <Button className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded">
                   Добавить
                 </Button>
               </div>
-          <div >
-            <Label>Оставшееся количество масло  (литр)</Label>
-            <Input readOnly value={0} className="bg-muted" />
-          </div>
+              <div>
+                <Label>Оставшееся количество масло (литр)</Label>
+                <Input
+                  readOnly
+                  value={oilData?.oil_volume}
+                  className="bg-muted"
+                />
+              </div>
             </form>
           </FormProvider>
         </CardContent>
@@ -163,70 +154,16 @@ export default function GasManagementForm() {
       {/* Middle Table Section */}
       <Card>
         <CardContent className="p-6">
-          <Table>
-            <TableHeader className="font-bold">
-              <TableRow className="border-b border-b-gray-300">
-                <TableHead className="font-bold">Машина</TableHead>
-                <TableHead className="font-bold">Количество</TableHead>
-                <TableHead className="font-bold">
-                  Последний дата заменa
-                </TableHead>
-                <TableHead className="font-bold">
-                  Следующая дата замены
-                </TableHead>
-                <TableHead className="font-bold"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {entries.map((entry, index) => (
-                <TableRow key={index} className="border-b border-b-gray-300">
-                  <TableCell>{entry.machine}</TableCell>
-                  <TableCell>{entry.quantity}</TableCell>
-                  <TableCell>{entry.start}</TableCell>
-                  <TableCell>{entry.end}</TableCell>
-                  <TableCell className="text-center">
-                    <Button
-                      variant="secondary"
-                      className="bg-red-100 hover:bg-red-200 text-red-600"
-                    >
-                      Заменён
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <h2 className="text-2xl font-medium">Покупные масла</h2>
+          <PurchasedOilTable />
         </CardContent>
       </Card>
 
       {/* Bottom Summary Section */}
       <Card>
         <CardContent className="p-6">
-          <Table>
-            <TableHeader className="font-bold">
-              <TableRow className="border-b border-b-gray-300">
-                <TableHead className="font-bold">Оплаченная сумма</TableHead>
-                <TableHead className="font-bold">Количество</TableHead>
-                <TableHead className="font-bold">Цена</TableHead>
-                <TableHead className="font-bold"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow className="border-b border-b-gray-300">
-                <TableCell className="font-medium">10,000,000 сум</TableCell>
-                <TableCell>300(м3)</TableCell>
-                <TableCell>2500 сум</TableCell>
-                <TableCell className="text-center">
-                  <Button
-                    variant="secondary"
-                    className="bg-green-100 hover:bg-green-200 text-green-600"
-                  >
-                    Куплено
-                  </Button>
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
+          <h2 className="text-2xl font-medium">Поменял масла</h2>
+          <RecycledOilTable />
         </CardContent>
       </Card>
     </div>

@@ -13,21 +13,21 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { fetchStationSales } from "@/lib/actions/gas.action";
 import { useQuery } from "@tanstack/react-query";
-import { PurchasedGasListResponse } from "@/lib/types/gas_station.types";
+import { SoldGasListResponse } from "@/lib/types/gas_station.types";
 import { queryClient } from "@/components/ui-items/ReactQueryProvider";
 import { useRouter } from "next/router";
 
 export default function SalesGasTable() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const id = useRouter()?.query.id;
-  const { data: purchased } = useQuery<PurchasedGasListResponse>({
-    queryKey: ["purchased", id],
+  const { data: sales } = useQuery<SoldGasListResponse>({
+    queryKey: ["sales", id],
     queryFn: () => fetchStationSales(id as string, currentPage),
     enabled: !!id,
   });
   useEffect(() => {
     queryClient.prefetchQuery({
-      queryKey: ["purchased", id, currentPage + 1],
+      queryKey: ["sales", id, currentPage + 1],
       queryFn: () => fetchStationSales(id as string, currentPage + 1),
     });
   }, [currentPage, id]);
@@ -36,7 +36,7 @@ export default function SalesGasTable() {
   const indexOfLastOrder = currentPage * itemsPerPage;
   const indexOfFirstOrder = (currentPage - 1) * itemsPerPage;
 
-  const totalPages = Math.ceil((purchased?.count as number) / itemsPerPage);
+  const totalPages = Math.ceil((sales?.count as number) / itemsPerPage);
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
@@ -73,30 +73,27 @@ export default function SalesGasTable() {
           <TableRow className="border-b border-gray-200">
             <TableHead className="font-bold">T/R</TableHead>
             <TableHead className="font-bold">Машина</TableHead>
+            <TableHead className="font-bold">Название заправки</TableHead>
+            <TableHead className="font-bold">Date</TableHead>
             <TableHead className="font-bold">Количество</TableHead>
-            <TableHead className="font-bold">Цена</TableHead>
             <TableHead className="font-bold w-[50px]"></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {purchased?.results?.map((purchased, index) => (
-            <TableRow key={purchased.id} className="border-b border-gray-200">
+          {sales?.results?.map((sales, index) => (
+            <TableRow key={sales.id} className="border-b border-gray-200">
               <TableCell>{index + 1}</TableCell>
-              <TableCell>
-                {purchased.payed_price_usd} $ / {purchased.payed_price_uzs} сум
-              </TableCell>
-              <TableCell>{purchased?.amount?.toFixed(2)}</TableCell>
-              <TableCell>
-                {purchased.price_usd} $ / {purchased.price_uzs} сум
-              </TableCell>
+              <TableCell>{sales?.car?.name}</TableCell>
+              <TableCell>{sales?.station?.name}</TableCell>
+              <TableCell>{sales?.created_at?.slice(0,10)} сум</TableCell>
+              <TableCell>{sales?.amount?.toFixed(2)}</TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
       <div className="mt-4 flex justify-between items-center">
         <div>
-          {purchased?.count} ta Zapravkalardan {indexOfFirstOrder + 1} dan{" "}
-          {Math.min(indexOfLastOrder, purchased?.count as number)} gacha
+          Итого: {sales?.count} с {indexOfFirstOrder + 1} до {Math.min(indexOfLastOrder, sales?.count as number) || 0}
         </div>
         <div className="flex space-x-2 items-center">
           <Button

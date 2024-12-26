@@ -29,14 +29,10 @@ $api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
     if (error.response.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
+      originalRequest._retry = true; // Prevent infinite retry loops
       if (window.location.pathname !== "/login") {
         window.location.href = "/login";
       }
-    }
-    console.log(error);
-    if (error.response.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true; // Prevent infinite retry loops
 
       // Get the refresh token
       const refreshToken = localStorage.getItem("refreshToken");
@@ -44,7 +40,7 @@ $api.interceptors.response.use(
       try {
         // Request a new access token
         const { data } = await $apiAuth.post(`/auth/api/token/refresh/`, {
-          refresh: refreshToken,
+          token: refreshToken,
         });
         console.log(data);
 
