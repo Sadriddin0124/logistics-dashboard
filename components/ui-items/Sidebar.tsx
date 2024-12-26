@@ -17,10 +17,6 @@ import {
   Users,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-import { ExchangeRate } from "@/lib/types/general.types";
-import { getExchangeRate } from "@/lib/actions/general";
-import { CurrencyStatus } from "./currency-status";
 import { Button } from "../ui/button";
 import { useRouter } from "next/router";
 
@@ -141,11 +137,6 @@ export const AppSidebar: React.FC<SideBarProps> = ({
       setSubItemStatus(false);
     }
   };
-  const { data: exchange } = useQuery<ExchangeRate[]>({
-    queryKey: ["exchange"],
-    queryFn: getExchangeRate,
-  });
-  const EXCHANGE_RATE = exchange?.find((item) => item?.Ccy === "USD");
   const logOut = () => {
     localStorage.removeItem("refreshToken")
     localStorage.removeItem("accessToken")
@@ -204,11 +195,6 @@ export const AppSidebar: React.FC<SideBarProps> = ({
             })}
             <div className="h-full flex flex-col items-end justify-end gap-2 p-6">
               <Button onClick={logOut} className="w-full mt-10">Выйти</Button>
-            <CurrencyStatus
-              currency={EXCHANGE_RATE?.Ccy as string}
-              value={EXCHANGE_RATE?.Rate as string}
-              change={EXCHANGE_RATE?.Diff as string}
-            />
             </div>
           </div>
           {subItemStatus && (

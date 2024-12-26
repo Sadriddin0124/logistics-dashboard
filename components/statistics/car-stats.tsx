@@ -58,11 +58,11 @@ export function CarCard({
         </div>
         <div className="flex justify-between w-full">
           <div className="text-md font-medium">Баланс лизинга</div> {/* Translation: "Leasing Balance" */}
-          <div>{splitToHundreds(item?.leasing_balance)} сум</div>
+          <div>{splitToHundreds(item?.amount_uzs) || 0} сум</div>
         </div>
         <div className="flex justify-between w-full">
           <div className="text-md font-medium">Оплаченный лизинг</div> {/* Translation: "Paid leasing" */}
-          <div>{splitToHundreds(item?.total_leasing_paid)} сум</div>
+          <div>{splitToHundreds(item?.total_leasing_paid) || 0} сум</div>
         </div>
       </CardContent>
     </Card>

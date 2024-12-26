@@ -161,7 +161,7 @@ export default function IncomeOutcomeGraph() {
 
 
   return (
-    <div className="grid grid-cols-1">
+    <div className="flex flex-col items-center justify-center">
       <Card className="w-full mt-4">
       <CardHeader>
         <CardTitle>Доход против Расхода</CardTitle>
@@ -181,7 +181,7 @@ export default function IncomeOutcomeGraph() {
               color: "hsl(var(--chart-2))",
             },
           }}
-          className="h-[400px]"
+          className="h-[500px]"
         >
           <ResponsiveContainer width="100%" height="100%">
             <LineChart

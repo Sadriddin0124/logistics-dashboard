@@ -24,7 +24,7 @@ const Breadcrumb = () => {
     },
     {
       key: "gas-sold",
-      value: "O Топливо (Газ)",
+      value: "Реализация газа"
     },
     {
       key: "oil",
@@ -36,10 +36,38 @@ const Breadcrumb = () => {
     },
     {
       key: "oil-exchange",
-      value: "",
+      value: "Замена масла",
     },
     {
       key: "oil-recycled",
+      value: "Лить масло",
+    },
+    {
+      key: "diesel",
+      value: "Дизель",
+    },
+    {
+      key: "diesel-fill",
+      value: "Дизельный впрыск",
+    },
+    {
+      key: "settings",
+      value: "Настройки",
+    },
+    {
+      key: "flight",
+      value: "Рейс",
+    },
+    {
+      key: "flight-create",
+      value: "Добавить рейс",
+    },
+    {
+      key: "flight-info",
+      value: "О рейсe",
+    },
+    {
+      key: "flight",
       value: "",
     },
   ];

@@ -63,12 +63,12 @@ export function ExpenseStats() {
   return (
     <div>
       <div className="flex items-center gap-2 p-4 bg-white rounded-2xl mb-4">
-        <div>
-          <label>Дата начала</label>
+        <div className="space-y-1">
+          <label className="text-sm">Дата начала</label>
           <Input type="date" className="w-[300px]" />
         </div>
-        <div>
-          <label>Дата окончания</label>
+        <div className="space-y-1">
+          <label className="text-sm">Дата окончания</label>
           <Input type="date" className="w-[300px]" />
         </div>
       </div>
@@ -76,58 +76,60 @@ export function ExpenseStats() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
           <StatCard
             title="Рейсы"
-            value={(flights_all?.count?.toFixed(2)) || 0}
+            value={flights_all?.count?.toFixed(2) || 0}
             icon={PlaneIcon}
             url="/flight/info/"
           />
           <StatCard
             title="Активные рейсы"
-            value={(flights?.count?.toFixed(2)) || 0}
+            value={flights?.count?.toFixed(2) || 0}
             icon={PlaneTakeoff}
             url="/flight/info/"
           />
           <StatCard
             title="Сумма дохода"
-            value={(data?.income_sum?.toFixed(2)) || 0}
+            value={data?.income_sum?.toFixed(2) || 0}
             icon={TrendingUpIcon}
             url="/finance/export-logs/?action=INCOME"
           />
           <StatCard
             title="Сумма расхода"
-            value={(data?.outcome_sum?.toFixed(2)) || 0}
+            value={data?.outcome_sum?.toFixed(2) || 0}
             icon={TrendingDownIcon}
             url="/flight/info/?action=OUTCOME"
           />
           <StatCard
             title={(data?.win as number) > 0 ? "Прибыль" : "Долг"}
-            value={(data?.win?.toFixed(2)) || 0}
+            value={data?.win?.toFixed(2) || 0}
             icon={AwardIcon}
           />
         </div>
         <div className="grid grid-cols-3 gap-4">
           <StatCard
+            status={true}
             title="Газ"
-            value={`${(gasVolume?.toFixed(2)) || 0} м3`}
+            value={`${gasVolume?.toFixed(2) || 0} м3`}
             icon={AwardIcon}
             url="/gas/gaz-info/?type=purchase"
             url2="/gas/gaz-info/?type=sale"
           />
           <StatCard
+            status={true}
             title="Масло"
-            value={`${(oilVolume?.toFixed(2)) || 0} л`}
+            value={`${oilVolume?.toFixed(2) || 0} л`}
             icon={AwardIcon}
             url="/oil/oil-info/?type=purchase"
             url2="/oil/oil-info/?type=recycle"
           />
           <StatCard
+            status={true}
             title="Дизель"
-            value={`${(diesel_volume?.toFixed(2)) || 0} л`}
+            value={`${diesel_volume?.toFixed(2) || 0} л`}
             icon={AwardIcon}
             url="/oil/oil-info/?type=purchase"
             url2="/oil/oil-info/?type=recycle"
           />
         </div>
-        
       </div>
     </div>
   );

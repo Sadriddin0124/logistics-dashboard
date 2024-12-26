@@ -20,7 +20,7 @@ const Cars = () => {
               title={`${item?.name} ${item?.models?.name}`} 
               value={`${item?.number}`}
               icon={Download}
-              url={`/cars/car-info/?fuel_type=${item?.fuel_type}`}
+              url={`/cars/car-infos/${item?.id}`}
               url2="/gas/gaz-info/?type=sale"
               title2={item?.fuel_type === "GAS" ? "Газ" : "Дизель"}
               title3="Газ"
