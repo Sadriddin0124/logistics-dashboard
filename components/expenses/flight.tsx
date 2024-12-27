@@ -13,7 +13,7 @@ import { removeCommas } from "@/lib/utils";
 import { SalaryFormData } from "./salary";
 import { useRouter } from "next/router";
 import { fetchAllFlights } from "@/lib/actions/flight.action";
-import { FlightPaginatedResponse2 } from "@/lib/types/flight.types";
+import { IFlightFormEdit } from "@/lib/types/flight.types";
 import { Input } from "../ui/input";
 
 export default function FlightForm() {
@@ -28,12 +28,12 @@ export default function FlightForm() {
   const [selectedCar, setSelectedFlight] = useState<Option | null>(null);
   const { id } = useRouter()?.query;
 
-  const { data: flights } = useQuery<FlightPaginatedResponse2>({
+  const { data: flights } = useQuery<IFlightFormEdit[]>({
     queryKey: ["all_flights"],
     queryFn: fetchAllFlights,
   });
   useEffect(() => {
-    const carOption = flights?.results?.map((flight) => {
+    const carOption = flights?.filter(item=> item?.status?.toLowerCase() === "active")?.map((flight) => {
       return {
         label: `${flight?.region?.name} ${flight?.car?.name} ${flight?.car?.models?.name}`,
         value: flight?.id,
@@ -51,7 +51,7 @@ export default function FlightForm() {
       toast.success(" Сохранено успешно!");
     },
     onError: () => {
-      toast.error("ni qo'shishda xatolik!");
+      toast.error("Ошибка сохранения!");
     },
   });
 

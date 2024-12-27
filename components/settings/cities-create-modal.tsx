@@ -33,7 +33,7 @@ export default function CreateCityModal({isOpen, setIsOpen, editItem, setEditIte
       toast.success(" Сохранено успешно!");
     },
     onError: () => {
-      toast.error("ni qo'shishda xatolik!");
+      toast.error("Ошибка сохранения!");
     },
   });
   const { mutate: updateMutation } = useMutation({
@@ -44,7 +44,7 @@ export default function CreateCityModal({isOpen, setIsOpen, editItem, setEditIte
       toast.success(" Сохранено успешно!");
     },
     onError: () => {
-      toast.error("ni qo'shishda xatolik!");
+      toast.error("Ошибка сохранения!");
     },
   });
   const onSubmit = (data: IRegion) => {

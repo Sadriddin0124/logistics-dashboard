@@ -110,7 +110,7 @@ export default function GasManagementForm() {
       setSelectedCar(null)
     },
     onError: () => {
-      toast.error("ni qo'shishda xatolik!");
+      toast.error("Ошибка сохранения!");
     },
   });
   const onSubmit = (data: AnotherStation) => {

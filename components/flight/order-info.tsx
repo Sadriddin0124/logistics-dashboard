@@ -66,7 +66,7 @@ export default function OrderFlightFormInfo() {
       push(`/flight`);
     },
     onError: () => {
-      toast.error("ni qo'shishda xatolik!");
+      toast.error("Ошибка сохранения!");
     },
   });
   const onSubmit = (data: IFlightData) => {

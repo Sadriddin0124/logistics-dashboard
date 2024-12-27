@@ -53,7 +53,7 @@ export default function GasManagementForm() {
       reset();
     },
     onError: () => {
-      toast.error("Xatolik yuz berdi!");
+      toast.error("Ошибка сохранения!");
     },
   });
   const { mutate: createMutation } = useMutation({
@@ -69,7 +69,7 @@ export default function GasManagementForm() {
       toast.success(" Сохранено успешно!");
     },
     onError: () => {
-      toast.error("ni qo'shishda xatolik!");
+      toast.error("Ошибка сохранения!");
     },
   });
 

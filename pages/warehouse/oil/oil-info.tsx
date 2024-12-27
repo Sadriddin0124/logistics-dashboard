@@ -59,7 +59,7 @@ export default function GasManagementForm() {
       toast.success(" Сохранено успешно!");
     },
     onError: () => {
-      toast.error("ni qo'shishda xatolik!");
+      toast.error("Ошибка сохранения!");
     },
   });
 
@@ -84,7 +84,7 @@ export default function GasManagementForm() {
        toast.success("Сохранено успешно!");
      },
      onError: () => {
-       toast.error("Xatolik yuz berdi!");
+       toast.error("Ошибка сохранения!");
      },
    });
    const handleDelete = (id: string) => {
@@ -142,7 +142,7 @@ export default function GasManagementForm() {
                 <Label>Оставшееся количество масло (литр)</Label>
                 <Input
                   readOnly
-                  value={oilData?.oil_volume}
+                  value={oilData?.oil_volume?.toFixed(2)}
                   className="bg-muted"
                 />
               </div>

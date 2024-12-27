@@ -79,7 +79,7 @@ export default function CitiesTable() {
       toast.success(" Сохранено успешно!");
     },
     onError: () => {
-      toast.error("ni qo'shishda xatolik!");
+      toast.error("Ошибка сохранения!");
     },
   });
   const handleDelete = (id: string) => {

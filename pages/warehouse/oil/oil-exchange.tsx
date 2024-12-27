@@ -10,7 +10,7 @@ import { queryClient } from "@/components/ui-items/ReactQueryProvider";
 import { toast } from "react-toastify";
 import { IOilExchange, IOilType } from "@/lib/types/oil.types";
 import { createOilExchange, fetchWholeOils } from "@/lib/actions/oil.action";
-import { fetchCarNoPage, updateCarDistance } from "@/lib/actions/cars.action";
+import { fetchCarNoPage, updateCarDistanceOil } from "@/lib/actions/cars.action";
 import { ICars } from "@/lib/types/cars.types";
 import { useRouter } from "next/router";
 
@@ -21,11 +21,17 @@ interface Option {
 
 export default function OilExchange() {
   const methods = useForm<IOilExchange>();
-  const { register, handleSubmit, setValue, formState: {errors} } = methods;
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = methods;
   const [stationOptions, setOilOptions] = useState<Option[]>([]);
   const [selectedOil, setSelectedOil] = useState<Option | null>(null);
   const [carOptions, setCarOptions] = useState<Option[]>([]);
   const [selectedCar, setSelectedCar] = useState<Option | null>(null);
+  const [oilVolume, setOilVolume] = useState(0)
   const { push } = useRouter();
   const { data: cars } = useQuery<ICars[]>({
     queryKey: ["cars"],
@@ -58,7 +64,9 @@ export default function OilExchange() {
       )?.distance_travelled;
       setValue("oil_recycle_distance", car as number);
     }
-  }, [cars, oil, selectedCar, setValue]);
+    const oil_volume = oil?.find(item=> item?.id === selectedOil?.value)?.oil_volume
+    setOilVolume(oil_volume as number)
+  }, [cars, oil, selectedCar, setValue, selectedOil]);
 
   const { mutate: createMutation } = useMutation({
     mutationFn: createOilExchange,
@@ -69,13 +77,13 @@ export default function OilExchange() {
       toast.success("Сохранено успешно!");
     },
     onError: () => {
-      toast.error("Xatolik yuz berdi!");
+      toast.error("Ошибка сохранения!");
     },
   });
   const { mutate: updateMutation } = useMutation({
-    mutationFn: updateCarDistance,
+    mutationFn: updateCarDistanceOil,
     onError: () => {
-      toast.error("Xatolik yuz berdi!");
+      toast.error("Ошибка сохранения!");
     },
   });
   const onSubmit = (data: IOilExchange) => {
@@ -86,9 +94,13 @@ export default function OilExchange() {
       car: selectedCar?.value as string,
       oil: selectedOil?.value as string,
       next_oil_recycle_distance:
-        data?.next_oil_recycle_distance + data?.oil_recycle_distance,
+        data?.next_oil_recycle_distance,
     });
-    updateMutation({id: selectedCar?.value as string, distance_travelled: data?.oil_recycle_distance, next_oil_recycle_distance: data?.next_oil_recycle_distance})
+    updateMutation({
+      id: selectedCar?.value as string,
+      distance_travelled: data?.oil_recycle_distance,
+      next_oil_recycle_distance: data?.next_oil_recycle_distance,
+    });
   };
 
   const handleSelectOil = (newValue: SingleValue<Option>) => {
@@ -142,18 +154,23 @@ export default function OilExchange() {
                     Введите объем переработанного масла
                   </label>
                   <Input
-                    {...register("amount", { required: true })}
+                    {...register("amount", {
+                      required: "Введите объем переработанного масла", // Required validation
+                      validate: (value) =>
+                        value < oilVolume || `Значение должно быть меньше ${oilVolume}`, // Custom validation
+                    })}
                     placeholder="0"
                     onChange={(e) => {
                       const value = parseFloat(e.target.value);
                       setValue("amount", isNaN(value) ? 0 : value); // Set 0 if value is invalid
                     }}
                   />
+                  {errors.amount && (
+                    <p className="text-red-500">{errors.amount.message}</p> // Display error message
+                  )}
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm">
-                  Текущее расстояние до масла
-                  </label>
+                  <label className="text-sm">Текущее расстояние до масла</label>
                   <Input
                     {...register("oil_recycle_distance", {
                       valueAsNumber: true,
@@ -164,7 +181,7 @@ export default function OilExchange() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm">
-                  Следующая масляная дистанция
+                    Следующая масляная дистанция
                   </label>
                   <Input
                     {...register("next_oil_recycle_distance", {
@@ -172,12 +189,16 @@ export default function OilExchange() {
                       required: "Это значение является обязательным.",
                       validate: (value) =>
                         value < oil_recycle_distance
-                      ? "Следующее расстояние рециркуляции масла должно быть больше текущего расстояния."
-                          : true
+                          ? "Следующее расстояние рециркуляции масла должно быть больше текущего расстояния."
+                          : true,
                     })}
                     placeholder="0"
                   />
-                  {errors?.next_oil_recycle_distance && <p className="text-sm text-red-500">{errors?.next_oil_recycle_distance?.message}</p>}
+                  {errors?.next_oil_recycle_distance && (
+                    <p className="text-sm text-red-500">
+                      {errors?.next_oil_recycle_distance?.message}
+                    </p>
+                  )}
                 </div>
               </div>
 

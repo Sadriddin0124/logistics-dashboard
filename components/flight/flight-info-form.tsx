@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 import { ImageType } from "@/lib/types/file.types";
 import { FileUploader } from "../ui-items/FileUploader";
 import { CurrencyInputs } from "../ui-items/currency-inputs";
-import { IFlightCreate, IFlightForm } from "@/lib/types/flight.types";
+import { IFlightCreate, IFlightFormEdit } from "@/lib/types/flight.types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient } from "../ui-items/ReactQueryProvider";
 import { toast } from "react-toastify";
@@ -59,7 +59,7 @@ export default function FlightInfoForm() {
     queryKey: ["employees"],
     queryFn: fetchEmployeesAll,
   });
-  const { data: flight } = useQuery<IFlightForm>({
+  const { data: flight } = useQuery<IFlightFormEdit>({
     queryKey: ["flight-one", id],
     queryFn: () => fetchFlight(id as string),
     enabled: !!id,
@@ -103,8 +103,8 @@ export default function FlightInfoForm() {
       setValue("price_uzs", Number(flight?.price_uzs));
       setValue("driver_expenses_uzs", Number(flight?.driver_expenses_uzs));
       setValue("flight_type", flight?.flight_type);
-      setImage({ id: flight?.upload as string, file: "" });
     }
+    setImage({id: flight?.upload?.id || "", file: flight?.upload?.file || ""})
   }, [flight, setValue]);
   const { mutate: createMutation } = useMutation({
     mutationFn: updateFlightData,
@@ -113,7 +113,7 @@ export default function FlightInfoForm() {
       toast.success(" Сохранено успешно!");
     },
     onError: () => {
-      toast.error("ni qo'shishda xatolik!");
+      toast.error("Ошибка сохранения!");
     },
   });
   const onSubmit = (data: IFlightCreate) => {
@@ -123,7 +123,7 @@ export default function FlightInfoForm() {
       driver_expenses_uzs: Number(removeCommas(data?.driver_expenses_uzs as string)),
       price_uzs: Number(removeCommas(data?.price_uzs as string)),
       price_usd: Number(data?.price_usd),
-      // upload: image?.id
+      upload: image?.id
     });
   };
 

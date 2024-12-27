@@ -88,7 +88,7 @@ export default function GasSold() {
       toast.success("Сохранено успешно!");
     },
     onError: () => {
-      toast.error("Xatolik yuz berdi!");
+      toast.error("Ошибка сохранения!");
     },
   });
   const { mutate: updateMutation } = useMutation({
@@ -98,7 +98,7 @@ export default function GasSold() {
       setSelectedStation(null);
     },
     onError: () => {
-      toast.error("Xatolik yuz berdi!");
+      toast.error("Ошибка сохранения!");
     },
   });
 

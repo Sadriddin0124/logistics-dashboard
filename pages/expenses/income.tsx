@@ -148,7 +148,7 @@ export default function IncomeForm() {
       reset()
     },
     onError: () => {
-      toast.error("ni qo'shishda xatolik!");
+      toast.error("Ошибка сохранения!");
     },
   });
 

@@ -69,6 +69,23 @@ export interface IFlightForm {
   route: string; // Required
   status?: string 
 }
+export interface IFlightFormEdit {
+  id?: string
+  region: IRegion; // UUID
+  flight_type: string; // Enum with 2 possible values
+  car: ICars; // Required
+  driver: string; // Required
+  departure_date: string; // Date in ISO format (required)
+  arrival_date?: string | null; // Date in ISO format (nullable)
+  price_uzs?: string | null; // Nullable
+  price_usd?: string | null; // Nullable
+  driver_expenses_uzs?: string | null; // Expenses allocated to the driver (nullable)
+  driver_expenses_usd?: string | null; // Expenses allocated to the driver (nullable)
+  upload?: {id: string, file: string}; // UUID (nullable)
+  cargo_info?: string | null; // Nullable
+  route: string; // Required
+  status?: string 
+}
 
 
 export interface  IFlightType{

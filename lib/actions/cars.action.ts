@@ -47,6 +47,18 @@ export const updateCarDistance = async (data: {
   const response = await $api.patch(`/cars/update/${data?.id}/`, dataSend);
   return response.data;
 };
+export const updateCarDistanceOil = async (data: {
+  id: string;
+  distance_travelled: number;
+  next_oil_recycle_distance?: number;
+}) => {
+  const data2 = {
+    distance_travelled: data?.distance_travelled,
+    next_oil_recycle_distance: data?.next_oil_recycle_distance,
+  };
+  const response = await $api.patch(`/cars/update/${data?.id}/`, data2);
+  return response.data;
+};
 
 
 export const updateCarLeasing = async (data: {

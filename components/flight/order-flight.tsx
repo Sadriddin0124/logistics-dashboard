@@ -43,7 +43,7 @@ export default function FlightForm() {
       push(`/flight`);
     },
     onError: () => {
-      toast.error("ni qo'shishda xatolik!");
+      toast.error("Ошибка сохранения!");
     },
   });
   const onSubmit = (data: IFlightData) => {
@@ -79,11 +79,13 @@ export default function FlightForm() {
                 <SelectValue placeholder="Выберите..." />
               </SelectTrigger>
               <SelectContent>
-              {regions?.filter(item=> item?.flight_type === "IN_UZB")?.map((region) => (
-                      <SelectItem key={region.id} value={region.id as string}>
-                        {region.name}
-                      </SelectItem>
-                    ))}
+                {regions
+                  ?.filter((item) => item?.flight_type === "IN_UZB")
+                  ?.map((region) => (
+                    <SelectItem key={region.id} value={region.id as string}>
+                      {region.name}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Selector>
             {errors?.region && (
@@ -95,7 +97,9 @@ export default function FlightForm() {
             <label className="text-sm font-medium">Введите имя водителя</label>
             <Input
               placeholder="Введите..."
-              {...register("driver_name", { required: "Имя водителя обязателен" })}
+              {...register("driver_name", {
+                required: "Имя водителя обязателен",
+              })}
             />
             {errors?.driver_name && (
               <p className="text-red-500">{errors?.driver_name?.message}</p>
@@ -120,6 +124,7 @@ export default function FlightForm() {
               {...register("driver_number", {
                 required: "Номер водителя обязателен",
               })}
+              
             />
             {errors?.driver_number && (
               <p className="text-red-500">{errors?.driver_number?.message}</p>
@@ -140,7 +145,13 @@ export default function FlightForm() {
             </label>
             <Input
               placeholder="Введите..."
-              {...register("car_number", { required: "Номер автомобиля обязателен" })}
+              {...register("car_number", {
+                required: "Номер автомобиля обязателен",
+              })}
+              onChange={(e)=> {
+                const value = e.target.value
+                setValue("car_number", value.toUpperCase())
+              }}
             />
             {errors?.car_number && (
               <p className="text-red-500">{errors?.car_number?.message}</p>

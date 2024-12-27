@@ -82,7 +82,7 @@ export default function LeasingForm() {
   const { mutate: updateMutation } = useMutation({
     mutationFn: updateCarLeasing,
     onError: () => {
-      toast.error("ni qo'shishda xatolik!");
+      toast.error("Ошибка сохранения!");
     },
   });
   const onSubmit = (data: FormValues) => {

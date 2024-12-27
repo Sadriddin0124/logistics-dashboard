@@ -60,7 +60,7 @@ export default function DieselFill() {
       toast.success("Сохранено успешно!");
     },
     onError: () => {
-      toast.error("Xatolik yuz berdi!");
+      toast.error("Ошибка сохранения!");
     },
   });
 

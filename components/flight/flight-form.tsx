@@ -30,7 +30,16 @@ import { removeCommas } from "@/lib/utils";
 import { useRouter } from "next/router";
 
 export default function FlightForm() {
-  const methods = useForm<IFlightData>();
+  const [image, setImage] = useState<ImageType>({ id: "", file: "" });
+  const [driverOptions, setDriverOptions] = useState<Option[]>([]);
+  const [selectedDriver, setSelectedDriver] = useState<Option | null>(null);
+  const [carOptions, setCarOptions] = useState<Option[]>([]);
+  const [selectedCar, setSelectedCar] = useState<Option | null>(null);
+  const methods = useForm<IFlightData>({
+    defaultValues: {
+      price_uzs: ""
+    }
+  });
   const {
     register,
     handleSubmit,
@@ -38,11 +47,6 @@ export default function FlightForm() {
     watch,
     formState: { errors },
   } = methods;
-  const [image, setImage] = useState<ImageType>({ id: "", file: "" });
-  const [driverOptions, setDriverOptions] = useState<Option[]>([]);
-  const [selectedDriver, setSelectedDriver] = useState<Option | null>(null);
-  const [carOptions, setCarOptions] = useState<Option[]>([]);
-  const [selectedCar, setSelectedCar] = useState<Option | null>(null);
   const flight_type = watch("flight_type");
   const route = watch("route");
 
@@ -89,10 +93,8 @@ export default function FlightForm() {
       setValue("driver_expenses_uzs", "");
       setValue("cargo_info", "");
     }
-    const region = watch("region");
-    const item = regions?.find((item) => item?.id === region);
-    setValue("price_uzs", item?.price1.toString());
   }, [flight_type, setValue, image, regions, watch]);
+  
   const { mutate: createMutation } = useMutation({
     mutationFn: createFlight,
     onSuccess: () => {
@@ -101,7 +103,7 @@ export default function FlightForm() {
       push(`/flight`);
     },
     onError: () => {
-      toast.error("ni qo'shishda xatolik!");
+      toast.error("Ошибка сохранения!");
     },
   });
   const onSubmit = (data: IFlightData) => {

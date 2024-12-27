@@ -35,7 +35,7 @@ export default function CreateModel({isOpen, setIsOpen, editItem, setEditItem}: 
         toast.success(" Сохранено успешно!");
       },
       onError: () => {
-        toast.error("ni qo'shishda xatolik!");
+        toast.error("Ошибка сохранения!");
       },
     });
     const { mutate: updateMutation } = useMutation({
@@ -47,7 +47,7 @@ export default function CreateModel({isOpen, setIsOpen, editItem, setEditItem}: 
         setEditItem(null)
       },
       onError: () => {
-        toast.error("ni qo'shishda xatolik!");
+        toast.error("Ошибка сохранения!");
       },
     });
   const onSubmit = (data: FormData) => {

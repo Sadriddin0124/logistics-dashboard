@@ -51,7 +51,7 @@ export default function GasManagementForm() {
       push(`/warehouse/gas/gas-info?id=${gasId}`)
     },
     onError: () => {
-      toast.error("Xatolik yuz berdi!");
+      toast.error("Ошибка сохранения!");
     },
   });
 
@@ -69,7 +69,7 @@ export default function GasManagementForm() {
       toast.success("Сохранено успешно!");
     },
     onError: () => {
-      toast.error("Xatolik yuz berdi!");
+      toast.error("Ошибка сохранения!");
     },
   });
 
