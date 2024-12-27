@@ -16,15 +16,10 @@ const Cars = () => {
         {car_info?.map((item, index) => {
           return (
             <CarCard
-            key={index}
-              title={`${item?.name} ${item?.models?.name}`} 
-              value={`${item?.number}`}
+              key={index}
               icon={Download}
               url={`/cars/car-infos/${item?.id}`}
               url2="/gas/gaz-info/?type=sale"
-              title2={item?.fuel_type === "GAS" ? "Газ" : "Дизель"}
-              title3="Газ"
-              distance={item?.distance_travelled}
               item={item}
             />
           );

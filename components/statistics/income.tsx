@@ -26,32 +26,49 @@ import { fetchFinanceInfo } from "@/lib/actions/stats.ction";
 import { useQuery } from "@tanstack/react-query";
 import { ResponseData } from "@/lib/types/stats.types";
 
+type ChartType = {
+  period: string;
+  Приход: number; // Default to 0 if no income
+  Расход: number;
+};
+
 export default function IncomeOutcomeGraph() {
   // Generate a list of months for the current year
   const getCurrentYearMonths = () => {
-    const now = new Date();
+    const year = new Date().getFullYear(); // Get the current year
     const months = [];
     for (let month = 0; month < 12; month++) {
+      if (month === 0) {
+        months.push(
+          new Date(year + 1, month, 1).toISOString().slice(0, 7) // Format: YYYY-MM
+        );
+      }
       months.push(
-        new Date(now.getFullYear(), month, 1).toISOString().slice(0, 7) // Format as YYYY-MM
+        new Date(year, month, 1).toISOString().slice(0, 7) // Format: YYYY-MM
       );
     }
+    months.splice(1, 1);
     return months;
   };
 
   const monthsInYear = useMemo(() => getCurrentYearMonths(), []);
+  console.log(monthsInYear);
 
-  // Query for financial data for the full year
+  console.log(`${monthsInYear[2]}-01`, `${monthsInYear[0]}-30`); // Debug: Ensure correct months are printed
+
   const { data: finance_info } = useQuery<ResponseData>({
     queryKey: ["finance_info"],
     queryFn: () =>
       fetchFinanceInfo(
-        `${monthsInYear[0]}-01`, // Start of the year
-        `${monthsInYear[11]}-31` // End of the year (ensuring we capture December)
+        `${monthsInYear[2]}-01`, // Start of the year
+        `${monthsInYear[0]}-30` // End of the year (ensuring we capture December)
       ),
   });
-
   // Map finance data to all months of the year
+  function newChart(array: ChartType[]) {
+    if (array.length === 0) return array; // Handle empty array case
+    return [...array.slice(1), array[0]]; // Create a new array
+  }
   const chartData = monthsInYear.map((month) => {
     const dataForMonth = finance_info?.results.chart_data.find(
       (entry) => entry.period.slice(0, 7) === month
@@ -62,8 +79,10 @@ export default function IncomeOutcomeGraph() {
       Расход: dataForMonth?.outcome || 0, // Default to 0 if no outcome
     };
   });
-
-    return (
+  const chartCorrect = newChart(chartData);
+  console.log(chartCorrect);
+  
+  return (
     <Card className="w-full mt-4">
       <CardHeader>
         <CardTitle>Доход против Расхода</CardTitle>
@@ -86,14 +105,17 @@ export default function IncomeOutcomeGraph() {
           className="h-[500px]"
         >
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+            <LineChart
+              data={chartCorrect}
+              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+            >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis
                 dataKey="period"
                 tickFormatter={(date) =>
                   new Date(date).toLocaleDateString("ru-RU", {
                     month: "short",
-                    year: "numeric",
+                    // year: "numeric",
                   })
                 }
               />

@@ -6,52 +6,47 @@ import { splitToHundreds } from "@/lib/utils";
 import { ICars } from "@/lib/types/cars.types";
 
 interface StatCardProps {
-  title: string;
-  value: string | number;
   icon: LucideIcon;
   url?: string;
   url2?: string;
-  title2?: string;
-  title3?: string;
-  distance?: number;
   item: ICars
 }
 
 export function CarCard({
-  title,
-  value,
   icon: Icon,
-  url,
-  title2,
-  distance,
-  item
+  item,
 }: StatCardProps) {
   return (
     <Card>
       <CardHeader className="flex flex-row finances-center justify-between space-y-0 pb-2">
-        <CardTitle className="font-medium">{title}</CardTitle>
-        {url && (
+        <CardTitle className="font-medium">{`${item?.name} ${item?.models?.name}`}</CardTitle>
           <Button
             variant={"ghost"}
             size={"sm"}
-            onClick={() => downloadExcelFile(url as string)}
+            onClick={() => downloadExcelFile(`/cars/car-infos/${item?.id}`)}
           >
             <Icon />
           </Button>
-        )}
       </CardHeader>
       <CardContent>
         <div className="flex justify-between w-full">
-          <div className="text-md font-medium">{value}</div>
-          {url && (
+          <div className="text-md font-medium">{item?.number}</div>
+            <div>
+            {/* <Button
+              variant={"ghost"}
+              size={"sm"}
+              onClick={() => downloadExcelFile(`/gas/gaz-info/?type=another&car_id=${item?.id}`)}
+            >
+              {item?.fuel_type === "GAS" ? "Газ" : "Дизель"} Translation: "Download" = "Загрузить"
+            </Button> */}
             <Button
               variant={"ghost"}
               size={"sm"}
-              onClick={() => downloadExcelFile(url as string)}
+              onClick={() => downloadExcelFile(`/gas/gaz-info/?type=another&car_id=${item?.id}`)}
             >
-              {title2} {/* Translation: "Download" = "Загрузить" */}
+              {item?.fuel_type === "GAS" ? "Газ" : "Дизель"} {/* Translation: "Download" = "Загрузить" */}
             </Button>
-          )}
+            </div>
         </div>
         <div className="flex justify-between w-full">
           <div className="text-md font-medium">Баланс лизинга</div> {/* Translation: "Leasing Balance" */}
@@ -63,7 +58,7 @@ export function CarCard({
         </div>
         <div className="flex justify-between w-full">
           <div className="text-md font-medium">Пробег</div> {/* Translation: "Paid leasing" */}
-          <div>{distance || 0} км</div>
+          <div>{item?.distance_travelled || 0} км</div>
         </div>
       </CardContent>
     </Card>

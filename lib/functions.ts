@@ -33,16 +33,15 @@ export const formatDate = (value: string, symbol: string) => {
 
 export const downloadExcelFile = async (link: string) => {
   try {
-    // Make the request using axios
     const response = await $api.get(link, {
       responseType: "blob", // Set response type to blob to handle binary data
       headers: {
         "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       },
     });
-
-    // Create a URL for the blob data
+    console.log(response);
     const url = window.URL.createObjectURL(new Blob([response.data]));
+    console.log(decodeURIComponent(url.split(/[-_]/).join(" ")))
     const name = link?.split("/")[1]
     // Create a temporary link element and trigger download
     const a = document.createElement("a");
@@ -51,8 +50,6 @@ export const downloadExcelFile = async (link: string) => {
     document.body.appendChild(a);
     a.click();
     a.remove();
-
-    // Clean up the URL object
     window.URL.revokeObjectURL(url);
   } catch (err) {
     console.error("Error downloading the file:", err);
