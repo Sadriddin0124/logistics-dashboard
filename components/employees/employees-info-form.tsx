@@ -60,6 +60,8 @@ export default function EmployeesInfoForm() {
   const [isChanged, setIsChanged] = useState(false);
 
   const balance = watch("balance_uzs");
+  console.log(balance);
+  
   useEffect(() => {
     if (employee) {
       reset(employee);
@@ -193,7 +195,7 @@ export default function EmployeesInfoForm() {
           />
         </div>
         <div className="flex col-span-2 justify-end gap-4 mt-8">
-          {balance === "0.00" || balance === null && (
+          {!balance && (
             <DeleteAlertDialog
               id={id as string}
               onDelete={handleDelete}

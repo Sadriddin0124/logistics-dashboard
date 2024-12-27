@@ -295,7 +295,7 @@ export default function FlightForm() {
           </div>
           {flight_type === "OUT" && (
             <div className="space-y-2">
-              <label className="text-sm font-medium">Расход на питание*</label>
+              <label className="text-sm font-medium">Расход на питание</label>
               <Input
                 {...register(`other_expenses`, {required: flight_type === "OUT" ? "Затраты на питание обязательны" : false})}
                 placeholder="Цена..."

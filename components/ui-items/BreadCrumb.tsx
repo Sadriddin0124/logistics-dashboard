@@ -70,6 +70,50 @@ const Breadcrumb = () => {
       key: "flight-order",
       value: "Заказать Рейс",
     },
+    {
+      key: "auto-parts",
+      value: "Автозапчасти",
+    },
+    {
+      key: "gas-create",
+      value: "Добавить заправку",
+    },
+    {
+      key: "oil-create",
+      value: "Добавить масло",
+    },
+    {
+      key: "employees",
+      value: "Водитель",
+    },
+    {
+      key: "employee-info",
+      value: "Информация о водителе",
+    },
+    {
+      key: "employees-create",
+      value: "Добавить водителя",
+    },
+    {
+      key: "cars",
+      value: "Автомобили",
+    },
+    {
+      key: "car-info",
+      value: "Информация об автомобилях",
+    },
+    {
+      key: "car-create",
+      value: "Добавить автомобиль",
+    },
+    {
+      key: "expenses",
+      value: "Расходы и Приходы",
+    },
+    {
+      key: "outcome",
+      value: "Расход",
+    },
   ];
 
   const findLabel = (segment: string) => {
