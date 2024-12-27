@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useEffect, useState } from "react";
 import { ImageType } from "@/lib/types/file.types";
 import { FileUploader } from "../ui-items/FileUploader";
-import { CurrencyInputs } from "../ui-items/currency-inputs";
+import { CurrencyInputs, formatNumberWithCommas } from "../ui-items/currency-inputs";
 import { IFlightData } from "@/lib/types/flight.types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient } from "../ui-items/ReactQueryProvider";
@@ -89,9 +89,9 @@ export default function FlightForm() {
       setValue("driver_expenses_uzs", "");
       setValue("cargo_info", "");
     }
-    const region = watch("region")
-    const item =  regions?.find(item=> item?.id === region)
-    setValue("price_uzs", item?.price1.toString())
+    const region = watch("region");
+    const item = regions?.find((item) => item?.id === region);
+    setValue("price_uzs", item?.price1.toString());
   }, [flight_type, setValue, image, regions, watch]);
   const { mutate: createMutation } = useMutation({
     mutationFn: createFlight,
@@ -167,12 +167,12 @@ export default function FlightForm() {
           <div className="space-y-2">
             <label className="text-sm font-medium">Выберите автомобиль*</label>
             <Select
-              {...register("car", { required: "Required" })}
+              {...register("car", { required: "Это значение является обязательным" })}
               options={carOptions}
               value={selectedCar}
               onChange={handleSelectCar}
               placeholder={"Isuzu 01A111AA"}
-              noOptionsMessage={() => "Type to add new option..."}
+              noOptionsMessage={() => "Не найдено"}
             />
             {errors?.car && (
               <p className="text-red-500">{errors?.car?.message}</p>
@@ -192,11 +192,13 @@ export default function FlightForm() {
                     <SelectValue placeholder="Выберите..." />
                   </SelectTrigger>
                   <SelectContent>
-                    {regions?.filter(item=> item?.flight_type === flight_type)?.map((region) => (
-                      <SelectItem key={region.id} value={region.id as string}>
-                        {region.name}
-                      </SelectItem>
-                    ))}
+                    {regions
+                      ?.filter((item) => item?.flight_type === flight_type)
+                      ?.map((region) => (
+                        <SelectItem key={region.id} value={region.id as string}>
+                          {region.name}
+                        </SelectItem>
+                      ))}
                   </SelectContent>
                 </Selector>
               )}
@@ -210,7 +212,7 @@ export default function FlightForm() {
           <div className="space-y-2">
             <label className="text-sm font-medium">Выберите водителя*</label>
             <Select
-              {...register("driver", { required: "Required" })}
+              {...register("driver", { required: "Это значение является обязательным" })}
               options={driverOptions}
               value={selectedDriver}
               onChange={handleSelectDriver}
@@ -227,7 +229,7 @@ export default function FlightForm() {
             <label className="text-sm font-medium">Маршрут*</label>
             <Selector
               onValueChange={(value) => handleSelectChange(value, "route")}
-              {...register("route", { required: "Route is required" })}
+              {...register("route", { required: "Требуется маршрут" })}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Выберите..." />
@@ -259,7 +261,7 @@ export default function FlightForm() {
             <Input
               type="date"
               placeholder="Введите дату"
-              {...register("departure_date", { required: "Required" })}
+              {...register("departure_date", { required: "Это значение является обязательным" })}
             />
             {errors?.departure_date && (
               <p className="text-red-500">{errors?.departure_date?.message}</p>
@@ -284,25 +286,39 @@ export default function FlightForm() {
               type="date"
               placeholder="Введите дату"
               {...register("arrival_date", {
-                required: route === "BEEN_TO" ? "Required" : false,
+                required: route === "BEEN_TO" ? "Это значение является обязательным" : false,
               })}
             />
             {errors?.arrival_date && (
               <p className="text-red-500">{errors?.arrival_date?.message}</p>
             )}
           </div>
-          {flight_type === "OUT" && <div className="space-y-2">
-            <label className="text-sm font-medium">Расход на питание*</label>
-            <Input
-              placeholder="Введите rasxod"
-              {...register("other_expenses", {
-                required: flight_type === "OUT" ? "Required" : false,
-              })}
-            />
-            {errors?.other_expenses && (
-              <p className="text-red-500">{errors?.other_expenses?.message}</p>
-            )}
-          </div>}
+          {flight_type === "OUT" && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Расход на питание*</label>
+              <Input
+                {...register(`other_expenses`, {required: flight_type === "OUT" ? "Затраты на питание обязательны" : false})}
+                placeholder="Цена..."
+                onInput={(e) => {
+                  const rawValue = e.currentTarget.value.replace(/,/g, "");
+
+                  if (rawValue === "0") {
+                    // If the user types 0, allow it without formatting
+                    e.currentTarget.value = "0";
+                  } else {
+                    const parsedValue = parseFloat(rawValue);
+                    // Apply formatting if it's not 0
+                    e.currentTarget.value = formatNumberWithCommas(parsedValue);
+                  }
+                }}
+              />
+              {errors?.other_expenses && (
+                <p className="text-red-500">
+                  {errors?.other_expenses?.message}
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Cargo Information */}

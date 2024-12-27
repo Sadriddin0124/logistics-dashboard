@@ -12,6 +12,7 @@ export interface IFinance {
   created_at?: string;
   leasing_balance?: number
   total_leasing_paid?: number
+  distance_travelled?: number
 }
 
 

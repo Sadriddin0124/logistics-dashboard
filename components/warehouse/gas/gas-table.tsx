@@ -16,6 +16,7 @@ import { fetchGasStation } from "@/lib/actions/gas.action";
 import { useQuery } from "@tanstack/react-query";
 import { GasListResponse } from "@/lib/types/gas_station.types";
 import { queryClient } from "@/components/ui-items/ReactQueryProvider";
+import { formatDate } from "@/lib/functions";
 
 export default function GasTable() {
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -83,7 +84,7 @@ export default function GasTable() {
               <TableCell>{station.name}</TableCell>
               <TableCell>{station?.remaining_gas?.toFixed(2)}</TableCell>
               <TableCell>
-                {station?.updated_at?.slice(0,10)}
+                {formatDate(station?.updated_at as string, "/")}
               </TableCell>
               <TableCell>
                 <Link href={`/warehouse/gas/gas-info?id=${station?.id}`}>

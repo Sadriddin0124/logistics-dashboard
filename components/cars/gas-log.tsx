@@ -16,6 +16,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchAutoGas } from "@/lib/actions/cars.action";
 import { queryClient } from "../ui-items/ReactQueryProvider";
 import { PurchasedGasListResponse } from "@/lib/types/gas_station.types";
+import { formatDate } from "@/lib/functions";
 
 export function GasLog() {
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -83,7 +84,7 @@ export function GasLog() {
             <TableRow key={i} className="border-b-gray-300 border-b">
               <TableCell>{entry.station?.name}</TableCell>
               <TableCell>{entry?.amount}</TableCell>
-              <TableCell>{entry?.created_at?.slice(0, 10)}</TableCell>
+              <TableCell>{formatDate(entry?.created_at as string, "/")}</TableCell>
             </TableRow>
           ))}
         </TableBody>

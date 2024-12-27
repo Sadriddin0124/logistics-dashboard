@@ -133,7 +133,7 @@ export default function GasSold() {
                     value={selectedCar}
                     onChange={handleSelectCar}
                     placeholder="Выберите автомобиль"
-                    noOptionsMessage={() => "Type to add new option..."}
+                    noOptionsMessage={() => "Не найдено"}
                     isClearable
                   />
                 </div>
@@ -145,10 +145,10 @@ export default function GasSold() {
                   type="number"
                     {...register("amount", {
                       valueAsNumber: true,
-                      required: "This field is required",
+                      required: "Это значение является обязательным",
                       validate: (value) =>
                         value <= remaining ||
-                        `Value must not exceed ${remaining}`,
+                        `Значение не должно превышать ${remaining}`,
                     })}
                     placeholder="0"
                   />
@@ -165,21 +165,21 @@ export default function GasSold() {
                     value={selectedStation}
                     onChange={handleSelectStation}
                     placeholder="Выберите заправку..."
-                    noOptionsMessage={() => "Type to add new option..."}
+                    noOptionsMessage={() => "Не найдено"}
                     isClearable
                   />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm">
-                     car distance
+                  Расстояние автомобиля
                   </label>
                   <Input
                     {...register("next_gas_distance", {
                       valueAsNumber: true,
-                      required: "This field is required",
+                      required: "Расстояние автомобиля",
                       validate: (value) =>
                         value >= distance ||
-                        `Value must bigger than ${distance}`,
+                        `Значение должно быть больше ${distance}`,
                     })}
                     placeholder="0"
                   />

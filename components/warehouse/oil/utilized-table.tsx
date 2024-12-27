@@ -16,6 +16,7 @@ import { queryClient } from "@/components/ui-items/ReactQueryProvider";
 import { OilUtilizedResponse } from "@/lib/types/oil.types";
 import { fetchUtilizedOils } from "@/lib/actions/oil.action";
 import { splitToHundreds } from "@/lib/utils";
+import { formatDate } from "@/lib/functions";
 
 export default function UtilizedOilTable() {
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -87,7 +88,7 @@ export default function UtilizedOilTable() {
               </TableCell>
               <TableCell>{utilized?.quantity_utilized} литр</TableCell>
               <TableCell>
-                {utilized.created_at.slice(0,10)}
+                {formatDate(utilized.created_at as string, "/")}
               </TableCell>
             </TableRow>
           ))}

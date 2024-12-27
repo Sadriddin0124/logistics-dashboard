@@ -200,7 +200,7 @@ export default function IncomeForm() {
               <Textarea
                 placeholder="Напишите комментарий..."
                 className="min-h-[120px] resize-none"
-                {...register("comment", { required: "Required" })}
+                {...register("comment", { required: "Это значение является обязательным" })}
               />
               {errors?.comment && (
                 <p className="text-red-500">{errors?.comment?.message}</p>

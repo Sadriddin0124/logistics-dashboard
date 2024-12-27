@@ -14,6 +14,8 @@ export type IStats = {
     outcome_sum: number; // Total outcome sum
     reason: string; // Reason or explanation for the action
     win: number; // Resulting balance or net value
+    leasing_balance: number; // Resulting balance or net value
+    total_leasing_paid: number; // Resulting balance or net value
   };
 
   export type StatsPaginated = PaginationResponse<IStats>

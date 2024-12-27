@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useEffect, useRef } from "react";
 import { useFormContext } from "react-hook-form";
 import { Input } from "@/components/ui/input";
@@ -26,6 +24,7 @@ interface CurrencyInputsProps {
   required?: boolean;
   disabled?: boolean;
 }
+
 export const CurrencyInputs: React.FC<CurrencyInputsProps> = ({ name, required, disabled }) => {
   const { data: exchange } = useQuery<ExchangeRate[]>({
     queryKey: ["exchange"],
@@ -69,7 +68,7 @@ export const CurrencyInputs: React.FC<CurrencyInputsProps> = ({ name, required, 
           Сум
         </Label>
         <Input
-        disabled={disabled}
+          disabled={disabled}
           id={uzsName}
           {...register(uzsName, {
             validate: (value) =>
@@ -78,8 +77,13 @@ export const CurrencyInputs: React.FC<CurrencyInputsProps> = ({ name, required, 
           type="text"
           onInput={(e) => {
             const rawValue = e.currentTarget.value.replace(/,/g, "");
-            const parsedValue = parseFloat(rawValue);
-            e.currentTarget.value = formatNumberWithCommas(parsedValue);
+            if (rawValue === "0") {
+              // Allow "0" to be typed directly
+              e.currentTarget.value = "0";
+            } else {
+              const parsedValue = parseFloat(rawValue);
+              e.currentTarget.value = formatNumberWithCommas(parsedValue);
+            }
           }}
         />
         {errors[uzsName] && (
@@ -91,4 +95,3 @@ export const CurrencyInputs: React.FC<CurrencyInputsProps> = ({ name, required, 
     </div>
   );
 };
-

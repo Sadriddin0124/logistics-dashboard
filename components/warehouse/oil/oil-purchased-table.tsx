@@ -17,6 +17,7 @@ import { useRouter } from "next/router";
 import { OilResponse } from "@/lib/types/oil.types";
 import { fetchOilPurchase } from "@/lib/actions/oil.action";
 import { splitToHundreds } from "@/lib/utils";
+import { formatDate } from "@/lib/functions";
 
 export default function PurchasedOilTable() {
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -92,7 +93,7 @@ export default function PurchasedOilTable() {
                 {splitToHundreds(Number(purchased.price_uzs ))} сум
               </TableCell>
               <TableCell>
-                {purchased.created_at?.slice(0,10)}
+                {formatDate(purchased.created_at as string, "/")}
               </TableCell>
               <TableCell>
                 <Button variant="secondary" className="bg-green-100 text-green-500">

@@ -23,11 +23,14 @@ import { fetchWholeOils } from "@/lib/actions/oil.action";
 import { IDieselPaginated } from "@/lib/types/diesel.types";
 import { fetchDiesel } from "@/lib/actions/diesel.action";
 import { Input } from "../ui/input";
+import { useState } from "react";
 
 export function ExpenseStats() {
+  const [startDate, setStartDate] = useState<string>("")
+  const [endDate, setEndDate] = useState<string>("")
   const { data: stats } = useQuery<StatsPaginated>({
-    queryKey: ["stats", 1],
-    queryFn: () => fetchFinanceStats(1, "", "", ""),
+    queryKey: ["stats", 1, startDate, endDate],
+    queryFn: () => fetchFinanceStats(1, startDate, endDate, ""),
   });
   const { data: flights } = useQuery<FlightPaginatedResponse>({
     queryKey: ["flight-stats", 1],
@@ -65,15 +68,15 @@ export function ExpenseStats() {
       <div className="flex items-center gap-2 p-4 bg-white rounded-2xl mb-4">
         <div className="space-y-1">
           <label className="text-sm">Дата начала</label>
-          <Input type="date" className="w-[300px]" />
+          <Input type="date" className="w-[300px]" onChange={(e)=>setStartDate(e.target.value)}/>
         </div>
         <div className="space-y-1">
           <label className="text-sm">Дата окончания</label>
-          <Input type="date" className="w-[300px]" />
+          <Input type="date" className="w-[300px]" onChange={(e)=>setEndDate(e.target.value)}/>
         </div>
       </div>
       <div className="flex flex-col gap-4">
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <StatCard
             title="Рейсы"
             value={flights_all?.count?.toFixed(2) || 0}
@@ -99,8 +102,14 @@ export function ExpenseStats() {
             url="/flight/info/?action=OUTCOME"
           />
           <StatCard
-            title={(data?.win as number) > 0 ? "Прибыль" : "Долг"}
-            value={data?.win?.toFixed(2) || 0}
+            title="Лизинговый баланс"
+            value={data?.leasing_balance?.toFixed(2) || 0}
+            icon={TrendingDownIcon}
+            url="/flight/info/?action=OUTCOME"
+          />
+          <StatCard
+            title={"Сумма лизинга выплачена"}
+            value={data?.total_leasing_paid?.toFixed(2) || 0}
             icon={AwardIcon}
           />
         </div>

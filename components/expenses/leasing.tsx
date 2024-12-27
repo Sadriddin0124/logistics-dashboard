@@ -52,7 +52,7 @@ export default function LeasingForm() {
   });
 
   useEffect(() => {
-    const carOption = cars?.map((car) => ({
+    const carOption = cars?.filter(item=> item?.type_of_payment === "LEASING")?.map((car) => ({
       label: `${car?.name} ${car?.number}`,
       value: car?.id,
     }));
@@ -116,7 +116,7 @@ export default function LeasingForm() {
                 value={selectedCar}
                 onChange={handleSelectCar}
                 placeholder="Выберите..."
-                noOptionsMessage={() => "Type to add new option..."}
+                noOptionsMessage={() => "Не найдено"}
               />
               {errors.car && (
                 <p className="text-red-500">{errors.car?.message}</p>

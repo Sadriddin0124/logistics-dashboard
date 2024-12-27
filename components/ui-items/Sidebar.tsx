@@ -194,7 +194,7 @@ export const AppSidebar: React.FC<SideBarProps> = ({
               );
             })}
             <div className="h-full flex flex-col items-end justify-end gap-2 p-6">
-              <Button onClick={logOut} className="w-full mt-10">Выйти</Button>
+              <Button onClick={logOut} className="w-full mt-10 bg-[#4880FF] text-white ml-3 hover:bg-blue-600">Выйти</Button>
             </div>
           </div>
           {subItemStatus && (

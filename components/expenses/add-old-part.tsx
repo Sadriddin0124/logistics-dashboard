@@ -86,7 +86,7 @@ export function OldPartsForm() {
   return (
     <Card className="rounded-2xl">
       <CardHeader>
-        <CardTitle>Old Запчасти для автомобиля</CardTitle>
+        <CardTitle className="text-2xl">Старые запчасти для автомобиля</CardTitle>
       </CardHeader>
       <CardContent>
         <FormProvider {...methods}>
@@ -120,19 +120,25 @@ export function OldPartsForm() {
                   <label className="text-sm mb-2 block">Цена</label>
                   <Input
                     {...register(`parts.${index}.price_uzs`)}
-                    defaultValue={item.id_detail}
                     placeholder="Цена..."
                     onInput={(e) => {
                       const rawValue = e.currentTarget.value.replace(/,/g, "");
-                      const parsedValue = parseFloat(rawValue);
-                      e.currentTarget.value =
-                        formatNumberWithCommas(parsedValue);
+
+                      if (rawValue === "0") {
+                        // If the user types 0, allow it without formatting
+                        e.currentTarget.value = "0";
+                      } else {
+                        const parsedValue = parseFloat(rawValue);
+                        // Apply formatting if it's not 0
+                        e.currentTarget.value =
+                          formatNumberWithCommas(parsedValue);
+                      }
                     }}
                   />
                 </div>
                 <div className="flex justify-between">
                   <div className="space-y-2 flex flex-col">
-                    <label>Utilize</label>
+                    <label>Утилизировать</label>
                     <Checkbox
                       checked={watch(`parts.${index}.in_sklad`)}
                       onCheckedChange={(checked) =>
@@ -141,7 +147,7 @@ export function OldPartsForm() {
                     />
                   </div>
                   <div className="space-y-2 flex flex-col">
-                    <label>Delete</label>
+                    <label>Удалить</label>
                     <Checkbox
                       checked={!watch(`parts.${index}.in_sklad`)}
                       onCheckedChange={(checked) =>

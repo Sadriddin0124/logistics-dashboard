@@ -241,7 +241,7 @@ export default function VehicleForm() {
                   disabled={!with_trailer}
                   id="trailer_number"
                   {...register("trailer_number", {
-                    required: with_trailer ? "Required" : false,
+                    required: with_trailer ? "Это значение является обязательным" : false,
                   })}
                   placeholder="Введите номер"
                   className="mt-1"

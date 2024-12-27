@@ -112,7 +112,7 @@ export default function OilExchange() {
                     value={selectedCar}
                     onChange={handleSelectCar}
                     placeholder="Isuzu 01A111AA"
-                    noOptionsMessage={() => "Type to add new option..."}
+                    noOptionsMessage={() => "Не найдено"}
                     isClearable
                   />
                 </div>
@@ -133,7 +133,7 @@ export default function OilExchange() {
                     value={selectedOil}
                     onChange={handleSelectOil}
                     placeholder="Выберите..."
-                    noOptionsMessage={() => "Type to add new option..."}
+                    noOptionsMessage={() => "Не найдено"}
                     isClearable
                   />
                 </div>
@@ -152,7 +152,7 @@ export default function OilExchange() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm">
-                    Previous oil distance
+                  Текущее расстояние до масла
                   </label>
                   <Input
                     {...register("oil_recycle_distance", {
@@ -164,15 +164,15 @@ export default function OilExchange() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm">
-                    Next oil distance
+                  Следующая масляная дистанция
                   </label>
                   <Input
                     {...register("next_oil_recycle_distance", {
                       valueAsNumber: true,
-                      required: "This field is required.",
+                      required: "Это значение является обязательным.",
                       validate: (value) =>
                         value < oil_recycle_distance
-                      ? "Next oil recycle distance must be greater than the current distance."
+                      ? "Следующее расстояние рециркуляции масла должно быть больше текущего расстояния."
                           : true
                     })}
                     placeholder="0"

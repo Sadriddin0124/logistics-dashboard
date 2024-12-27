@@ -16,6 +16,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchAutoExpense } from "@/lib/actions/cars.action";
 import { queryClient } from "../ui-items/ReactQueryProvider";
 import { PaginatedFuel } from "@/lib/types/cars.types";
+import { formatDate } from "@/lib/functions";
 
 export function FuelLog() {
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -83,7 +84,7 @@ export function FuelLog() {
             <TableRow key={i} className="border-b-gray-300 border-b">
               <TableCell>{entry?.volume}</TableCell>
               <TableCell>{entry.price_uzs} сум</TableCell>
-              <TableCell>{entry?.created_at?.slice(0, 10)}</TableCell>
+              <TableCell>{formatDate(entry?.created_at, "/")}</TableCell>
             </TableRow>
           ))}
         </TableBody>

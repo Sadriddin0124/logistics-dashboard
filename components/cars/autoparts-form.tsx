@@ -3,7 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChevronLeftIcon, ChevronRightIcon, X } from "lucide-react";
 import { useRouter } from "next/router";
-import { createAutoDetail, deleteAutoDetail, fetchAutoDetails } from "@/lib/actions/cars.action";
+import {
+  createAutoDetail,
+  deleteAutoDetail,
+  fetchAutoDetails,
+} from "@/lib/actions/cars.action";
 import { queryClient } from "../ui-items/ReactQueryProvider";
 import { toast } from "react-toastify";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -24,7 +28,7 @@ interface FormValues {
   id?: string;
   name: string;
   id_detail: string;
-  in_sklad: boolean,
+  in_sklad: boolean;
   price_uzs: string;
 }
 
@@ -54,10 +58,10 @@ export function AutoPartsForm() {
   const [deleteId, setDeleteId] = useState<string>("");
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [index, setIndex] = useState<number>(10)
+  const [index, setIndex] = useState<number>(10);
   const router = useRouter();
   const { id } = router.query;
-    const { data: carDetails } = useQuery<PaginatedCarDetail>({
+  const { data: carDetails } = useQuery<PaginatedCarDetail>({
     queryKey: ["car_details", currentPage, id],
     queryFn: () => fetchAutoDetails(currentPage, id as string),
   });
@@ -91,8 +95,6 @@ export function AutoPartsForm() {
     }
   }, [carDetails, prepend, methods]);
 
-
-
   const { mutate: createMutation } = useMutation({
     mutationFn: createAutoDetail,
     onSuccess: () => {
@@ -111,7 +113,7 @@ export function AutoPartsForm() {
       car: id as string,
     }));
     console.log(data?.parts);
-    
+
     createMutation(formData);
   };
 
@@ -126,34 +128,34 @@ export function AutoPartsForm() {
     );
   };
   const handleDelete = (item: FormValues, index: number) => {
-    if(item?.id) {
-      setDeleteOpen(true)
-      setDeleteId(item?.id)
-      setIndex(index)
-    }else {
-      remove(index)
+    if (item?.id) {
+      setDeleteOpen(true);
+      setDeleteId(item?.id);
+      setIndex(index);
+    } else {
+      remove(index);
     }
   };
   console.log(fields);
-    const { mutate: deleteMutation } = useMutation({
-      mutationFn: deleteAutoDetail,
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["car_details", currentPage] });
-        remove(index);
-        toast.success("Удаление выполнено успешно!");
-      setDeleteOpen(false)
-      },
-      onError: () => {
-        toast.error("Ошибка при удалении!");
-      },
-    });
-  
+  const { mutate: deleteMutation } = useMutation({
+    mutationFn: deleteAutoDetail,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["car_details", currentPage] });
+      remove(index);
+      toast.success("Удаление выполнено успешно!");
+      setDeleteOpen(false);
+    },
+    onError: () => {
+      toast.error("Ошибка при удалении!");
+    },
+  });
+
   const onDelete = () => {
     const payload = {
       id: [deleteId],
       sell_price: deletePrice,
-    }
-    deleteMutation(payload)
+    };
+    deleteMutation(payload);
   };
   const itemsPerPage = 10;
   const indexOfLastOrder = currentPage * itemsPerPage;
@@ -217,7 +219,7 @@ export function AutoPartsForm() {
                 <div className="flex-1 relative">
                   <label className="text-sm mb-2 block">ID запчасти</label>
                   <Input
-                    {...register(`parts.${index}.id_detail`, )}
+                    {...register(`parts.${index}.id_detail`)}
                     defaultValue={item.id_detail}
                     placeholder="Введите ID запчасти..."
                   />
@@ -225,19 +227,26 @@ export function AutoPartsForm() {
                 <div className="flex-1">
                   <label className="text-sm mb-2 block">Цена</label>
                   <Input
-                    {...register(`parts.${index}.price_uzs`, )}
-                    defaultValue={item.id_detail}
+                    {...register(`parts.${index}.price_uzs`)}
                     placeholder="Цена..."
                     onInput={(e) => {
                       const rawValue = e.currentTarget.value.replace(/,/g, "");
-                      const parsedValue = parseFloat(rawValue);
-                      e.currentTarget.value = formatNumberWithCommas(parsedValue);
+
+                      if (rawValue === "0") {
+                        // If the user types 0, allow it without formatting
+                        e.currentTarget.value = "0";
+                      } else {
+                        const parsedValue = parseFloat(rawValue);
+                        // Apply formatting if it's not 0
+                        e.currentTarget.value =
+                          formatNumberWithCommas(parsedValue);
+                      }
                     }}
                   />
                 </div>
 
                 <div className=" self-end">
-                <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+                  <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
                     <Button
                       variant="ghost"
                       type="button"
@@ -245,35 +254,39 @@ export function AutoPartsForm() {
                     >
                       <X />
                     </Button>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Введите цену, чтобы отключить машину</DialogTitle>
-                    </DialogHeader>
-                    <div className="flex flex-col gap-4">
-                      <div className="space-y-2">
-                        <label
-                          htmlFor="amount"
-                          className="block text-sm font-medium"
-                        >
-                          Сумма
-                        </label>
-                        <Input
-                          value={deletePrice}
-                          onChange={(e) => setDeletePrice(e.target.value)}
-                        />
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>
+                          Введите цену, чтобы отключить машину
+                        </DialogTitle>
+                      </DialogHeader>
+                      <div className="flex flex-col gap-4">
+                        <div className="space-y-2">
+                          <label
+                            htmlFor="amount"
+                            className="block text-sm font-medium"
+                          >
+                            Сумма
+                          </label>
+                          <Input
+                            value={deletePrice}
+                            onChange={(e) => setDeletePrice(e.target.value)}
+                          />
+                        </div>
                       </div>
-                    </div>
-                    <DialogFooter >
-                      <DialogTrigger><Button variant={"outline"}>Назад</Button></DialogTrigger>
-                      <Button
-                        onClick={onDelete}
-                        className="bg-blue-500 text-white hover:bg-blue-600 rounded-md"
-                      >
-                        Утилизировать
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
+                      <DialogFooter>
+                        <DialogTrigger>
+                          <Button variant={"outline"}>Назад</Button>
+                        </DialogTrigger>
+                        <Button
+                          onClick={onDelete}
+                          className="bg-blue-500 text-white hover:bg-blue-600 rounded-md"
+                        >
+                          Утилизировать
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </div>
             ))}
@@ -303,50 +316,52 @@ export function AutoPartsForm() {
           </form>
         </FormProvider>
         <div className="mt-4 flex justify-between items-center">
-        <div>
-        Итого: {carDetails?.count || 0} с {indexOfFirstOrder + 1} до{" "}
-        {Math.min(indexOfLastOrder, carDetails?.count as number) || 0}
+          <div>
+            Итого: {carDetails?.count || 0} с {indexOfFirstOrder + 1} до{" "}
+            {Math.min(indexOfLastOrder, carDetails?.count as number) || 0}
+          </div>
+          <div className="flex space-x-2 items-center">
+            <Button
+              variant="outline"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="w-10 h-10 p-0"
+            >
+              <ChevronLeftIcon className="w-4 h-4" />
+              <span className="sr-only">Предыдущая страница</span>
+            </Button>
+            {buttons.map((button, index) =>
+              button === "..." ? (
+                <span key={index} style={{ margin: "0 5px" }}>
+                  ...
+                </span>
+              ) : (
+                <Button
+                  key={index}
+                  onClick={() => handlePageChange(button as number)}
+                  disabled={button === currentPage}
+                  className={
+                    button === currentPage
+                      ? "bg-[#4880FF] text-white"
+                      : "border"
+                  }
+                  variant={button === currentPage ? "default" : "ghost"}
+                >
+                  {button || ""}
+                </Button>
+              )
+            )}
+            <Button
+              variant="outline"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="w-10 h-10 p-0"
+            >
+              <ChevronRightIcon className="w-4 h-4" />
+              <span className="sr-only">Следующая страница</span>
+            </Button>
+          </div>
         </div>
-        <div className="flex space-x-2 items-center">
-          <Button
-            variant="outline"
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-            className="w-10 h-10 p-0"
-          >
-            <ChevronLeftIcon className="w-4 h-4" />
-            <span className="sr-only">Предыдущая страница</span>
-          </Button>
-          {buttons.map((button, index) =>
-            button === "..." ? (
-              <span key={index} style={{ margin: "0 5px" }}>
-                ...
-              </span>
-            ) : (
-              <Button
-                key={index}
-                onClick={() => handlePageChange(button as number)}
-                disabled={button === currentPage}
-                className={
-                  button === currentPage ? "bg-[#4880FF] text-white" : "border"
-                }
-                variant={button === currentPage ? "default" : "ghost"}
-              >
-                {button || ""}
-              </Button>
-            )
-          )}
-          <Button
-            variant="outline"
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            className="w-10 h-10 p-0"
-          >
-            <ChevronRightIcon className="w-4 h-4" />
-            <span className="sr-only">Следующая страница</span>
-          </Button>
-        </div>
-      </div>
       </CardContent>
     </Card>
   );

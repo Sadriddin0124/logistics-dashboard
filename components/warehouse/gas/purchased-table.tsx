@@ -9,6 +9,7 @@ import { useQuery } from '@tanstack/react-query'
 import { PurchasedGasListResponse } from '@/lib/types/gas_station.types'
 import { queryClient } from '@/components/ui-items/ReactQueryProvider'
 import { useRouter } from 'next/router'
+import { formatDate } from '@/lib/functions'
 
 
 
@@ -66,7 +67,7 @@ const buttons = getPaginationButtons();
             <TableHead className="font-bold">T/R</TableHead>
             <TableHead className="font-bold">Оплаченная сумма</TableHead>
             <TableHead className="font-bold">Количество</TableHead>
-            <TableHead className="font-bold">Date</TableHead>
+            <TableHead className="font-bold">Дата</TableHead>
             <TableHead className="font-bold">Цена</TableHead>
             <TableHead className="font-bold w-[50px]"></TableHead>
           </TableRow>
@@ -77,7 +78,7 @@ const buttons = getPaginationButtons();
               <TableCell>{index + 1}</TableCell>
               <TableCell>{purchased.payed_price_uzs} сум</TableCell>
               <TableCell>{purchased?.amount?.toFixed(2)}</TableCell>
-              <TableCell>{purchased?.created_at?.slice(0,10)}</TableCell>
+              <TableCell>{formatDate(purchased?.created_at as string, "/")}</TableCell>
               <TableCell>{purchased.price_uzs} сум</TableCell>
               <TableCell>
                 <Button variant="secondary" size="sm" className='bg-green-100 text-green-400'>

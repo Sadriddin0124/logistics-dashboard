@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { IDieselTypeForPagination } from "@/lib/types/diesel.types";
+import { formatDate } from "@/lib/functions";
 const PurchasedDiesel = ({ data }: { data: IDieselTypeForPagination[] }) => {
   return (
     <div>
@@ -19,7 +20,7 @@ const PurchasedDiesel = ({ data }: { data: IDieselTypeForPagination[] }) => {
                 <TableHead className="font-bold">Машина</TableHead>
                 <TableHead className="font-bold">Количество</TableHead>
                 <TableHead className="font-bold">Цена</TableHead>
-                <TableHead className="font-bold">Date</TableHead>
+                <TableHead className="font-bold">Дата</TableHead>
                 <TableHead className="font-bold"></TableHead>
               </TableRow>
             </TableHeader>
@@ -35,7 +36,7 @@ const PurchasedDiesel = ({ data }: { data: IDieselTypeForPagination[] }) => {
                       {item?.price_uzs} сум
                     </TableCell>
                     <TableCell>
-                      {item?.created_at?.slice(0,10)} 
+                      {formatDate(item?.created_at as string, "/")} 
                     </TableCell>
                     <TableCell>
                       <Button

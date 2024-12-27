@@ -174,7 +174,7 @@ export default function FlightInfoForm() {
               value={selectedCar}
               onChange={handleSelectCar}
               placeholder={"Isuzu 01A111AA"}
-              noOptionsMessage={() => "Type to add new option..."}
+              noOptionsMessage={() => "Не найдено"}
             />
           </div>
 
@@ -202,12 +202,12 @@ export default function FlightInfoForm() {
           <div className="space-y-2">
             <label className="text-sm font-medium">Выберите водителя*</label>
             <Select
-              {...register("driver", { required: "Required" })}
+              {...register("driver", { required: "Это значение является обязательным" })}
               options={driverOptions}
               value={selectedDriver}
               onChange={handleSelectDriver}
               placeholder={"Выберите водителя"}
-              noOptionsMessage={() => "Type to add new option..."}
+              noOptionsMessage={() => "Не найдено"}
             />
             {errors?.driver && (
               <p className="text-red-500">{errors?.driver?.message}</p>

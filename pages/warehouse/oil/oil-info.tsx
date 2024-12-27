@@ -98,7 +98,7 @@ export default function GasManagementForm() {
           <FormProvider {...methods}>
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className="grid grid-cols-2 gap-4"
+              className="grid grid-cols-2 gap-5"
             >
               <div className="space-y-2">
                 <label className="text-sm">Название масло</label>
@@ -126,7 +126,7 @@ export default function GasManagementForm() {
                 {status && <p className="text-sm text-red-500">{status}</p>}
               </div>
 
-              <div className="flex justify-end gap-2 col-span-2">
+              <div className="flex justify-end mt-4 gap-2 col-span-2">
                 <ForceDeleteDialog
                   id={id as string}
                   onDelete={handleDelete}

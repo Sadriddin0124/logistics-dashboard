@@ -90,7 +90,7 @@ export default function DieselFill() {
                     value={selectedCar}
                     onChange={handleSelectCar}
                     placeholder="Isuzu 01A111AA"
-                    noOptionsMessage={() => "Type to add new option..."}
+                    noOptionsMessage={() => "Не найдено"}
                     isClearable
                   />
                 </div>
@@ -102,7 +102,7 @@ export default function DieselFill() {
                     {...register("volume", {
                       required: "Обязательно для заполнения",
                       validate: (value) =>
-                        parseFloat(value) > (Number(diesel_volume) || 0)
+                        parseFloat(value) > (Number(diesel_volume?.volume) || 0)
                           ? "Количество превышает остаток топлива"
                           : true,
                     })}

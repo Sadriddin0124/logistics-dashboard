@@ -32,6 +32,7 @@ import {
 } from "@/lib/types/gas_station.types";
 import { removeCommas } from "@/lib/utils";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { formatDate } from "@/lib/functions";
 
 export default function GasManagementForm() {
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -137,7 +138,7 @@ export default function GasManagementForm() {
                   <Input
                     disabled={id ? true : false}
                     {...register("name", {
-                      required: true,
+                      required: "Это значение является обязательным",
                     })}
                     placeholder="0"
                   />
@@ -145,12 +146,12 @@ export default function GasManagementForm() {
                 <div className="space-y-2">
                   <label className="text-sm">Выберите автомобиль</label>
                   <Select
-                  {...register("car", {required: "Required"})}
+                  {...register("car", {required: "Это значение является обязательным"})}
                     options={carOptions}
                     value={selectedCar}
                     onChange={handleSelectCar}
                     placeholder={"Isuzu 01A111AA"}
-                    noOptionsMessage={() => "Type to add new option..."}
+                    noOptionsMessage={() => "Не найдено"}
                   />
                 </div>
                 <div className="space-y-2">
@@ -165,7 +166,7 @@ export default function GasManagementForm() {
                     disabled={id ? true : false}
                     {...register("purchased_volume", {
                       valueAsNumber: true,
-                      required: true,
+                      required: "Это значение является обязательным",
                     })}
                     placeholder="0"
                   />
@@ -191,7 +192,7 @@ export default function GasManagementForm() {
                 <TableHead className="font-bold">Машина</TableHead>
                 <TableHead className="font-bold">Количество</TableHead>
                 <TableHead className="font-bold">Цена</TableHead>
-                <TableHead className="font-bold">Date</TableHead>
+                <TableHead className="font-bold">Дата</TableHead>
                 <TableHead className="font-bold"></TableHead>
               </TableRow>
             </TableHeader>
@@ -201,7 +202,7 @@ export default function GasManagementForm() {
                   <TableCell>{entry?.car?.name}</TableCell>
                   <TableCell>{entry?.purchased_volume}</TableCell>
                   <TableCell>{entry?.payed_price_uzs}</TableCell>
-                  <TableCell>{entry?.created_at?.slice(0,10)}</TableCell>
+                  <TableCell>{formatDate(entry?.created_at as string, "/")}</TableCell>
                   <TableCell>
                     <Button
                       variant="secondary"

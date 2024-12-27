@@ -1,7 +1,7 @@
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "../ui/input";
-import { CurrencyInputs } from "../ui-items/currency-inputs";
+import { formatNumberWithCommas } from "../ui-items/currency-inputs";
 import { Checkbox } from "../ui/checkbox";
 
 export function AutoPartsExpense() {
@@ -22,10 +22,10 @@ export function AutoPartsExpense() {
     );
   };
   console.log(fields.length);
-  
+
   return (
     <div className="mt-6 space-y-6">
-        <h2 className="text-2xl font-semibold">Запчасти для автомобиля</h2>
+      <h2 className="text-2xl font-semibold">Запчасти для автомобиля</h2>
 
       {fields.map((item, index) => (
         <div key={item.id} className="grid grid-cols-2 gap-4">
@@ -45,7 +45,22 @@ export function AutoPartsExpense() {
           </div>
           <div className="space-y-2">
             <label>Цена</label>
-            <CurrencyInputs name={`parts.${index}.price`} required={true}/>
+            <Input
+              {...register(`parts.${index}.price_uzs`)}
+              placeholder="Цена..."
+              onInput={(e) => {
+                const rawValue = e.currentTarget.value.replace(/,/g, "");
+
+                if (rawValue === "0") {
+                  // If the user types 0, allow it without formatting
+                  e.currentTarget.value = "0";
+                } else {
+                  const parsedValue = parseFloat(rawValue);
+                  // Apply formatting if it's not 0
+                  e.currentTarget.value = formatNumberWithCommas(parsedValue);
+                }
+              }}
+            />
           </div>
           <div className="flex justify-between w-full">
             <div className="space-y-2 flex flex-col">
@@ -57,9 +72,15 @@ export function AutoPartsExpense() {
                 }
               />
             </div>
-          <Button disabled={fields.length <= 1} variant="ghost" type="button" className="self-end" onClick={() => remove(index)}>
-            Удалить
-          </Button>
+            <Button
+              disabled={fields.length <= 1}
+              variant="ghost"
+              type="button"
+              className="self-end"
+              onClick={() => remove(index)}
+            >
+              Удалить
+            </Button>
           </div>
         </div>
       ))}

@@ -17,6 +17,7 @@ import { useQuery } from "@tanstack/react-query";
 import { OilListResponse } from "@/lib/types/oil.types";
 import { fetchOils } from "@/lib/actions/oil.action";
 import { queryClient } from "@/components/ui-items/ReactQueryProvider";
+import { formatDate } from "@/lib/functions";
 
 
 export default function GasTable() {
@@ -78,7 +79,7 @@ const buttons = getPaginationButtons();
             <TableRow key={oil?.id} className="border-b border-gray-200">
               <TableCell>{oil?.oil_name}</TableCell>
               <TableCell>{oil?.oil_volume?.toFixed(2)}</TableCell>
-              <TableCell>{oil?.updated_at?.slice(0,10)}</TableCell>
+              <TableCell>{formatDate(oil?.updated_at as string, "/")}</TableCell>
               <TableCell>
                 <Link href={`/warehouse/oil/oil-info?id=${oil?.id}`}>
                   <Button

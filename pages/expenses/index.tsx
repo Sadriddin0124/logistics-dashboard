@@ -23,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { downloadExcelFile } from "@/lib/functions";
 
 export default function Expenses() {
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -86,6 +87,8 @@ export default function Expenses() {
         return "Рейс";
       case "OTHER":
         return "Общий";
+      case "LEASING":
+        return "Лизинг";
       default:
     }
   };
@@ -96,35 +99,37 @@ export default function Expenses() {
       setExpenseType(value);
     }
   };
+  const [action, setAction] = useState("INCOME")
 
-  const downloadExcelFile = async () => {
-    try {
-      const response = await fetch("http://16.171.242.109/finance/export-logs/", {
-        method: "GET",
-        headers: {
-          "Content-Type":
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        },
-      });
+  const downloadFile = async () => {
+    downloadExcelFile(`/finance/export-logs/?action=${action}`)
+    // try {
+    //   const response = await fetch(`http://16.171.242.109`, {
+    //     method: "GET",
+    //     headers: {
+    //       "Content-Type":
+    //         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    //     },
+    //   });
 
-      if (!response.ok) {
-        throw new Error("Не удалось загрузить Excel файл");
-      }
+    //   if (!response.ok) {
+    //     throw new Error("Не удалось загрузить Excel файл");
+    //   }
 
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
+    //   const blob = await response.blob();
+    //   const url = window.URL.createObjectURL(blob);
 
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "filename.xlsx"; // Установите ваше имя файла здесь
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
+    //   const a = document.createElement("a");
+    //   a.href = url;
+    //   a.download = "filename.xlsx"; // Установите ваше имя файла здесь
+    //   document.body.appendChild(a);
+    //   a.click();
+    //   a.remove();
 
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error("Ошибка при скачивании файла:", err);
-    }
+    //   window.URL.revokeObjectURL(url);
+    // } catch (err) {
+    //   console.error("Ошибка при скачивании файла:", err);
+    // }
   };
 
   return (
@@ -132,7 +137,7 @@ export default function Expenses() {
       <div className="text-2xl font-medium mb-3">
         <h2>Расходы и Приходы</h2>
       </div>
-      <div className="grid grid-cols-4 items-end max-w-4xl gap-4 my-4">
+      <div className="grid grid-cols-5 items-end gap-4 my-4">
         <div>
           <label>Дата начала</label>
           <Input
@@ -161,10 +166,23 @@ export default function Expenses() {
               <SelectItem value="FIX_CAR">Ремонт автомобиля</SelectItem>
               <SelectItem value="FLIGHT">Рейс</SelectItem>
               <SelectItem value="OTHER">Общий</SelectItem>
+              <SelectItem value="LEASING">Лизинг</SelectItem>
             </SelectContent>
           </Select>
         </div>
-        <Button onClick={downloadExcelFile}>
+        <div>
+          <label>Расход или Приход</label>
+          <Select onValueChange={(value)=>setAction(value)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Расход или Приход" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="OUTCOME">Расход</SelectItem>
+              <SelectItem value="INCOME"> Приход</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <Button onClick={downloadFile} className="bg-[#4880FF] text-white ml-3 hover:bg-blue-600">
           <Download className="mr-2 h-4 w-4" />
           Скачать Excel
         </Button>

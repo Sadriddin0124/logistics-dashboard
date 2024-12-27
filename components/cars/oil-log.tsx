@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchAutoOil } from "@/lib/actions/cars.action";
 import { queryClient } from "../ui-items/ReactQueryProvider";
+import { formatDate } from "@/lib/functions";
 
 export function OilLog() {
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -87,7 +88,7 @@ export function OilLog() {
               <TableCell>
                 {entry?.remaining_oil} л    
               </TableCell>
-              <TableCell>{entry?.created_at?.slice(0,10)}</TableCell>
+              <TableCell>{formatDate(entry?.created_at as string, "/")}</TableCell>
               {/* <TableCell>
                 <Button variant="secondary" size="sm">
                   Заправлено

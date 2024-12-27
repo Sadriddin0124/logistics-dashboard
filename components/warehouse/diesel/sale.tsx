@@ -13,6 +13,7 @@ import { fetchDieselSale } from "@/lib/actions/diesel.action";
 import { queryClient } from "@/components/ui-items/ReactQueryProvider";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { formatDate } from "@/lib/functions";
 const SaleDiesel = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const { data: diesel_sale, isLoading } = useQuery<IDieselPaginated>({
@@ -67,7 +68,7 @@ const SaleDiesel = () => {
           <TableRow className="border-b border-b-gray-300">
             <TableHead className="font-bold">Машина</TableHead>
             <TableHead className="font-bold">Количество</TableHead>
-            <TableHead className="font-bold">Date</TableHead>
+            <TableHead className="font-bold">Дата</TableHead>
             <TableHead className="font-bold"></TableHead>
           </TableRow>
         </TableHeader>
@@ -77,7 +78,7 @@ const SaleDiesel = () => {
               <TableRow key={index}>
                 <TableCell className="font-medium">{item?.car?.name}</TableCell>
                 <TableCell>{item?.volume}</TableCell>
-                <TableCell>{item?.created_at?.slice(0,10)}</TableCell>
+                <TableCell>{formatDate(item?.created_at as string, "/")}</TableCell>
                 <TableCell>
                   <Button
                     variant="secondary"

@@ -78,7 +78,7 @@
 //         placeholder={placeholder}
 //         styles={customStyles}
 //         inputValue={inputValue} // Bind inputValue state
-//         noOptionsMessage={() => 'Type to add new option...'}
+//         noOptionsMessage={() => 'Не найдено'}
 //         isClearable // Allow clearing selections
 //         getOptionLabel={(e) => e.label} // Customize how options are displayed in the dropdown
 //       />
@@ -205,7 +205,7 @@ const MultiSelector: React.FC<MultiSelectorProps> = ({
         placeholder={placeholder}
         styles={defaultStyles}
         inputValue={inputValue} // Bind inputValue state
-        noOptionsMessage={() => 'Type to add new option...'}
+        noOptionsMessage={() => 'Не найдено'}
         isClearable={isClearable} // Allow clearing selections
         getOptionLabel={(e) => e.label} // Customize how options are displayed in the dropdown
       />

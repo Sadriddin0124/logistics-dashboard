@@ -112,12 +112,12 @@ export default function Salary() {
                   Выберите сотрудника.*
                 </label>
                 <Select
-                  {...register("employee", { required: "Required" })}
+                  {...register("employee", { required: "Это значение является обязательным" })}
                   options={driverOptions}
                   value={selectedDriver}
                   onChange={handleSelectDriver}
                   placeholder={"Выберите сотрудника..."}
-                  noOptionsMessage={() => "Type to add new option..."}
+                  noOptionsMessage={() => "Не найдено"}
                 />
                 {errors?.employee && (
                   <p className="text-red-500">{errors?.employee?.message}</p>

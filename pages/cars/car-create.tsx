@@ -44,7 +44,8 @@ export default function VehicleForm() {
   const methods = useForm<FormValues>({
     defaultValues: {
       with_trailer: "false",
-      type_of_payment: "CASH"
+      type_of_payment: "CASH",
+      fuel_type: "GAS"
     },
   });
   const {
@@ -57,6 +58,7 @@ export default function VehicleForm() {
   const [modelOptions, setModelOptions] = useState<Option[]>([]);
   const [selectedModel, setSelectedModel] = useState<Option | null>(null);
   const [model, setModel] = useState<string>("");
+  const [status, setStatus] = useState(true)
   const type_of_payment = watch("type_of_payment");
   const { push } = useRouter()
   const { data: models } = useQuery<IModel[]>({
@@ -107,10 +109,17 @@ export default function VehicleForm() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["models_all"] });
       setSelectedModel({ label: data?.name, value: data?.id });
+      setValue("model", data?.id)
     },
   });
   const handleAddModel = () => {
-    if (model) {
+    if (model && status) {
+      createModelMutation({ name: model });
+    }
+  };
+  const enterModel = (event: React.KeyboardEvent) => {
+    setStatus(false)
+    if (event?.key === "Enter") {
       createModelMutation({ name: model });
     }
   };
@@ -158,14 +167,15 @@ export default function VehicleForm() {
                     Марка автомобиля*
                   </label>
                   <Select
-                  {...register("model", {required: "Required"})}
+                  {...register("model", {required: "Введите марку автомобиля"})}
                     options={modelOptions}
                     value={selectedModel}
                     onChange={handleSelectModel}
                     onBlur={handleAddModel}
                     onInputChange={(value) => setModel(value)}
+                    onKeyDown={enterModel}
                     placeholder="Марка автомобиля"
-                    noOptionsMessage={() => "Type to add new option..."}
+                    noOptionsMessage={() => "Не найдено"}
                     isClearable
                   />
                   {errors.model && (
@@ -245,7 +255,7 @@ export default function VehicleForm() {
                   <Input
                     disabled={with_trailer === "false" ? true : false}
                     id="trailer_number"
-                    {...register("trailer_number", {required: with_trailer === "true" ? "required" : false})}
+                    {...register("trailer_number", {required: with_trailer === "true" ? "Это значение является обязательным" : false})}
                     placeholder="Введите номер"
                     className="mt-1"
                     onChange={(e)=> {
@@ -274,7 +284,7 @@ export default function VehicleForm() {
                     onValueChange={(value) => setValue("fuel_type", value)} // Ensure that the form state is updated when the value changes
                   >
                     <SelectTrigger id="fuel_type" className="mt-1">
-                      <SelectValue placeholder="Газ" />
+                      <SelectValue placeholder="Выберите тип топлива" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="GAS">Газ</SelectItem>
@@ -341,7 +351,7 @@ export default function VehicleForm() {
                   </label>
                   <Input
                     id="leasing_period"
-                    {...register("leasing_period", {required: watch("type_of_payment") === "LEASING" ? "Required" : false})}
+                    {...register("leasing_period", {required: watch("type_of_payment") === "LEASING" ? "Это значение является обязательным" : false})}
                     type="number"
                     placeholder="Введите срок..."
                     className="mt-1"
@@ -358,15 +368,15 @@ export default function VehicleForm() {
                     htmlFor="leasing_period"
                     className="block text-sm font-medium text-gray-700"
                   >
-                    Пройденное расстояние автомобиля (в км)*
+                    Введите пробег автомобиля (в км)*
                   </label>
                   <Input
                     id="distance_travelled"
                     {...register("distance_travelled", {
-                      required: "Введите срок лизинга",
+                      required: "Введите пробег автомобиля",
                     })}
                     type="number"
-                    placeholder="Введите Пройденное расстояние автомобиля (в км)..."
+                    placeholder="Введите пробег автомобиля (в км)..."
                     className="mt-1"
                   />
                   {errors.distance_travelled && (

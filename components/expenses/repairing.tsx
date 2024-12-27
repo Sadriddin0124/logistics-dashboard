@@ -132,7 +132,7 @@ export default function RepairingForm() {
                 value={selectedCar}
                 onChange={handleSelectCar}
                 placeholder="Выберите..."
-                noOptionsMessage={() => "Type to add new option..."}
+                noOptionsMessage={() => "Не найдено"}
               />
               {errors.car && (
                 <p className="text-red-500">{errors.car?.message}</p>

@@ -13,7 +13,7 @@ import { removeCommas } from "@/lib/utils";
 import { SalaryFormData } from "./salary";
 import { useRouter } from "next/router";
 import { fetchAllFlights } from "@/lib/actions/flight.action";
-import { FlightPaginatedResponse } from "@/lib/types/flight.types";
+import { FlightPaginatedResponse2 } from "@/lib/types/flight.types";
 import { Input } from "../ui/input";
 
 export default function FlightForm() {
@@ -28,14 +28,14 @@ export default function FlightForm() {
   const [selectedCar, setSelectedFlight] = useState<Option | null>(null);
   const { id } = useRouter()?.query;
 
-  const { data: flights } = useQuery<FlightPaginatedResponse>({
+  const { data: flights } = useQuery<FlightPaginatedResponse2>({
     queryKey: ["all_flights"],
     queryFn: fetchAllFlights,
   });
   useEffect(() => {
     const carOption = flights?.results?.map((flight) => {
       return {
-        label: flight?.flight_type,
+        label: `${flight?.region?.name} ${flight?.car?.name} ${flight?.car?.models?.name}`,
         value: flight?.id,
       };
     });
@@ -84,9 +84,12 @@ export default function FlightForm() {
               <div className="space-y-2">
                 <label className="text-sm font-medium">Причина*</label>
                 <Input
-                  {...register("reason", { required: true })}
+                  {...register("reason", { required: "Введите причину" })}
                   placeholder="Введите причину..."
                 />
+                {errors?.reason && (
+                  <p className="text-red-500">{errors?.reason?.message}</p>
+                )}
               </div>
             </div>
 
@@ -97,15 +100,15 @@ export default function FlightForm() {
                 Выберите рейс*
                 </label>
                 <Select
-                  {...register("car", { required: "Required" })}
+                  {...register("flight", { required: "Выберите рейс" })}
                   options={carOptions}
                   value={selectedCar}
                   onChange={handleSelectFlight}
                   placeholder="Выберите..."
-                  noOptionsMessage={() => "Type to add new option..."}
+                  noOptionsMessage={() => "Не найдено"}
                 />
-                {errors?.car && (
-                  <p className="text-red-500">{errors?.car?.message}</p>
+                {errors?.flight && (
+                  <p className="text-red-500">{errors?.flight?.message}</p>
                 )}
               </div>
 

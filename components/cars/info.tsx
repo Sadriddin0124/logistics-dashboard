@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { formatDate } from "@/lib/functions";
 import { ICars } from "@/lib/types/cars.types";
 import { Car, Calendar, CreditCard } from "lucide-react";
 
@@ -50,7 +51,7 @@ export default function VehicleInfoCard({ car }: { car: ICars }) {
           <div>
             <p className="text-sm font-medium">Дата следующего обслуживания</p>
             <p className="text-xl font-medium">
-              {car?.updated_at?.slice(0, 10)}
+              {formatDate(car?.updated_at as string, "/")}
             </p>
           </div>
         </div>

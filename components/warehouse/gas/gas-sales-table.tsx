@@ -16,6 +16,7 @@ import { useQuery } from "@tanstack/react-query";
 import { SoldGasListResponse } from "@/lib/types/gas_station.types";
 import { queryClient } from "@/components/ui-items/ReactQueryProvider";
 import { useRouter } from "next/router";
+import { formatDate } from "@/lib/functions";
 
 export default function SalesGasTable() {
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -74,7 +75,7 @@ export default function SalesGasTable() {
             <TableHead className="font-bold">T/R</TableHead>
             <TableHead className="font-bold">Машина</TableHead>
             <TableHead className="font-bold">Название заправки</TableHead>
-            <TableHead className="font-bold">Date</TableHead>
+            <TableHead className="font-bold">Дата</TableHead>
             <TableHead className="font-bold">Количество</TableHead>
             <TableHead className="font-bold w-[50px]"></TableHead>
           </TableRow>
@@ -85,7 +86,7 @@ export default function SalesGasTable() {
               <TableCell>{index + 1}</TableCell>
               <TableCell>{sales?.car?.name}</TableCell>
               <TableCell>{sales?.station?.name}</TableCell>
-              <TableCell>{sales?.created_at?.slice(0,10)} сум</TableCell>
+              <TableCell>{formatDate(sales?.created_at as string, "/")} сум</TableCell>
               <TableCell>{sales?.amount?.toFixed(2)}</TableCell>
             </TableRow>
           ))}

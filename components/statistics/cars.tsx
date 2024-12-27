@@ -24,6 +24,8 @@ const Cars = () => {
               url2="/gas/gaz-info/?type=sale"
               title2={item?.fuel_type === "GAS" ? "Газ" : "Дизель"}
               title3="Газ"
+              distance={item?.distance_travelled}
+              item={item}
             />
           );
         })}
