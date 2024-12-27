@@ -85,7 +85,7 @@ export default function GasSold() {
       queryClient.invalidateQueries({ queryKey: ["gas_stations"] });
       push(`/warehouse/gas/`);
       setSelectedStation(null);
-      toast.success("Muvaffaqiyatli qo'shildi!");
+      toast.success("Сохранено успешно!");
     },
     onError: () => {
       toast.error("Xatolik yuz berdi!");

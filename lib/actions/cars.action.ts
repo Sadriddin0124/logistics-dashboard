@@ -48,6 +48,7 @@ export const updateCarDistance = async (data: {
   return response.data;
 };
 
+
 export const updateCarLeasing = async (data: {
   id: string;
   leasing_payed_amount: number;
@@ -119,7 +120,7 @@ export const updateAutoDetail = async (data: ICarsDetail[]) => {
 
 export const deleteAutoDetail = async (data: {
   id: string[];
-  sell_price: string;
+  sell_price: number;
 }) => {
   const response = await $api.post(`/cars/detail-delete/`, data);
   return response.data;

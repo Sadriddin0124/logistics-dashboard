@@ -97,7 +97,7 @@ export default function FlightForm() {
     mutationFn: createFlight,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["recycled"] });
-      toast.success(" muvaffaqiyatli qo'shildi!");
+      toast.success(" Сохранено успешно!");
       push(`/flight`);
     },
     onError: () => {

@@ -32,7 +32,7 @@ export default function CreateModel({isOpen, setIsOpen, editItem, setEditItem}: 
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["models"] });
         reset();
-        toast.success(" muvaffaqiyatli qo'shildi!");
+        toast.success(" Сохранено успешно!");
       },
       onError: () => {
         toast.error("ni qo'shishda xatolik!");
@@ -43,7 +43,7 @@ export default function CreateModel({isOpen, setIsOpen, editItem, setEditItem}: 
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["models"] });
         reset();
-        toast.success(" muvaffaqiyatli qo'shildi!");
+        toast.success(" Сохранено успешно!");
         setEditItem(null)
       },
       onError: () => {

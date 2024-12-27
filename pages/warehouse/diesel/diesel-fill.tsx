@@ -57,7 +57,7 @@ export default function DieselFill() {
       queryClient.invalidateQueries({ queryKey: ["diesel_sale"] });
       setSelectedCar(null);
       reset();
-      toast.success("Muvaffaqiyatli qo'shildi!");
+      toast.success("Сохранено успешно!");
     },
     onError: () => {
       toast.error("Xatolik yuz berdi!");

@@ -102,8 +102,8 @@ export function EmployeeFlightTable() {
       </Table>
       <div className="mt-4 flex justify-between items-center">
         <div>
-          {employeeFlight?.count} reys из {indexOfFirstOrder + 1} по{" "}
-          {Math.min(indexOfLastOrder, employeeFlight?.count as number) || ""}
+        Итого: {employeeFlight?.count || 0} с {indexOfFirstOrder + 1} до{" "}
+        {Math.min(indexOfLastOrder, employeeFlight?.count as number) || 0}
         </div>
         <div className="flex space-x-2 items-center">
           <Button

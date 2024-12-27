@@ -34,7 +34,7 @@ export default function OtherExpenseForm() {
     mutationFn: createFinance,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["finance"] });
-      toast.success(" muvaffaqiyatli qo'shildi!");
+      toast.success(" Сохранено успешно!");
     },
     onError: () => {
       toast.error("ni qo'shishda xatolik!");

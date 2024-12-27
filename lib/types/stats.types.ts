@@ -15,7 +15,9 @@ export type IStats = {
     reason: string; // Reason or explanation for the action
     win: number; // Resulting balance or net value
     leasing_balance: number; // Resulting balance or net value
-    total_leasing_paid: number; // Resulting balance or net value
+    total_leasing_paid: number; // Resulting balance or net value\
+    flight_count: number
+    active_flight_count: number
   };
 
   export type StatsPaginated = PaginationResponse<IStats>

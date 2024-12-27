@@ -98,7 +98,7 @@ export default function GasManagementForm() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["diesel"] });
       reset();
-      toast.success(" muvaffaqiyatli qo'shildi!");
+      toast.success(" Сохранено успешно!");
     },
     onError: () => {
       toast.error("ni qo'shishda xatolik!");

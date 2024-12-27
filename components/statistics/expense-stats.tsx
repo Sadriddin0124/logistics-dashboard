@@ -2,8 +2,6 @@
 
 import {
   fetchFinanceStats,
-  fetchFlightsStats,
-  fetchFlightsStatsAll,
 } from "@/lib/actions/stats.ction";
 import { StatCard } from "./stat-card";
 import {
@@ -15,7 +13,6 @@ import {
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { StatsPaginated } from "@/lib/types/stats.types";
-import { FlightPaginatedResponse } from "@/lib/types/flight.types";
 import { IGasStation } from "@/lib/types/gas_station.types";
 import { fetchAllGasStation } from "@/lib/actions/gas.action";
 import { IOilType } from "@/lib/types/oil.types";
@@ -23,22 +20,20 @@ import { fetchWholeOils } from "@/lib/actions/oil.action";
 import { IDieselPaginated } from "@/lib/types/diesel.types";
 import { fetchDiesel } from "@/lib/actions/diesel.action";
 import { Input } from "../ui/input";
-import { useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 
-export function ExpenseStats() {
-  const [startDate, setStartDate] = useState<string>("")
-  const [endDate, setEndDate] = useState<string>("")
+type Props = {
+  start: string,
+  end: string
+  setStart: Dispatch<SetStateAction<string>>
+  setEnd: Dispatch<SetStateAction<string>>
+}
+
+export function ExpenseStats({start, end, setStart, setEnd}: Props) {
+
   const { data: stats } = useQuery<StatsPaginated>({
-    queryKey: ["stats", 1, startDate, endDate],
-    queryFn: () => fetchFinanceStats(1, startDate, endDate, ""),
-  });
-  const { data: flights } = useQuery<FlightPaginatedResponse>({
-    queryKey: ["flight-stats", 1],
-    queryFn: () => fetchFlightsStats(1, "ACTIVE"),
-  });
-  const { data: flights_all } = useQuery<FlightPaginatedResponse>({
-    queryKey: ["flight-stats-all"],
-    queryFn: () => fetchFlightsStatsAll(),
+    queryKey: ["stats", 1, start, end],
+    queryFn: () => fetchFinanceStats(1, start, end, ""),
   });
   const { data: stations } = useQuery<IGasStation[]>({
     queryKey: ["all_stations"],
@@ -68,24 +63,24 @@ export function ExpenseStats() {
       <div className="flex items-center gap-2 p-4 bg-white rounded-2xl mb-4">
         <div className="space-y-1">
           <label className="text-sm">Дата начала</label>
-          <Input type="date" className="w-[300px]" onChange={(e)=>setStartDate(e.target.value)}/>
+          <Input type="date" className="w-[300px]" onChange={(e)=>setStart(e.target.value)}/>
         </div>
         <div className="space-y-1">
           <label className="text-sm">Дата окончания</label>
-          <Input type="date" className="w-[300px]" onChange={(e)=>setEndDate(e.target.value)}/>
+          <Input type="date" className="w-[300px]" onChange={(e)=>setEnd(e.target.value)}/>
         </div>
       </div>
       <div className="flex flex-col gap-4">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <StatCard
             title="Рейсы"
-            value={flights_all?.count?.toFixed(2) || 0}
+            value={data?.flight_count || 0}
             icon={PlaneIcon}
             url="/flight/info/"
           />
           <StatCard
             title="Активные рейсы"
-            value={flights?.count?.toFixed(2) || 0}
+            value={data?.active_flight_count || 0}
             icon={PlaneTakeoff}
             url="/flight/info/"
           />

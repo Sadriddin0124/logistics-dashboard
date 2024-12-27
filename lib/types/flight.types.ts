@@ -25,9 +25,9 @@ export interface IFlightCreate {
   driver: string; // Required
   departure_date: string; // Date in ISO format (required)
   arrival_date?: string | null; // Date in ISO format (nullable)
-  price_uzs?: number; 
+  price_uzs?: number | string; 
   price_usd?: number; 
-  driver_expenses_uzs?: number; 
+  driver_expenses_uzs?: number | string; 
   driver_expenses_usd?: number; 
   upload?: string | null; // UUID (nullable)
   cargo_info?: string | null; // Nullable

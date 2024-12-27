@@ -64,7 +64,7 @@ export default function Salary() {
     mutationFn: createFinance,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["finance"] });
-      toast.success(" muvaffaqiyatli qo'shildi!");
+      toast.success(" Сохранено успешно!");
       reset();
       setSelectedDriver(null)
     },

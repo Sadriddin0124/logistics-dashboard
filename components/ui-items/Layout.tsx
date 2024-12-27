@@ -13,9 +13,9 @@ export default function Layout({ children }: LayoutProps) {
   const pathname = usePathname();
   const [sideBar, setSideBar] = useState<boolean>(false);
   const [subItemStatus, setSubItemStatus] = useState<boolean>(false);
-  const [load, setLoad] = useState(false)
+  const [load, setLoad] = useState(false);
   setTimeout(() => {
-    setLoad(false)
+    setLoad(false);
   }, 1000);
   return (
     <SidebarProvider>
@@ -48,10 +48,10 @@ export default function Layout({ children }: LayoutProps) {
               </div>
             )}
           </div>
-          {load ? <Loading/> :
-           ""}
-           <main className={`${load ? "fixed z-[-1]" : ""} p-4`}>{children}</main>
-
+          {load ? <Loading /> : ""}
+          <main className={`${load ? "fixed z-[-1]" : ""} p-4`}>
+            {children}
+          </main>
         </SidebarInset>
       </div>
     </SidebarProvider>

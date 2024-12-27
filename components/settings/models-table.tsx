@@ -75,7 +75,7 @@ export default function ModelsTable() {
     mutationFn: deleteModel,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["models"] });
-      toast.success(" muvaffaqiyatli qo'shildi!");
+      toast.success(" Сохранено успешно!");
     },
     onError: () => {
       toast.error("ni qo'shishda xatolik!");

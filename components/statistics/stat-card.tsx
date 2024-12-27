@@ -12,16 +12,16 @@ interface StatCardProps {
   status?: boolean
 }
 
-export function StatCard({ title, value, icon: Icon, url, url2, status }: StatCardProps) {
+export function StatCard({ title, value, icon: Icon, url, url2, }: StatCardProps) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
-        {url2 ? <Button variant={"ghost"} size={"sm"} onClick={()=>downloadExcelFile(url as string)}>распроданный</Button> : <Icon className="h-4 w-4 text-muted-foreground mr-2" />}
+        {url2 ? <Button variant={"ghost"} size={"sm"} onClick={()=>downloadExcelFile(url as string)}><Download className="h-4 w-4 text-muted-foreground" size={"icon"} /></Button> : <Icon className="h-4 w-4 text-muted-foreground mr-2" />}
       </CardHeader>
       <CardContent className="flex justify-between w-full">
         <div className="text-lg font-bold">{value}</div>
-        {url && <Button variant={"ghost"} size={"sm"} onClick={()=>downloadExcelFile(url as string)}>{!status ? <Download className="h-4 w-4 text-muted-foreground" size={"icon"} /> : "куплен"}</Button>}
+        {url && <Button variant={"ghost"} size={"sm"} onClick={()=>downloadExcelFile(url as string)}><Download className="h-4 w-4 text-muted-foreground" size={"icon"} /></Button>}
       </CardContent>
     </Card>
   )

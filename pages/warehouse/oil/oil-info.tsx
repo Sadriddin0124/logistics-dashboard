@@ -56,7 +56,7 @@ export default function GasManagementForm() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["oil"] });
       queryClient.invalidateQueries({ queryKey: ["oil_purchases"] });
-      toast.success(" muvaffaqiyatli qo'shildi!");
+      toast.success(" Сохранено успешно!");
     },
     onError: () => {
       toast.error("ni qo'shishda xatolik!");
@@ -81,7 +81,7 @@ export default function GasManagementForm() {
      onSuccess: () => {
        queryClient.invalidateQueries({ queryKey: ["oil"] });
        router.push("/warehouse/oil")
-       toast.success("Muvaffaqiyatli qo'shildi!");
+       toast.success("Сохранено успешно!");
      },
      onError: () => {
        toast.error("Xatolik yuz berdi!");

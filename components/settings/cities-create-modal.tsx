@@ -30,7 +30,7 @@ export default function CreateCityModal({isOpen, setIsOpen, editItem, setEditIte
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["regions"] });
       // push(`/warehouse/oil/oil-info?id=${data?.id}`)
-      toast.success(" muvaffaqiyatli qo'shildi!");
+      toast.success(" Сохранено успешно!");
     },
     onError: () => {
       toast.error("ni qo'shishda xatolik!");
@@ -41,7 +41,7 @@ export default function CreateCityModal({isOpen, setIsOpen, editItem, setEditIte
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["regions"] });
       // push(`/warehouse/oil/oil-info?id=${data?.id}`)
-      toast.success(" muvaffaqiyatli qo'shildi!");
+      toast.success(" Сохранено успешно!");
     },
     onError: () => {
       toast.error("ni qo'shishda xatolik!");

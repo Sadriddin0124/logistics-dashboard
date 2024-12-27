@@ -105,7 +105,7 @@ export default function GasManagementForm() {
     mutationFn: createAnotherStation,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["another-stations", currentPage] });
-      toast.success(" muvaffaqiyatli qo'shildi!");
+      toast.success(" Сохранено успешно!");
       reset()
       setSelectedCar(null)
     },

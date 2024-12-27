@@ -144,7 +144,7 @@ export default function IncomeForm() {
     mutationFn: createFinance,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["finance"] });
-      toast.success(" muvaffaqiyatli qo'shildi!");
+      toast.success(" Сохранено успешно!");
       reset()
     },
     onError: () => {
@@ -184,7 +184,7 @@ export default function IncomeForm() {
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium">
-                  Введите сумму расхода.*
+                  Введите сумму прихода.*
                 </label>
                 <CurrencyInputs name="amount" />
               </div>

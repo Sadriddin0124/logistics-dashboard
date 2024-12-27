@@ -57,7 +57,7 @@ export default function LeasingForm() {
       value: car?.id,
     }));
     setCarOptions(carOption as Option[]);
-    const amount = cars?.find(item=> item?.id === selectedCar?.value)?.price_uzs
+    const amount = cars?.find(item=> item?.id === selectedCar?.value)?.leasing_payed_amount
     setCarAmount(amount as number)
   }, [cars, selectedCar]);
 
@@ -79,6 +79,12 @@ export default function LeasingForm() {
     setValue("car", newValue?.value as string);
   };
 
+  const { mutate: updateMutation } = useMutation({
+    mutationFn: updateCarLeasing,
+    onError: () => {
+      toast.error("ni qo'shishda xatolik!");
+    },
+  });
   const onSubmit = (data: FormValues) => {
     const formData = {
       car: data?.car,
@@ -91,15 +97,12 @@ export default function LeasingForm() {
     console.log(formData);
 
     createFinanceMutation(formData);
+    const item = {id: selectedCar?.value as string, leasing_payed_amount: Number(removeCommas(data?.amount_uzs)) + carAmount}
+    console.log(item);
+    
     updateMutation({id: selectedCar?.value as string, leasing_payed_amount: Number(removeCommas(data?.amount_uzs)) + carAmount})
   };
 
-    const { mutate: updateMutation } = useMutation({
-      mutationFn: updateCarLeasing,
-      onError: () => {
-        toast.error("ni qo'shishda xatolik!");
-      },
-    });
 
   return (
     <FormProvider {...methods}>

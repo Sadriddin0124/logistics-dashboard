@@ -17,6 +17,7 @@ import { toast } from "react-toastify";
 import { deleteAutoDetail } from "@/lib/actions/cars.action";
 import { FormProvider, useForm } from "react-hook-form";
 import { CurrencyInputs } from "../ui-items/currency-inputs";
+import { removeCommas } from "@/lib/utils";
 
 interface DeleteDialogProps {
   id: string[]; // The ids of the items to delete
@@ -59,7 +60,7 @@ export function AutoPartsDelete({
   const onDelete = (data: DeleteType) => {
     const payload = {
       id: id,
-      sell_price: data.amount_uzs,
+      sell_price: Number(removeCommas(data.amount_uzs)),
     };
     deleteMutation(payload); // Pass the mapped payload to the mutation
   };

@@ -119,8 +119,11 @@ import { fetchFinanceInfo } from "@/lib/actions/stats.ction";
 import { useQuery } from "@tanstack/react-query";
 import { ResponseData } from "@/lib/types/stats.types";
 import YearGraph from "./income";
-
-export default function IncomeOutcomeGraph() {
+type Props = {
+  start: string,
+  end: string
+}
+export default function IncomeOutcomeGraph({start, end}: Props) {
   const getCurrentMonthDays = () => {
     const now = new Date();
     const daysInMonth = new Date(
@@ -142,9 +145,9 @@ export default function IncomeOutcomeGraph() {
   const daysInMonth = useMemo(() => getCurrentMonthDays(), []);
 
   const { data: finance_info } = useQuery<ResponseData>({
-    queryKey: ["finance_info"],
+    queryKey: ["finance_info", start, end],
     queryFn: () =>
-      fetchFinanceInfo(daysInMonth[0], daysInMonth[daysInMonth.length - 1]),
+      fetchFinanceInfo(start || daysInMonth[0], end || daysInMonth[daysInMonth.length - 1]),
   });
 
   // Map finance data to all days of the month

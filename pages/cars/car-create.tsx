@@ -45,7 +45,6 @@ export default function VehicleForm() {
     defaultValues: {
       with_trailer: "false",
       type_of_payment: "CASH",
-      fuel_type: "GAS"
     },
   });
   const {
@@ -79,7 +78,7 @@ export default function VehicleForm() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["cars"] });
       push(`/cars/car-info?id=${data?.id}`);
-      toast.success(" muvaffaqiyatli qo'shildi!");
+      toast.success(" Сохранено успешно!");
     },
     onError: () => {
       toast.error("ni qo'shishda xatolik!");

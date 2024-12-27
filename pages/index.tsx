@@ -249,14 +249,16 @@
 import Cars from "@/components/statistics/cars";
 import { ExpenseStats } from "@/components/statistics/expense-stats";
 import IncomeOutcomeGraph from "@/components/statistics/linegraph";
-import React from "react";
+import React, { useState } from "react";
 
 const FormWrapper: React.FC = () => {
+  const [startDate, setStartDate] = useState<string>("")
+  const [endDate, setEndDate] = useState<string>("")
   return (
     <div>
-      <ExpenseStats />
+      <ExpenseStats end={endDate} setEnd={setEndDate} start={startDate} setStart={setStartDate} />
       <div className=" grid grid-cols-1 gap-4">
-        <IncomeOutcomeGraph />
+        <IncomeOutcomeGraph  end={endDate} start={startDate} />
         <Cars />
       </div>
     </div>

@@ -112,8 +112,6 @@ export function AutoPartsForm() {
       price_uzs: Number(removeCommas(item?.price_uzs)),
       car: id as string,
     }));
-    console.log(data?.parts);
-
     createMutation(formData);
   };
 
@@ -142,18 +140,18 @@ export function AutoPartsForm() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["car_details", currentPage] });
       remove(index);
-      toast.success("Удаление выполнено успешно!");
+      toast.success("Утилизация завершена успешно!");
       setDeleteOpen(false);
     },
     onError: () => {
-      toast.error("Ошибка при удалении!");
+      toast.error("Ошибка при утилизации!");
     },
   });
 
   const onDelete = () => {
     const payload = {
       id: [deleteId],
-      sell_price: deletePrice,
+      sell_price: Number(deletePrice),
     };
     deleteMutation(payload);
   };

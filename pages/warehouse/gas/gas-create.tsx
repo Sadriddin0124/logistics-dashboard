@@ -66,7 +66,7 @@ export default function GasManagementForm() {
       });
       console.log(addGasData);
       
-      toast.success("Muvaffaqiyatli qo'shildi!");
+      toast.success("Сохранено успешно!");
     },
     onError: () => {
       toast.error("Xatolik yuz berdi!");

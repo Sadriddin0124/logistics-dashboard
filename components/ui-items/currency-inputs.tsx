@@ -43,6 +43,7 @@ export const CurrencyInputs: React.FC<CurrencyInputsProps> = ({ name, required, 
 
   const isUpdating = useRef(false);
 
+  // Create dynamic key with _uzs
   const uzsName = `${name}_uzs`;
   const uzsValue = watch(uzsName); // Watch only the specific field
 
@@ -84,6 +85,10 @@ export const CurrencyInputs: React.FC<CurrencyInputsProps> = ({ name, required, 
               const parsedValue = parseFloat(rawValue);
               e.currentTarget.value = formatNumberWithCommas(parsedValue);
             }
+            // Update the raw value in the form context with the _uzs key
+            setValue(uzsName, e.currentTarget.value, {
+              shouldValidate: true,
+            });
           }}
         />
         {errors[uzsName] && (

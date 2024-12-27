@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchAutoRoute } from "@/lib/actions/cars.action";
 import { queryClient } from "../ui-items/ReactQueryProvider";
+import { formatDate } from "@/lib/functions";
 
 export function RouteLog() {
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -88,8 +89,8 @@ export function RouteLog() {
               <TableCell>
                 {route.price_uzs} сум
               </TableCell>
-              <TableCell>{route?.departure_date?.slice(0,10)}</TableCell>
-              <TableCell>{route?.arrival_date?.slice(0,10)}</TableCell>
+              <TableCell>{formatDate(route?.departure_date as string, "/")}</TableCell>
+              <TableCell>{formatDate(route?.arrival_date as string, "/")}</TableCell>
               <TableCell><p className="line-clamp-1 overflow-hidden">{route.cargo_info}</p></TableCell>
             </TableRow>
           ))}

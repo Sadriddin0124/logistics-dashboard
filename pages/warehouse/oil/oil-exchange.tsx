@@ -66,7 +66,7 @@ export default function OilExchange() {
       queryClient.invalidateQueries({ queryKey: ["gas_oil"] });
       push(`/warehouse/oil/`);
       setSelectedOil(null);
-      toast.success("Muvaffaqiyatli qo'shildi!");
+      toast.success("Сохранено успешно!");
     },
     onError: () => {
       toast.error("Xatolik yuz berdi!");

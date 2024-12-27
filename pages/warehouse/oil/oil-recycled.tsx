@@ -41,7 +41,7 @@ export default function GasManagementForm() {
       queryClient.invalidateQueries({ queryKey: ["quantity"] });
       // push(`/warehouse/oil/oil-info?id=${data?.id}`)
       reset()
-      toast.success(" muvaffaqiyatli qo'shildi!");
+      toast.success(" Сохранено успешно!");
     },
     onError: () => {
       toast.error("ni qo'shishda xatolik!");

@@ -50,7 +50,7 @@ export default function GasManagementForm() {
       queryClient.invalidateQueries({ queryKey: ["station"] });
       queryClient.invalidateQueries({ queryKey: ["purchased"] });
       reset();
-      toast.success("Muvaffaqiyatli qo'shildi!");
+      toast.success("Сохранено успешно!");
     },
     onError: () => {
       toast.error("Xatolik yuz berdi!");
@@ -71,7 +71,7 @@ export default function GasManagementForm() {
    onSuccess: () => {
      queryClient.invalidateQueries({ queryKey: ["gas_stations"] });
      router.push("/warehouse/gas")
-     toast.success("Muvaffaqiyatli qo'shildi!");
+     toast.success("Сохранено успешно!");
    },
    onError: () => {
      toast.error("Xatolik yuz berdi!");

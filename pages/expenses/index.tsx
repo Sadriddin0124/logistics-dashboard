@@ -172,13 +172,14 @@ export default function Expenses() {
         </div>
         <div>
           <label>Расход или Приход</label>
-          <Select onValueChange={(value)=>setAction(value)}>
+          <Select onValueChange={(value)=>setAction(value === "." ? "" : value)}>
             <SelectTrigger>
               <SelectValue placeholder="Расход или Приход" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="OUTCOME">Расход</SelectItem>
               <SelectItem value="INCOME"> Приход</SelectItem>
+              <SelectItem value="."> Расход или Приход</SelectItem>
             </SelectContent>
           </Select>
         </div>

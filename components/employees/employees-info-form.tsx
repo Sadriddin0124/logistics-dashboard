@@ -83,7 +83,7 @@ export default function EmployeesInfoForm() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["employee"] });
       reset();
-      toast.success(" muvaffaqiyatli qo'shildi!");
+      toast.success(" Сохранено успешно!");
     },
     onError: () => {
       toast.error("ni qo'shishda xatolik!");
@@ -96,7 +96,7 @@ export default function EmployeesInfoForm() {
     mutationFn: deleteEmployee,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["employees"] });
-      toast.success(" muvaffaqiyatli qo'shildi!");
+      toast.success(" Сохранено успешно!");
       router.push("/employees");
     },
     onError: () => {

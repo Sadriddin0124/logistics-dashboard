@@ -66,7 +66,7 @@ export default function GasManagementForm() {
       });
       reset();
       queryClient.invalidateQueries({ queryKey: ["gas_stations"] });
-      toast.success(" muvaffaqiyatli qo'shildi!");
+      toast.success(" Сохранено успешно!");
     },
     onError: () => {
       toast.error("ni qo'shishda xatolik!");

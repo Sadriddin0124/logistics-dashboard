@@ -67,8 +67,8 @@ const Breadcrumb = () => {
       value: "О рейсe",
     },
     {
-      key: "flight",
-      value: "",
+      key: "flight-order",
+      value: "Заказать Рейс",
     },
   ];
 

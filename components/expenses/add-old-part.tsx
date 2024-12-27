@@ -55,10 +55,12 @@ export function OldPartsForm() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["car_details"] });
       methods.reset();
+      toast.success("Утилизация завершена успешно!");
     },
     onError: () => {
-      toast.error("Ошибка при сохранении!");
+      toast.error("Ошибка при утилизации!");
     },
+
   });
 
   const onSubmit = (data: { parts: FormValues[] }) => {

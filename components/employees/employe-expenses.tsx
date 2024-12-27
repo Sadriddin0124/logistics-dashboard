@@ -94,8 +94,8 @@ export function EmployeeExpensesTable() {
       </Table>
       <div className="mt-4 flex justify-between items-center">
         <div>
-          {employeeExpenses?.count} reys из {indexOfFirstOrder + 1} по{" "}
-          {Math.min(indexOfLastOrder, employeeExpenses?.count as number) || ""}
+        Итого: {employeeExpenses?.count || 0} с {indexOfFirstOrder + 1} до{" "}
+        {Math.min(indexOfLastOrder, employeeExpenses?.count as number) || 0}
         </div>
         <div className="flex space-x-2 items-center">
           <Button

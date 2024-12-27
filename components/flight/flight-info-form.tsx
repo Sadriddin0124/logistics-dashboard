@@ -28,6 +28,7 @@ import { IEmployee } from "@/lib/types/employee.types";
 import { fetchEmployeesAll } from "@/lib/actions/employees.action";
 import { useRouter } from "next/router";
 import EndFlight from "./end-flight";
+import { removeCommas } from "@/lib/utils";
 
 export default function FlightInfoForm() {
   const methods = useForm<IFlightCreate>();
@@ -109,7 +110,7 @@ export default function FlightInfoForm() {
     mutationFn: updateFlightData,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["recycled"] });
-      toast.success(" muvaffaqiyatli qo'shildi!");
+      toast.success(" Сохранено успешно!");
     },
     onError: () => {
       toast.error("ni qo'shishda xatolik!");
@@ -119,9 +120,8 @@ export default function FlightInfoForm() {
     createMutation({
       ...data,
       id: id as string,
-      driver_expenses_usd: Number(data?.driver_expenses_usd),
-      driver_expenses_uzs: Number(data?.driver_expenses_uzs),
-      price_uzs: Number(data?.price_uzs),
+      driver_expenses_uzs: Number(removeCommas(data?.driver_expenses_uzs as string)),
+      price_uzs: Number(removeCommas(data?.price_uzs as string)),
       price_usd: Number(data?.price_usd),
       // upload: image?.id
     });

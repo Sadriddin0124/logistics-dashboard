@@ -1,4 +1,5 @@
 import { $api } from "@/pages/api/api";
+// import { formatDistanceToNow } from 'date-fns';
 
 export const formatUzbekistanPhoneNumber = (input: string): string => {
   const prefix = "+998";
@@ -58,3 +59,13 @@ export const downloadExcelFile = async (link: string) => {
   }
 };
 
+
+
+// export const TimeAgo = ({ timestamp }: { timestamp: Date }) => {
+//   const timeAgo = formatDistanceToNow(new Date(timestamp), { addSuffix: true });
+//   return timeAgo
+// };
+
+export const fuelChange = (fuel: string) => {
+  return fuel === "GAS" ? "Газ" : "Дизель"
+}

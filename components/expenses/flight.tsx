@@ -48,7 +48,7 @@ export default function FlightForm() {
       reset();
       setSelectedFlight(null)
       queryClient.invalidateQueries({ queryKey: ["finance"] });
-      toast.success(" muvaffaqiyatli qo'shildi!");
+      toast.success(" Сохранено успешно!");
     },
     onError: () => {
       toast.error("ni qo'shishda xatolik!");
