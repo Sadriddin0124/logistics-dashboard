@@ -6,24 +6,28 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useRouter } from "next/router";
 import { FormProvider, useForm } from "react-hook-form";
-import { CurrencyInputs } from "@/components/ui-items/currency-inputs";
 import { IOil, IOilType } from "@/lib/types/oil.types";
 import { removeCommas } from "@/lib/utils";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { createOilPurchase, deleteOil, fetchOil } from "@/lib/actions/oil.action";
+import {
+  createOilPurchase,
+  deleteOil,
+  fetchOil,
+} from "@/lib/actions/oil.action";
 import { queryClient } from "@/components/ui-items/ReactQueryProvider";
 import { toast } from "react-toastify";
 import { Label } from "@/components/ui/label";
 import PurchasedOilTable from "@/components/warehouse/oil/oil-purchased-table";
 import RecycledOilTable from "@/components/warehouse/oil/oil-recycled-table";
 import { ForceDeleteDialog } from "@/components/ui-items/force-delete";
+import CurrencyInputWithSelect from "@/components/ui-items/currencySelect";
 
 export default function GasManagementForm() {
   const methods = useForm<IOil>();
-  const { register, handleSubmit, setValue, watch } = methods;
+  const { register, handleSubmit, setValue, watch, reset } = methods;
   const amount_uzs = watch("amount_uzs");
   const price_uzs = watch("price_uzs");
-  const router = useRouter()
+  const router = useRouter();
   const { id } = router.query;
   const [status, setStatus] = useState<string>("");
 
@@ -37,13 +41,13 @@ export default function GasManagementForm() {
     if (oilData) {
       setValue("oil_name", oilData?.oil_name);
     }
-    const payedPrice = Number(removeCommas(amount_uzs as string)) || 0;
-    const pricePerLiter = Number(removeCommas(price_uzs as string)) || 0;
+    const payedPrice = Number(removeCommas(amount_uzs?.toString())) || 0;
+    const pricePerLiter = Number(removeCommas(price_uzs?.toString())) || 0;
     if (pricePerLiter > 0) {
       const result = payedPrice / pricePerLiter;
       setValue("oil_volume", Number(result.toFixed(2)));
       if (result < 1) {
-        setStatus("gaz narxi to'langan summadan baland bo'lmasligi kerak")
+        setStatus("Цена на нефть не должна быть выше уплаченной суммы.");
       }
     } else {
       setValue("oil_volume", 0);
@@ -57,6 +61,7 @@ export default function GasManagementForm() {
       queryClient.invalidateQueries({ queryKey: ["oil"] });
       queryClient.invalidateQueries({ queryKey: ["oil_purchases"] });
       toast.success(" Сохранено успешно!");
+      reset();
     },
     onError: () => {
       toast.error("Ошибка сохранения!");
@@ -67,8 +72,9 @@ export default function GasManagementForm() {
     const formData = {
       oil_volume: data?.oil_volume,
       // amount_usd: Number(removeCommas(data?.amount_usd)),
-      amount_uzs: Number(removeCommas(data?.amount_uzs)),
-      price_uzs: Number(removeCommas(data?.price_uzs)),
+      amount_uzs: Number(removeCommas(data?.amount_uzs?.toString())),
+      price_uzs: Number(removeCommas(data?.price_uzs?.toString())),
+      price: Number(removeCommas(data?.price?.toString())),
       // price_usd: Number(removeCommas(data?.price_usd)),
     };
     createMutation({
@@ -76,23 +82,22 @@ export default function GasManagementForm() {
       oilData: formData as IOilType,
     });
   };
-    const { mutate: deleteMutation } = useMutation({
-      mutationFn: deleteOil,
-     onSuccess: () => {
-       queryClient.invalidateQueries({ queryKey: ["oil"] });
-       router.push("/warehouse/oil")
-       toast.success("Сохранено успешно!");
-     },
-     onError: () => {
-       toast.error("Ошибка сохранения!");
-     },
-   });
-   const handleDelete = (id: string) => {
-    deleteMutation(id)
-   }
+  const { mutate: deleteMutation } = useMutation({
+    mutationFn: deleteOil,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["oil"] });
+      router.push("/warehouse/oil");
+      toast.success("Сохранено успешно!");
+    },
+    onError: () => {
+      toast.error("Ошибка сохранения!");
+    },
+  });
+  const handleDelete = (id: string) => {
+    deleteMutation(id);
+  };
   return (
     <div className="w-full container mx-auto mt-8 space-y-8">
-      {/* Top Form Section */}
       <Card>
         <CardContent className="mt-8">
           <FormProvider {...methods}>
@@ -107,7 +112,7 @@ export default function GasManagementForm() {
 
               <div className="space-y-2">
                 <label className="text-sm">Оплаченная сумма</label>
-                <CurrencyInputs name="amount" />
+                <CurrencyInputWithSelect name="amount" />
               </div>
 
               <div className="space-y-2">
@@ -122,7 +127,7 @@ export default function GasManagementForm() {
               </div>
               <div className="space-y-2">
                 <label className="text-sm">Цена на масло (литр)</label>
-                <CurrencyInputs name="price" />
+                <CurrencyInputWithSelect name="price" />
                 {status && <p className="text-sm text-red-500">{status}</p>}
               </div>
 

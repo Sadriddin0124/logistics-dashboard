@@ -34,6 +34,7 @@ export default function GasSold() {
     register,
     handleSubmit,
     // formState: { errors },
+    reset,
   } = methods;
   const [carOptions, setCarOptions] = useState<Option[]>([]);
   const [selectedStation, setSelectedStation] = useState<Option | null>(null);
@@ -86,6 +87,7 @@ export default function GasSold() {
       push(`/warehouse/gas/`);
       setSelectedStation(null);
       toast.success("Сохранено успешно!");
+      reset();
     },
     onError: () => {
       toast.error("Ошибка сохранения!");
@@ -103,13 +105,15 @@ export default function GasSold() {
   });
 
   const onSubmit = (data: FormValues) => {
-
     createMutation({
       ...data,
       car: selectedCar?.value as string,
       station: selectedStation?.value as string,
     });
-    updateMutation({id: selectedCar?.value as string, distance_travelled: data?.next_gas_distance})
+    updateMutation({
+      id: selectedCar?.value as string,
+      distance_travelled: data?.next_gas_distance,
+    });
   };
 
   const handleSelectStation = (newValue: SingleValue<Option>) => {
@@ -142,7 +146,7 @@ export default function GasSold() {
                     Количество купленного газа (м3)
                   </label>
                   <Input
-                  type="number"
+                    type="number"
                     {...register("amount", {
                       valueAsNumber: true,
                       required: "Это значение является обязательным",
@@ -170,9 +174,7 @@ export default function GasSold() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm">
-                  Расстояние автомобиля
-                  </label>
+                  <label className="text-sm">Расстояние автомобиля</label>
                   <Input
                     {...register("next_gas_distance", {
                       valueAsNumber: true,
@@ -185,7 +187,10 @@ export default function GasSold() {
                   />
                   {methods.formState.errors.next_gas_distance && (
                     <p className="text-red-500 text-sm">
-                      {methods.formState.errors.next_gas_distance.message as string}
+                      {
+                        methods.formState.errors.next_gas_distance
+                          .message as string
+                      }
                     </p>
                   )}
                 </div>
@@ -198,10 +203,15 @@ export default function GasSold() {
               </div>
             </form>
             <div className="grid grid-cols-2 gap-4 ">
-            <div className="space-y-2">
-              <label className="text-sm">Газ в базе (м3)</label>
-              <Input value={remaining || 0} placeholder="0" readOnly className="bg-muted"/>
-            </div>
+              <div className="space-y-2">
+                <label className="text-sm">Газ в базе (м3)</label>
+                <Input
+                  value={remaining || 0}
+                  placeholder="0"
+                  readOnly
+                  className="bg-muted"
+                />
+              </div>
             </div>
           </FormProvider>
         </CardContent>

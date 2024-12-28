@@ -17,10 +17,10 @@ export interface IOil {
   oil_volume: number;
   next_oil_recycle_distance: number;
   oil_recycle_distance: number;
-  amount_uzs: string;
-  amount_usd: string;
-  price_uzs: string;
-  price_usd: string;
+  amount_uzs: string | number;
+  amount_usd: string | number;
+  price_uzs: string | number;
+  price: string | number;
   updated_at?: string;
   created_at?: string;
 }
@@ -48,7 +48,7 @@ export interface OilListResponse {
 
 export interface IOilRecycle {
   quantity_utilized: number;
-  price_usd?: number;
+  price?: number;
   price_uzs: number;
 }
 interface IRemaining {

@@ -16,7 +16,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchCar } from "@/lib/actions/cars.action";
 import { CarListResponse } from "@/lib/types/cars.types";
 import { queryClient } from "../ui-items/ReactQueryProvider";
-import { fuelChange } from "@/lib/functions";
+import { formatDate, fuelChange } from "@/lib/functions";
 
 export default function CarsTable() {
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -77,6 +77,7 @@ export default function CarsTable() {
             <TableHead className="font-bold">Номер прицепа</TableHead>
             <TableHead className="font-bold">Марка автомобиля</TableHead>
             <TableHead className="font-bold">Тип топлива</TableHead>
+            <TableHead className="font-bold">День покупки</TableHead>
             <TableHead className="font-bold w-[50px]"></TableHead>
           </TableRow>
         </TableHeader>
@@ -88,6 +89,7 @@ export default function CarsTable() {
               <TableCell className="px-5">{car.trailer_number}</TableCell>
               <TableCell className="px-5">{car.models?.name}</TableCell>
               <TableCell className="px-5">{fuelChange(car?.fuel_type)}</TableCell>
+              <TableCell className="px-5">{formatDate(car?.created_at, "/")}</TableCell>
               <TableCell className="px-5 flex gap-1 items-center">
                 <Link href={`/cars/car-info?id=${car?.id}`}>
                   <Button variant="ghost" size="icon" className="h-8 w-8">

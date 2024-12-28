@@ -10,12 +10,13 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { ChevronLeftIcon, ChevronRightIcon, Pencil } from "lucide-react";
+import { ChevronLeftIcon, ChevronRightIcon, Download, Pencil } from "lucide-react";
 import Link from "next/link";
 import { fetchFlights } from "@/lib/actions/flight.action";
 import { useQuery } from "@tanstack/react-query";
 import { queryClient } from "../ui-items/ReactQueryProvider";
-import { FlightPaginatedResponse } from "@/lib/types/flight.types";
+import { FlightPaginatedResponse2 } from "@/lib/types/flight.types";
+import { downloadExcelFile } from "@/lib/functions";
 
 export default function FlightTable({
   active,
@@ -25,7 +26,7 @@ export default function FlightTable({
   setActive: Dispatch<SetStateAction<string>>;
 }) {
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const { data: flights } = useQuery<FlightPaginatedResponse>({
+  const { data: flights } = useQuery<FlightPaginatedResponse2>({
     queryKey: ["flights", currentPage],
     queryFn: () => fetchFlights(currentPage),
   });
@@ -75,7 +76,8 @@ export default function FlightTable({
         <TableHeader className="font-bold">
           <TableRow className="border-b border-gray-200">
             <TableHead className="font-bold p-5">ID рейса</TableHead>
-            <TableHead className="font-bold">Номер автомобиля</TableHead>
+            <TableHead className="font-bold">Автомобили</TableHead>
+            <TableHead className="font-bold">Область</TableHead>
             <TableHead className="font-bold">Статус</TableHead>
             <TableHead className="font-bold">Цена рейса</TableHead>
             <TableHead className="font-bold w-[50px]">
@@ -104,7 +106,8 @@ export default function FlightTable({
           {flights?.results.map((flight, index) => (
             <TableRow key={index} className="border-b border-gray-200">
               <TableCell className="px-5">{index + 1}</TableCell>
-              <TableCell className="px-5">{flight?.car?.number}</TableCell>
+              <TableCell className="px-5">{flight?.car?.name} {flight?.car?.models?.name} {flight?.car?.number}</TableCell>
+              <TableCell className="px-5">{flight?.region?.name}</TableCell>
               <TableCell className="px-5">{flight?.status.toLowerCase() === "active" ? "Активный" : "Завершенный"}</TableCell>
               <TableCell className="px-5">{flight?.price_uzs} сум</TableCell>
               <TableCell className="px-5">
@@ -113,6 +116,7 @@ export default function FlightTable({
                     <Pencil className="h-4 w-4" />
                   </Button>
                 </Link>
+                <Button variant={"ghost"} size={"icon"} onClick={()=>downloadExcelFile(`/finance/flight-info/${flight?.id}`)}><Download/></Button>
               </TableCell>
             </TableRow>
           ))}

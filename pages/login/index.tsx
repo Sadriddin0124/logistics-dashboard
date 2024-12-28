@@ -1,4 +1,4 @@
-"use client";
+"использовать клиент";
 
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -21,14 +21,13 @@ import { useMutation } from "@tanstack/react-query";
 import { LoginUser } from "@/lib/actions/auth";
 import {
   formatPhoneNumber,
-  formatUzbekistanPhoneNumber,
 } from "@/lib/functions";
 import { LoginTypes } from "@/lib/types/auth.types";
 
 const loginSchema = z.object({
   phone: z.string(),
   password: z.string(),
-  // .min(8, { message: "Password must be at least 8 characters long" }),
+  // .min(8, { message: "Пароль должен содержать не менее 8 символов" }),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
@@ -40,7 +39,7 @@ export default function LoginForm() {
   const methods = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      phone: "+998 ",
+      phone: "",
     },
   });
   const {
@@ -62,9 +61,9 @@ export default function LoginForm() {
     onError: (error: ErrorType) => {
       console.log(error);
       if (error?.status === 401) {
-        setErrorMessage("Kontragent nomi yoki parol noto‘g‘ri");
+        setErrorMessage("Имя пользователя или пароль неверны");
       } else {
-        setErrorMessage("Ma'lumotlarni yuklashda xatolik");
+        setErrorMessage("Ошибка при загрузке данных");
       }
     },
   });
@@ -86,40 +85,25 @@ export default function LoginForm() {
     <section className="w-full h-screen flex justify-center items-center bg-slate-100 fixed top-0 left-0">
       <Card className="w-full max-w-md mx-auto">
         <CardHeader>
-          <CardTitle className="text-2xl">Tizimga kirish</CardTitle>
+          <CardTitle className="text-2xl">Вход в систему</CardTitle>
           <CardDescription>
-            Tizimga kirish uchun ma&apos;lumotlaringizni kiriting
+            Введите свои данные для входа в систему
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="phone">Telefon raqam</Label>
+              <Label htmlFor="phone">Номер телефона</Label>
               <Controller
                 name="phone"
                 control={control}
-                rules={{
-                  required: true,
-                  pattern: {
-                    value: /^\+998 \d{2} \d{3} \d{2} \d{2}$/,
-                    message: "Noto‘g‘ri raqam formati",
-                  },
-                }}
-                render={({ field: { onChange, value, ...field } }) => (
+                render={({ field: { value, ...field } }) => (
                   <Input
                     {...field}
                     id="phone"
                     type="tel"
                     value={value}
-                    onChange={(e) => {
-                      const formattedValue = formatUzbekistanPhoneNumber(
-                        e.target.value
-                      );
-                      onChange(formattedValue);
-                      e.target.value = formattedValue;
-                    }}
-                    className="font-mono"
-                    placeholder="+998 __ ___ __ __"
+                    placeholder="Введите номер телефона"
                     aria-describedby="phone-hint"
                   />
                 )}
@@ -131,12 +115,12 @@ export default function LoginForm() {
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Parol</Label>
+              <Label htmlFor="password">Пароль</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Parolni kiriting"
-                {...register("password", { required: "Parolni kiriting" })}
+                placeholder="Введите пароль"
+                {...register("password", { required: "Введите пароль" })}
                 aria-invalid={errors.password ? "true" : "false"}
               />
               {errors.password && (
@@ -148,7 +132,7 @@ export default function LoginForm() {
             {isError && (
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Xato</AlertTitle>
+                <AlertTitle>Ошибка</AlertTitle>
                 <AlertDescription>{errorMessage}</AlertDescription>
               </Alert>
             )}
@@ -157,7 +141,7 @@ export default function LoginForm() {
               className="bg-[#4880FF] text-white hover:bg-blue-600 w-full rounded-md"
               disabled={isPending}
             >
-              {isPending ? "Kirilmoqda..." : "Tizimga kirish"}
+              {isPending ? "Вход..." : "Войти в систему"}
             </Button>
           </form>
         </CardContent>

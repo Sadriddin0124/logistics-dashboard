@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { FormProvider, useForm } from "react-hook-form";
 import { IOil, IOilType } from "@/lib/types/oil.types";
-import { CurrencyInputs } from "@/components/ui-items/currency-inputs";
 import { useEffect, useState } from "react";
 import { removeCommas } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
@@ -13,6 +12,7 @@ import { createOil, createOilPurchase } from "@/lib/actions/oil.action";
 import { queryClient } from "@/components/ui-items/ReactQueryProvider";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
+import CurrencyInputWithSelect from "@/components/ui-items/currencySelect";
 // import { useRouter } from "next/router";
 
 export default function GasManagementForm() {
@@ -27,8 +27,8 @@ export default function GasManagementForm() {
 
   const { push } = router;
   useEffect(() => {
-    const payedPrice = Number(removeCommas(amount_uzs as string)) || 0;
-    const pricePerLiter = Number(removeCommas(price_uzs as string)) || 0;
+    const payedPrice = Number(removeCommas(amount_uzs)) || 0;
+    const pricePerLiter = Number(removeCommas(price_uzs)) || 0;
     console.log(payedPrice);
     console.log(pricePerLiter);
 
@@ -38,7 +38,6 @@ export default function GasManagementForm() {
       if (result < 1) {
         setStatus("gaz narxi to'langan summadan baland bo'lmasligi kerak");
       }
-
       setValue("oil_volume", Number(result.toFixed(2)));
     } else {
       setValue("oil_volume", 0);
@@ -75,12 +74,10 @@ export default function GasManagementForm() {
 
   const onSubmit = (data: IOil) => {
     const formData = {
-      amount_usd: Number(removeCommas(data?.amount_usd)),
-      amount_uzs: Number(removeCommas(data?.amount_uzs)),
-      price_uzs: Number(removeCommas(data?.price_uzs)),
-      price_usd: Number(removeCommas(data?.price_usd)),
+      amount_uzs: Number(removeCommas(data?.amount_uzs?.toString())),
+      price_uzs: Number(removeCommas(data?.price_uzs?.toString())),
+      price: Number(removeCommas(data?.price?.toString())),
     };
-
     createMutation({
       oil_name: data?.oil_name,
       oil_volume: 0,
@@ -106,7 +103,7 @@ export default function GasManagementForm() {
 
                 <div className="space-y-2">
                   <label className="text-sm">Оплаченная сумма</label>
-                  <CurrencyInputs name="amount" />
+                  <CurrencyInputWithSelect name="amount" />
                 </div>
               </div>
 
@@ -126,7 +123,7 @@ export default function GasManagementForm() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm">Цена на масло (литр)</label>
-                  <CurrencyInputs name="price" />
+                  <CurrencyInputWithSelect name="price" />
                   {status && <p className="text-sm text-red-500">{status}</p>}
                 </div>
               </div>

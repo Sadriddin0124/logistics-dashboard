@@ -63,7 +63,7 @@ export const updateCarDistanceOil = async (data: {
 
 export const updateCarLeasing = async (data: {
   id: string;
-  leasing_payed_amount: number;
+  leasing_payed_amount: number | string;
 }) => {
   const response = await $api.patch(`/cars/update/${data?.id}/`, {
     leasing_payed_amount: data?.leasing_payed_amount,

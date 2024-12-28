@@ -5,15 +5,15 @@ import { createFinance } from "@/lib/actions/finance.action";
 import { toast } from "react-toastify";
 import { removeCommas } from "@/lib/utils";
 import { queryClient } from "@/components/ui-items/ReactQueryProvider";
-import { CurrencyInputs } from "@/components/ui-items/currency-inputs";
 import { Button } from "@/components/ui/button";
 import { Input } from "../ui/input";
 import { useRouter } from "next/router";
+import CurrencyInputWithSelect from "../ui-items/currencySelect";
 
 interface PartsFormData {
   action: string;
   amount_uzs: string;
-  amount_usd: string;
+  amount: string;
   kind: string;
   flight: string;
   driver: string;
@@ -28,6 +28,7 @@ export default function OtherExpenseForm() {
   const {
     register,
     formState: { errors },
+    reset
   } = methods;
   const { id } = useRouter()?.query;
   const { mutate: createMutation } = useMutation({
@@ -35,6 +36,7 @@ export default function OtherExpenseForm() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["finance"] });
       toast.success(" Сохранено успешно!");
+      reset()
     },
     onError: () => {
       toast.error("Ошибка сохранения!");
@@ -45,7 +47,7 @@ export default function OtherExpenseForm() {
     const formData = {
       ...data,
       action: "OUTCOME",
-      amount_uzs: Number(removeCommas(data?.amount_uzs)),
+      amount: Number(removeCommas(data?.amount)),
       // amount_usd: Number(removeCommas(data?.amount_usd)),
       car: "",
       kind: id as string,
@@ -76,10 +78,10 @@ export default function OtherExpenseForm() {
                 <label className="text-sm font-medium">
                   Введите сумму расхода.*
                 </label>
-                <CurrencyInputs name="amount" />
+                <CurrencyInputWithSelect name="amount" />
               </div>
-              {errors?.amount_usd && (
-                <p className="text-red-500">{errors?.amount_usd?.message}</p>
+              {errors?.amount_uzs && (
+                <p className="text-red-500">{errors?.amount_uzs?.message}</p>
               )}
             </div>
 

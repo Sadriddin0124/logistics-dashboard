@@ -94,7 +94,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
         className={`w-full bg-blue-500 flex p-2 cursor-pointer items-center justify-center text-white rounded-md hover:bg-blue-400 ${uploading ? "opacity-40" : ""}`}
       >
         <Upload className="mr-2 h-4 w-4" />
-        {uploading ? "Uploading..." : "Choose File & Upload"}
+        {uploading ? "Загрузка..." : "Выберите файл и загрузите"}
       </div>
       {(uploading || uploadProgress > 0) && (
         <Progress value={uploadProgress} className="w-full" />
@@ -124,7 +124,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
             height={500}
             src={image?.file}
             alt="Uploaded Preview"
-            className={`object-cover group-hover:brightness-50 ease-linear duration-200`}
+            className={`object-cover aspect_16_9 group-hover:brightness-50 ease-linear duration-200`}
           />
         </div>
       ) : image?.file ? (

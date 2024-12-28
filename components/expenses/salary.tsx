@@ -1,6 +1,5 @@
 import { useForm, FormProvider } from "react-hook-form";
 import { Textarea } from "@/components/ui/textarea";
-import { CurrencyInputs } from "../ui-items/currency-inputs";
 import { Button } from "../ui/button";
 import { useCallback, useEffect, useState } from "react";
 import { Option } from "@/pages/warehouse/diesel";
@@ -14,10 +13,13 @@ import { queryClient } from "../ui-items/ReactQueryProvider";
 import { toast } from "react-toastify";
 import { removeCommas } from "@/lib/utils";
 import { useRouter } from "next/router";
+import { Checkbox } from "../ui/checkbox";
+import CurrencyInputWithSelect from "../ui-items/currencySelect";
 
 export interface SalaryFormData {
   action: string;
-  amount_uzs: string;
+  amount_uzs: number;
+  amount: string | number;
   kind: string;
   flight: string;
   employee: string;
@@ -25,6 +27,8 @@ export interface SalaryFormData {
   balance: string;
   comment: string;
   reason: string;
+  volume?: number;
+  bonus: boolean;
 }
 
 export default function Salary() {
@@ -34,6 +38,7 @@ export default function Salary() {
     setValue,
     formState: { errors },
     reset,
+    watch
   } = methods;
   const [driverOptions, setDriverOptions] = useState<Option[]>([]);
   const [selectedDriver, setSelectedDriver] = useState<Option | null>(null);
@@ -77,11 +82,13 @@ export default function Salary() {
     const formData = {
       ...data,
       action: "OUTCOME",
-      amount_uzs: Number(removeCommas(data?.amount_uzs)),
+      amount: Number(removeCommas(data?.amount as string)),
       kind: id as string,
       car: "",
       flight: "",
     };
+    console.log(data);
+    
     createMutation(formData);
   };
 
@@ -123,6 +130,15 @@ export default function Salary() {
                   <p className="text-red-500">{errors?.employee?.message}</p>
                 )}
               </div>
+              <div className="space-y-2 flex flex-col">
+                  <label>Предоставление бонуса</label>
+                  <Checkbox
+                    checked={watch("bonus")}
+                    onCheckedChange={(checked) =>
+                      setValue("bonus", checked as boolean)
+                    }
+                  />
+                </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -135,7 +151,7 @@ export default function Salary() {
                 <label className="text-sm font-medium">
                   Введите сумму расхода.*
                 </label>
-                <CurrencyInputs name="amount" />
+                <CurrencyInputWithSelect name="amount" />
               </div>
             </div>
 

@@ -1,23 +1,23 @@
 import { useForm, FormProvider } from "react-hook-form";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "../ui/button";
 import { useEffect, useState } from "react";
 import { Option } from "@/pages/warehouse/diesel";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Select, { SingleValue } from "react-select";
-import { createFinance } from "@/lib/actions/finance.action";
+import { createFinanceDiesel } from "@/lib/actions/finance.action";
 import { queryClient } from "../ui-items/ReactQueryProvider";
 import { toast } from "react-toastify";
-import { removeCommas } from "@/lib/utils";
-import { SalaryFormData } from "./salary";
-import { useRouter } from "next/router";
 import { fetchAllFlights } from "@/lib/actions/flight.action";
 import { IFlightFormEdit } from "@/lib/types/flight.types";
-import { Input } from "../ui/input";
 import CurrencyInputWithSelect from "../ui-items/currencySelect";
+import { fetchCarNoPage } from "@/lib/actions/cars.action";
+import { ICars } from "@/lib/types/cars.types";
+import { Input } from "../ui/input";
+import { IFinanceDiesel } from "@/lib/types/finance.types";
+import { removeCommas } from "@/lib/utils";
 
-export default function FlightForm() {
-  const methods = useForm<SalaryFormData>();
+export default function DieselExpense() {
+  const methods = useForm<IFinanceDiesel>();
   const {
     register,
     setValue,
@@ -26,15 +26,18 @@ export default function FlightForm() {
   } = methods;
   const [flightOptions, setFlightOptions] = useState<Option[]>([]);
   const [selectedFlight, setSelectedFlight] = useState<Option | null>(null);
-  const [balance, setBalance] = useState(0);
-  const { id } = useRouter()?.query;
-
+  const [carOptions, setCarOptions] = useState<Option[]>([]);
+  const [selectedCar, setSelectedCar] = useState<Option | null>(null);
+  const { data: cars } = useQuery<ICars[]>({
+    queryKey: ["cars"],
+    queryFn: fetchCarNoPage,
+  });
   const { data: flights } = useQuery<IFlightFormEdit[]>({
     queryKey: ["all_flights"],
     queryFn: fetchAllFlights,
   });
   useEffect(() => {
-    const carOption = flights
+    const flightOption = flights
       ?.filter((item) => item?.status?.toLowerCase() === "active")
       ?.map((flight) => {
         let regionName: string | undefined;
@@ -52,15 +55,18 @@ export default function FlightForm() {
           value: flight?.id,
         };
       });
-    setFlightOptions(carOption as Option[]);
-    const balance = flights?.find(
-      (item) => selectedFlight?.value === item?.id
-    )?.flight_balance;
-    setBalance(balance as number);
-  }, [flights, selectedFlight?.value]);
+    setFlightOptions(flightOption as Option[]);
+    const carOption = cars
+      ?.filter((item) => item?.type_of_payment === "LEASING")
+      ?.map((car) => ({
+        label: `${car?.name} ${car?.number}`,
+        value: car?.id,
+      }));
+    setCarOptions(carOption as Option[]);
+  }, [flights, cars]);
 
   const { mutate: createMutation } = useMutation({
-    mutationFn: createFinance,
+    mutationFn: createFinanceDiesel,
     onSuccess: () => {
       reset();
       setSelectedFlight(null);
@@ -72,21 +78,23 @@ export default function FlightForm() {
     },
   });
 
-  const onSubmit = (data: SalaryFormData) => {
-    const formData = {
-      ...data,
-      action: "OUTCOME",
-      amount: Number(removeCommas(data?.amount as string)),
-      car: "",
-      employee: "",
-      kind: id as string,
-    };
+  const onSubmit = (data: IFinanceDiesel) => {
+      console.log(data);
+      const formData = {
+        ...data,
+        price: Number(removeCommas(data?.price as string))
+      }
     createMutation(formData);
   };
 
   const handleSelectFlight = (newValue: SingleValue<Option>) => {
     setSelectedFlight(newValue);
     setValue("flight", newValue?.value as string);
+  };
+
+  const handleSelectCar = (newValue: SingleValue<Option>) => {
+    setSelectedCar(newValue);
+    setValue("car", newValue?.value as string);
   };
   return (
     <div>
@@ -99,20 +107,25 @@ export default function FlightForm() {
           <div className="grid grid-cols-1 gap-4 mt-4">
             <div className=" grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Причина*</label>
-                <Input
-                  {...register("reason", { required: "Введите причину" })}
-                  placeholder="Введите причину..."
+                <label className="text-sm font-medium">
+                  Выберите автомобиль*
+                </label>
+                <Select
+                  options={carOptions}
+                  value={selectedCar}
+                  onChange={handleSelectCar}
+                  placeholder="Выберите..."
+                  noOptionsMessage={() => "Не найдено"}
                 />
-                {errors?.reason && (
-                  <p className="text-red-500">{errors?.reason?.message}</p>
+                {errors.car && (
+                  <p className="text-red-500">{errors.car?.message}</p>
                 )}
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium">
                   Введите сумму расхода.*
                 </label>
-                <CurrencyInputWithSelect name="amount" />
+                <CurrencyInputWithSelect name="price" />
               </div>
             </div>
 
@@ -132,17 +145,35 @@ export default function FlightForm() {
                 )}
               </div>
               <div className="space-y-2">
-              <label className="text-sm font-medium">Баланс Рейса</label>
-              <Input
-                  value={balance}
-                  className="bg-muted"
-                  readOnly
-                  placeholder="Введите причину..."
-                />
+                <label className="text-sm font-medium">
+                Введите количество дизельного топлива*
+                </label>
+                <Input {...register("volume", {required: "Обязательно указывается количество дизельного топлива.", valueAsNumber: true})} />
               </div>
+              {errors?.volume && (
+                  <p className="text-red-500">{errors?.volume?.message}</p>
+                )}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                Введите количество дизельного топлива*
+                </label>
+                <Input {...register("km", {required: "Обязательно указывается количество дизельного топлива.", valueAsNumber: true})} />
+              </div>
+              {errors?.km && (
+                  <p className="text-red-500">{errors?.km?.message}</p>
+                )}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                Введите количество дизельного топлива*
+                </label>
+                <Input {...register("km_car", {required: "Обязательно указывается количество дизельного топлива.", valueAsNumber: true})} />
+              </div>
+              {errors?.km_car && (
+                  <p className="text-red-500">{errors?.km_car?.message}</p>
+                )}
             </div>
 
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <label className="text-sm font-medium">
                 Комментарий о ремонте
               </label>
@@ -151,7 +182,7 @@ export default function FlightForm() {
                 className="min-h-[120px] resize-none"
                 {...register("comment")}
               />
-            </div>
+            </div> */}
             <div className="w-full justify-end flex">
               <Button
                 type="submit"

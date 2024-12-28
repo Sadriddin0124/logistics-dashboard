@@ -138,7 +138,6 @@ export default function FlightTable() {
   return (
     <div className="w-full container mx-auto bg-white rounded-2xl min-h-screen p-8">
       <h2 className="mb-4 text-2xl font-medium">История расходов</h2>
-
       <Table>
         <TableHeader className="font-bold">
           <TableRow className="border-b border-gray-200">
@@ -155,6 +154,7 @@ export default function FlightTable() {
               <TableCell className="px-5">{finance.action?.toLowerCase() === "outcome" ? "Расход" : "Приход"}</TableCell>
               <TableCell className="px-5">{handleChange(finance?.kind as string)}</TableCell>
               <TableCell className="px-5">{finance.amount_uzs} сум</TableCell>
+              {/* <TableCell className="px-5">{finance?.driver_expenses} сум</TableCell> */}
               <TableCell className="px-5">
                 <span className="line-clamp-1 overflow-hidden">
                   {finance.comment}

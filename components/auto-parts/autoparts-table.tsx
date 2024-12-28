@@ -77,6 +77,7 @@ export default function AutoPartsTable({ setSelectedParts, selectedParts }: { se
             <TableHead>Машина</TableHead>
             <TableHead>Цена автозапчасти</TableHead>
             <TableHead>Местоположение</TableHead>
+            <TableHead>Статус</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -92,6 +93,7 @@ export default function AutoPartsTable({ setSelectedParts, selectedParts }: { se
               <TableCell>{part.car?.name}</TableCell>
               <TableCell>{part?.price_uzs} сум</TableCell>
               <TableCell>{part?.id_detail}</TableCell>
+              <TableCell>{part?.in_sklad ? "В Склате" : "Не в Склате"}</TableCell>
             </TableRow>
           ))}
         </TableBody>

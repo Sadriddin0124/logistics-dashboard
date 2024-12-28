@@ -26,6 +26,7 @@ export default function OilExchange() {
     handleSubmit,
     setValue,
     formState: { errors },
+    reset
   } = methods;
   const [stationOptions, setOilOptions] = useState<Option[]>([]);
   const [selectedOil, setSelectedOil] = useState<Option | null>(null);
@@ -75,6 +76,7 @@ export default function OilExchange() {
       push(`/warehouse/oil/`);
       setSelectedOil(null);
       toast.success("Сохранено успешно!");
+      reset()
     },
     onError: () => {
       toast.error("Ошибка сохранения!");

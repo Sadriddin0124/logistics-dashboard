@@ -30,18 +30,19 @@ export default function Expenses() {
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
   const [expenseType, setExpenseType] = useState<string>("");
+  const [action, setAction] = useState("")
   const { data: financeList } = useQuery<IFinanceResponse>({
-    queryKey: ["finances", currentPage, startDate, endDate, expenseType],
-    queryFn: () => fetchFinances(currentPage, startDate, endDate, expenseType),
+    queryKey: ["finances", currentPage, startDate, endDate, expenseType, action],
+    queryFn: () => fetchFinances(currentPage, startDate, endDate, expenseType, action),
   });
 
   useEffect(() => {
     queryClient.prefetchQuery({
-      queryKey: ["finances", currentPage + 1, startDate, endDate, expenseType],
+      queryKey: ["finances", currentPage + 1, startDate, endDate, expenseType, action],
       queryFn: () =>
-        fetchFinances(currentPage + 1, startDate, endDate, expenseType),
+        fetchFinances(currentPage + 1, startDate, endDate, expenseType, action),
     });
-  }, [currentPage, startDate, endDate, expenseType]);
+  }, [currentPage, startDate, endDate, expenseType, action]);
 
   const itemsPerPage = 10;
   const indexOfLastOrder = currentPage * itemsPerPage;
@@ -99,7 +100,6 @@ export default function Expenses() {
       setExpenseType(value);
     }
   };
-  const [action, setAction] = useState("INCOME")
 
   const downloadFile = async () => {
     downloadExcelFile(`/finance/export-logs/?action=${action}`)

@@ -14,7 +14,6 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { useRouter } from "next/router";
 import { FormProvider, useForm } from "react-hook-form";
-import { CurrencyInputs } from "@/components/ui-items/currency-inputs";
 import { Option } from "../diesel";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { fetchCarNoPage } from "@/lib/actions/cars.action";
@@ -33,6 +32,7 @@ import {
 import { removeCommas } from "@/lib/utils";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { formatDate } from "@/lib/functions";
+import CurrencyInputWithSelect from "@/components/ui-items/currencySelect";
 
 export default function GasManagementForm() {
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -116,8 +116,8 @@ export default function GasManagementForm() {
   const onSubmit = (data: AnotherStation) => {
     createMutation({
       ...data,
-      payed_price_usd: Number(removeCommas(data?.payed_price_usd as string)),
-      payed_price_uzs: Number(removeCommas(data?.payed_price_uzs as string)),
+      payed_price_uzs: Number(removeCommas(data?.payed_price_uzs?.toString())),
+      payed_price: Number(removeCommas(data?.payed_price?.toString())),
     });
     console.log(data);
   };
@@ -156,7 +156,7 @@ export default function GasManagementForm() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm">Цена на газ (м3)</label>
-                  <CurrencyInputs name="payed_price" />
+                  <CurrencyInputWithSelect name="payed_price" />
                 </div>
                 <div className="space-y-2 col">
                   <label className="text-sm">

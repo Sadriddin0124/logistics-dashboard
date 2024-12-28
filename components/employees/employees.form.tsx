@@ -19,27 +19,43 @@ import { queryClient } from "../ui-items/ReactQueryProvider";
 import { toast } from "react-toastify";
 
 import { useRouter } from "next/router";
+import { FileType } from "@/lib/types/general.types";
+import { FileUploader } from "../ui-items/FileUploader";
+import { formatPhoneNumber } from "@/lib/functions";
 
 export default function EmployeesInfoForm() {
-  const { control, handleSubmit, formState: { errors } } = useForm<IEmployee>({
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    setValue,
+  } = useForm<IEmployee>({
     defaultValues: {
-      phone: ""
-    }
+      phone: "",
+    },
   });
-  const { push } = useRouter()
+  const [passport, setPassport] = React.useState<FileType | null>(null);
+  const [license, setLicense] = React.useState<FileType | null>(null);
+  const { push } = useRouter();
+  React.useEffect(() => {
+    setValue("license_photo", license?.id as string);
+    setValue("passport_photo", passport?.id as string);
+  }, [setValue, passport, license]);
   const { mutate: createMutation } = useMutation({
     mutationFn: createEmployee,
     onSuccess: () => {
-      push(`/employees`)
+      push(`/employees`);
       queryClient.invalidateQueries({ queryKey: ["employees"] });
       toast.success(" Сохранено успешно!");
+      reset();
     },
     onError: () => {
       toast.error("Ошибка сохранения!");
     },
   });
   const onSubmit = (data: IEmployee) => {
-    createMutation({ ...data });
+    createMutation({ ...data, phone: formatPhoneNumber(data?.phone) });
   };
   return (
     <div className="container mx-auto space-y-8 mt-8 ">
@@ -48,12 +64,16 @@ export default function EmployeesInfoForm() {
         className="grid gap-6 md:grid-cols-2 bg-white rounded-2xl p-8"
       >
         <div>
-          <label className="text-sm font-medium mb-2 block">Полное имя водителя*</label>
+          <label className="text-sm font-medium mb-2 block">
+            Полное имя водителя*
+          </label>
           <Controller
             name="full_name"
             control={control}
             rules={{ required: "Полное имя обязательно" }}
-            render={({ field }) => <Input {...field} placeholder="Введите имя сотрудника" />}
+            render={({ field }) => (
+              <Input {...field} placeholder="Введите имя сотрудника" />
+            )}
           />
           {errors.full_name && (
             <p className="text-red-500 text-xs">{errors.full_name.message}</p>
@@ -61,12 +81,16 @@ export default function EmployeesInfoForm() {
         </div>
 
         <div>
-          <label className="text-sm font-medium mb-2 block">Номер телефона сотрудника*</label>
+          <label className="text-sm font-medium mb-2 block">
+            Номер телефона сотрудника*
+          </label>
           <Controller
             name="phone"
             control={control}
             rules={{ required: "Номер телефона обязателен" }}
-            render={({ field }) => <Input {...field} placeholder="Введите номер сотрудника" />}
+            render={({ field }) => (
+              <Input {...field} placeholder="Введите номер сотрудника" />
+            )}
           />
           {errors.phone && (
             <p className="text-red-500 text-xs">{errors.phone.message}</p>
@@ -74,7 +98,9 @@ export default function EmployeesInfoForm() {
         </div>
 
         <div>
-          <label className="text-sm font-medium mb-2 block">Выберите маршрут водителя*</label>
+          <label className="text-sm font-medium mb-2 block">
+            Выберите маршрут водителя*
+          </label>
           <Controller
             name="flight_type"
             control={control}
@@ -87,7 +113,9 @@ export default function EmployeesInfoForm() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="OUT">За территории Узбекистана</SelectItem>
-                  <SelectItem value="IN_UZB">На территории Узбекистана</SelectItem>
+                  <SelectItem value="IN_UZB">
+                    На территории Узбекистана
+                  </SelectItem>
                 </SelectContent>
               </Select>
             )}
@@ -97,30 +125,62 @@ export default function EmployeesInfoForm() {
           )}
         </div>
 
-        <div>
-          <label className="text-sm font-medium mb-2 block">ID водительских прав</label>
-          <Controller
-            name="license"
-            control={control}
-            rules={{ required: "Требуется номер лицензии" }}
-            render={({ field }) => <Input {...field} placeholder="Введите..." />}
+        <div className="col-span-2 grid grid-cols-2 gap-4">
+          <div>
+            <label className="text-sm font-medium mb-2 block">
+              ID водительских прав
+            </label>
+            <Controller
+              name="license_photo"
+              control={control}
+              rules={{ required: "Требуется номер лицензии" }}
+              render={({ field }) => {
+                console.log(field);
+                return (
+                  <FileUploader
+                    type=".png, .jpg"
+                    image={license as FileType}
+                    setImage={
+                      setLicense as React.Dispatch<
+                        React.SetStateAction<FileType>
+                      >
+                    }
+                  />
+                );
+              }}
             />
-          {errors.license && (
-            <p className="text-red-500 text-xs">{errors.license.message}</p>
-          )}
-        </div>
+            {errors.license && (
+              <p className="text-red-500 text-xs">{errors.license.message}</p>
+            )}
+          </div>
 
-        <div>
-          <label className="text-sm font-medium mb-2 block">ID паспорта водителя</label>
-          <Controller
-            name="passport"
-            rules={{ required: "Требуется номер паспорта" }}
-            control={control}
-            render={({ field }) => <Input {...field} placeholder="Введите..." />}
-          />
-          {errors.passport && (
-            <p className="text-red-500 text-xs">{errors.passport.message}</p>
-          )}
+          <div>
+            <label className="text-sm font-medium block">
+              ID паспорта водителя
+            </label>
+            <Controller
+              name="passport_photo"
+              rules={{ required: "Требуется номер паспорта" }}
+              control={control}
+              render={({ field }) => {
+                console.log(field);                
+                return (
+                  <FileUploader
+                    type=".png, .jpg"
+                    image={passport as FileType}
+                    setImage={
+                      setPassport as React.Dispatch<
+                        React.SetStateAction<FileType>
+                      >
+                    }
+                  />
+                );
+              }}
+            />
+            {errors.passport && (
+              <p className="text-red-500 text-xs">{errors.passport.message}</p>
+            )}
+          </div>
         </div>
         <div className="flex col-span-2 justify-end gap-4 mt-8">
           <Button

@@ -17,7 +17,7 @@ export interface IFlight {
 }
 
 export interface IFlightCreate {
-  id?: string
+  id?: string;
   region: string; // UUID
   status?: string; // UUID
   flight_type: string; // Enum with 2 possible values
@@ -25,16 +25,22 @@ export interface IFlightCreate {
   driver: string; // Required
   departure_date: string; // Date in ISO format (required)
   arrival_date?: string | null; // Date in ISO format (nullable)
-  price_uzs?: number | string; 
-  price_usd?: number; 
-  driver_expenses_uzs?: number | string; 
-  driver_expenses_usd?: number; 
+  price_uzs?: number | string;
+  price?: number;
+  driver_expenses_uzs?: number | string;
+  driver_expenses?: number;
   upload?: string | null; // UUID (nullable)
   cargo_info?: string | null; // Nullable
   route: string; // Required
+  other_expenses_uzs?: string | number;
+  other_expenses?: string | number;
+  flight_expenses?: string | number;
+  flight_expenses_uzs?: string;
+  start_km: number;
+  end_km?: number;
 }
 export interface IFlightData {
-  id?: string
+  id?: string;
   region: string; // UUID
   flight_type: string; // Enum with 2 possible values
   car: string; // Required
@@ -42,18 +48,23 @@ export interface IFlightData {
   driver: string; // Required
   departure_date: string; // Date in ISO format (required)
   arrival_date?: string | null; // Date in ISO format (nullable)
-  price_uzs?: string; 
-  driver_expenses_uzs?: string; 
+  price_uzs: string | number;
+  price: string | number;
+  driver_expenses_uzs: number | string;
   upload?: string | null; // UUID (nullable)
   cargo_info?: string | null; // Nullable
   route: string; // Required
-  driver_number?: string
-  driver_name?: string
-  car_number?: string
-  other_expenses?: string
+  driver_number?: string;
+  driver_name?: string;
+  car_number?: string;
+  other_expenses: number | string;
+  flight_expenses: number | string;
+  driver_expenses: number | string;
+  start_km: number;
+  end_km?: number;
 }
 export interface IFlightForm {
-  id?: string
+  id?: string;
   region: IRegion; // UUID
   flight_type: string; // Enum with 2 possible values
   car: ICars; // Required
@@ -67,29 +78,34 @@ export interface IFlightForm {
   upload?: string | null; // UUID (nullable)
   cargo_info?: string | null; // Nullable
   route: string; // Required
-  status?: string 
+  status?: string;
 }
 export interface IFlightFormEdit {
-  id?: string
-  region: IRegion; // UUID
+  id?: string;
+  region: IRegion | string; // UUID
   flight_type: string; // Enum with 2 possible values
-  car: ICars; // Required
+  car: ICars | string; // Required
   driver: string; // Required
   departure_date: string; // Date in ISO format (required)
   arrival_date?: string | null; // Date in ISO format (nullable)
-  price_uzs?: string | null; // Nullable
-  price_usd?: string | null; // Nullable
-  driver_expenses_uzs?: string | null; // Expenses allocated to the driver (nullable)
-  driver_expenses_usd?: string | null; // Expenses allocated to the driver (nullable)
-  upload?: {id: string, file: string}; // UUID (nullable)
+  price_uzs?: number; // Nullable
+  price?: string | null; // Nullable
+  driver_expenses_uzs?: number; // Expenses allocated to the driver (nullable)
+  driver_expenses?: string | null; // Expenses allocated to the driver (nullable)
+  upload?: { id: string; file: string }; // UUID (nullable)
   cargo_info?: string | null; // Nullable
   route: string; // Required
-  status?: string 
+  status?: string;
+  flight_balance: number;
+  flight_expenses_uzs?: string;
+  flight_expenses: number | string;
+  other_expenses: number | string;
+  start_km: number;
+  end_km?: number;
 }
 
-
-export interface  IFlightType{
-  id?: string
+export interface IFlightType {
+  id?: string;
   region: string; // UUID
   flight_type: string; // Enum with 2 possible values
   car: ICars; // Required
@@ -107,8 +123,8 @@ export interface  IFlightType{
   cargo_info?: string | null; // Nullable
 }
 
-export interface  IFlightType2{
-  id?: string
+export interface IFlightType2 {
+  id?: string;
   region: IRegion; // UUID
   flight_type: string; // Enum with 2 possible values
   car: ICars; // Required
@@ -126,8 +142,8 @@ export interface  IFlightType2{
   cargo_info?: string | null; // Nullable
 }
 
-export interface  IOrderedFlight{
-  id?: string
+export interface IOrderedFlight {
+  id?: string;
   region: IRegion; // UUID
   flight_type: string; // Enum with 2 possible values
   car: ICars; // Required
@@ -147,5 +163,5 @@ export interface  IOrderedFlight{
   cargo_info?: string | null; // Nullable
 }
 
-export type FlightPaginatedResponse = PaginationResponse<IFlightType>
-export type FlightPaginatedResponse2 = PaginationResponse<IFlightType2>
+export type FlightPaginatedResponse = PaginationResponse<IFlightType>;
+export type FlightPaginatedResponse2 = PaginationResponse<IFlightType2>;

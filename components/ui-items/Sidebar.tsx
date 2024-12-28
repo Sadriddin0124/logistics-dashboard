@@ -19,6 +19,10 @@ import {
 import { usePathname } from "next/navigation";
 import { Button } from "../ui/button";
 import { useRouter } from "next/router";
+import { useQuery } from "@tanstack/react-query";
+import { ExchangeRate } from "@/lib/types/general.types";
+import { getExchangeRate } from "@/lib/actions/general";
+import { CurrencyStatus } from "./currency-status";
 
 type MenuItem = {
   id?: string;
@@ -35,7 +39,7 @@ const menuItems: MenuItem[] = [
     title: "Отчеты",
     icon: <BarChart2 />,
     key: "",
-  href: "/",
+    href: "/",
   },
   {
     id: "2",
@@ -52,7 +56,7 @@ const menuItems: MenuItem[] = [
         href: "/warehouse/oil",
       },
       {
-        title: "Топливо (Саларка)",
+        title: "Покупка топливо (соляркa)",
         href: "/warehouse/diesel",
       },
       {
@@ -128,7 +132,16 @@ export const AppSidebar: React.FC<SideBarProps> = ({
 }) => {
   const [activeSubItem, setActiveSubItem] = useState<MenuItem[]>([]);
   const pathname = usePathname();
-  const { push } = useRouter()
+  const { push } = useRouter();
+  const { data: exchange } = useQuery<ExchangeRate[]>({
+    queryKey: ["exchange"],
+    queryFn: getExchangeRate,
+  });
+  const EXCHANGE_RATE = exchange?.filter((item) =>
+    ["USD", "RUB", "KZT"]?.includes(item?.Ccy)
+  );
+  console.log(EXCHANGE_RATE);
+
   const handleLink = (item: MenuItem) => {
     setActiveSubItem(item.children as MenuItem[]);
     if (item?.children) {
@@ -138,10 +151,10 @@ export const AppSidebar: React.FC<SideBarProps> = ({
     }
   };
   const logOut = () => {
-    localStorage.removeItem("refreshToken")
-    localStorage.removeItem("accessToken")
-    push("/login")
-  }
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("accessToken");
+    push("/login");
+  };
   return (
     <aside className="fixed top-0 left-0 h-full z-50">
       <Sidebar
@@ -194,7 +207,20 @@ export const AppSidebar: React.FC<SideBarProps> = ({
               );
             })}
             <div className="h-full flex flex-col items-end justify-end gap-2 p-6">
-              <Button onClick={logOut} className="w-full mt-10 bg-[#4880FF] text-white ml-3 hover:bg-blue-600">Выйти</Button>
+              {EXCHANGE_RATE?.map((rate, index) => (
+                <CurrencyStatus
+                  key={index}
+                  currency={rate?.Ccy as string}
+                  value={rate?.Rate as string}
+                  change={rate?.Diff as string}
+                />
+              ))}
+              <Button
+                onClick={logOut}
+                className="w-full mt-10 bg-[#4880FF] text-white ml-3 hover:bg-blue-600"
+              >
+                Выйти
+              </Button>
             </div>
           </div>
           {subItemStatus && (

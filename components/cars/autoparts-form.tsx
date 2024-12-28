@@ -24,6 +24,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { formatNumberWithCommas } from "../ui-items/currency-inputs";
+import { Skeleton } from "../ui/skeleton";
 interface FormValues {
   id?: string;
   name: string;
@@ -35,14 +36,7 @@ interface FormValues {
 export function AutoPartsForm() {
   const methods = useForm<{ parts: FormValues[] }>({
     defaultValues: {
-      parts: [
-        {
-          name: "",
-          id_detail: "",
-          in_sklad: false,
-          price_uzs: "",
-        },
-      ],
+      parts: [],
     },
   });
 
@@ -59,6 +53,7 @@ export function AutoPartsForm() {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [index, setIndex] = useState<number>(10);
+  const [skeletonStatus, setSkeletonStatus] = useState(false)
   const router = useRouter();
   const { id } = router.query;
   const { data: carDetails } = useQuery<PaginatedCarDetail>({
@@ -100,6 +95,9 @@ export function AutoPartsForm() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["car_details"] });
       methods.reset();
+      setTimeout(() => {
+        setSkeletonStatus(false)
+      }, 1000);
     },
     onError: () => {
       toast.error("Ошибка при сохранении!");
@@ -113,6 +111,7 @@ export function AutoPartsForm() {
       car: id as string,
     }));
     createMutation(formData);
+    setSkeletonStatus(true)
   };
 
   const watchedFields = watch("parts");
@@ -195,124 +194,164 @@ export function AutoPartsForm() {
         <CardTitle>Запчасти для автомобиля</CardTitle>
       </CardHeader>
       <CardContent>
-        <FormProvider {...methods}>
-          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
-            {fields.map((item, index) => (
-              <div key={item.id} className="flex items-start gap-4 mb-4">
-                <div className="flex-1">
-                  <label className="text-sm mb-2 block">
-                    Название запчасти
-                  </label>
-                  <Input
-                    {...register(`parts.${index}.name`, { required: true })}
-                    defaultValue={item.name}
-                    placeholder="Введите название запчасти..."
-                  />
-                  {errors.parts?.[index]?.name && (
-                    <span className="text-red-500 text-xs">
-                      Поле обязательно для заполнения
-                    </span>
-                  )}
-                </div>
-                <div className="flex-1 relative">
-                  <label className="text-sm mb-2 block">ID запчасти</label>
-                  <Input
-                    {...register(`parts.${index}.id_detail`)}
-                    defaultValue={item.id_detail}
-                    placeholder="Введите ID запчасти..."
-                  />
-                </div>
-                <div className="flex-1">
-                  <label className="text-sm mb-2 block">Цена</label>
-                  <Input
-                    {...register(`parts.${index}.price_uzs`)}
-                    placeholder="Цена..."
-                    onInput={(e) => {
-                      const rawValue = e.currentTarget.value.replace(/,/g, "");
-
-                      if (rawValue === "0") {
-                        // If the user types 0, allow it without formatting
-                        e.currentTarget.value = "0";
-                      } else {
-                        const parsedValue = parseFloat(rawValue);
-                        // Apply formatting if it's not 0
-                        e.currentTarget.value =
-                          formatNumberWithCommas(parsedValue);
-                      }
-                    }}
-                  />
-                </div>
-
-                <div className=" self-end">
-                  <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-                    <Button
-                      variant="ghost"
-                      type="button"
-                      onClick={() => handleDelete(item, index)}
+        {skeletonStatus ? (
+          <div className="flex flex-col gap-[50px]">
+            <div className="space-y-2">
+              {Array((carDetails?.results?.length ?? 0) + 1)
+                .fill(null) // Ensures each index has a value to avoid undefined elements
+                .map((item, index) => {
+                  return (
+                    <div
+                      key={index}
+                      className="grid items-end grid-cols-10 gap-4 mb-4"
                     >
-                      <X />
-                    </Button>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>
-                          Введите цену, чтобы отключить машину
-                        </DialogTitle>
-                      </DialogHeader>
-                      <div className="flex flex-col gap-4">
-                        <div className="space-y-2">
-                          <label
-                            htmlFor="amount"
-                            className="block text-sm font-medium"
-                          >
-                            Сумма
-                          </label>
-                          <Input
-                            value={deletePrice}
-                            onChange={(e) => setDeletePrice(e.target.value)}
-                          />
-                        </div>
+                      <div className=" col-span-3 space-y-2">
+                        <Skeleton className="h-4 w-20" />
+                        <Skeleton className="h-8 w-full" />
                       </div>
-                      <DialogFooter>
-                        <DialogTrigger>
-                          <Button variant={"outline"}>Назад</Button>
-                        </DialogTrigger>
-                        <Button
-                          onClick={onDelete}
-                          className="bg-blue-500 text-white hover:bg-blue-600 rounded-md"
-                        >
-                          Утилизировать
-                        </Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
-                </div>
-              </div>
-            ))}
-            <div className="flex gap-2 w-full justify-end mt-9">
-              <Button
-                type="button"
-                className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded-md"
-                onClick={() => {
-                  append({
-                    name: "",
-                    id_detail: "",
-                    price_uzs: "",
-                    in_sklad: false,
-                  });
-                }}
-                disabled={!isLastFieldValid()} // Disable based on last field validation
-              >
-                Добавить новую запчасть
-              </Button>
-              <Button
-                type="submit"
-                className="bg-[#4880FF] text-white hover:bg-blue-600 w-[200px] rounded-md"
-              >
-                Сохранять
-              </Button>
+                      <div className=" col-span-3 space-y-2">
+                        <Skeleton className="h-4 w-20" />
+                        <Skeleton className="h-8 w-full" />
+                      </div>
+                      <div className=" col-span-3 space-y-2">
+                        <Skeleton className="h-4 w-20" />
+                        <Skeleton className="h-8 w-full" />
+                      </div>
+                      <div className=" col-span-1 space-y-2">
+                        <Skeleton className="h-8 w-full" />
+                      </div>
+                    </div>
+                  );
+                })}
             </div>
-          </form>
-        </FormProvider>
+            <div className="flex justify-end w-full gap-3">
+              <Skeleton className="h-8 w-[250px]" />
+              <Skeleton className="h-8 w-[200px]" />
+            </div>
+          </div>
+        ) : (
+          <FormProvider {...methods}>
+            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
+              {fields.map((item, index) => (
+                <div key={item.id} className="flex items-start gap-4 mb-4">
+                  <div className="flex-1">
+                    <label className="text-sm mb-2 block">
+                      Название запчасти
+                    </label>
+                    <Input
+                      {...register(`parts.${index}.name`, { required: true })}
+                      defaultValue={item.name}
+                      placeholder="Введите название запчасти..."
+                    />
+                    {errors.parts?.[index]?.name && (
+                      <span className="text-red-500 text-xs">
+                        Поле обязательно для заполнения
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex-1 relative">
+                    <label className="text-sm mb-2 block">ID запчасти</label>
+                    <Input
+                      {...register(`parts.${index}.id_detail`)}
+                      defaultValue={item.id_detail}
+                      placeholder="Введите ID запчасти..."
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="text-sm mb-2 block">Цена</label>
+                    <Input
+                      {...register(`parts.${index}.price_uzs`)}
+                      placeholder="Цена..."
+                      onInput={(e) => {
+                        const rawValue = e.currentTarget.value.replace(
+                          /,/g,
+                          ""
+                        );
+
+                        if (rawValue === "0") {
+                          // If the user types 0, allow it without formatting
+                          e.currentTarget.value = "0";
+                        } else {
+                          const parsedValue = parseFloat(rawValue);
+                          // Apply formatting if it's not 0
+                          e.currentTarget.value =
+                            formatNumberWithCommas(parsedValue);
+                        }
+                      }}
+                    />
+                  </div>
+
+                  <div className=" self-end">
+                    <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+                      <Button
+                        variant="ghost"
+                        type="button"
+                        onClick={() => handleDelete(item, index)}
+                      >
+                        <X />
+                      </Button>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>
+                            Введите цену, чтобы отключить машину
+                          </DialogTitle>
+                        </DialogHeader>
+                        <div className="flex flex-col gap-4">
+                          <div className="space-y-2">
+                            <label
+                              htmlFor="amount"
+                              className="block text-sm font-medium"
+                            >
+                              Сумма
+                            </label>
+                            <Input
+                              value={deletePrice}
+                              onChange={(e) => setDeletePrice(e.target.value)}
+                            />
+                          </div>
+                        </div>
+                        <DialogFooter>
+                          <DialogTrigger>
+                            <Button variant={"outline"}>Назад</Button>
+                          </DialogTrigger>
+                          <Button
+                            onClick={onDelete}
+                            className="bg-blue-500 text-white hover:bg-blue-600 rounded-md"
+                          >
+                            Утилизировать
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                </div>
+              ))}
+              <div className="flex gap-2 w-full justify-end mt-9">
+                <Button
+                  type="button"
+                  className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded-md"
+                  onClick={() => {
+                    append({
+                      name: "",
+                      id_detail: "",
+                      price_uzs: "",
+                      in_sklad: false,
+                    });
+                  }}
+                >
+                  Добавить новую запчасть
+                </Button>
+                <Button
+                  type="submit"
+                  className="bg-[#4880FF] text-white hover:bg-blue-600 w-[200px] rounded-md"
+                  disabled={!isLastFieldValid()}
+                >
+                  Сохранять
+                </Button>
+              </div>
+            </form>
+          </FormProvider>
+        )}
         <div className="mt-4 flex justify-between items-center">
           <div>
             Итого: {carDetails?.count || 0} с {indexOfFirstOrder + 1} до{" "}

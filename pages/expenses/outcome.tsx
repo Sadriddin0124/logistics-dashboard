@@ -15,6 +15,7 @@ import FlightForm from "@/components/expenses/flight";
 import OtherExpenseForm from "@/components/expenses/other";
 import { OldPartsForm } from "@/components/expenses/add-old-part";
 import LeasingForm from "@/components/expenses/leasing";
+import DieselExpense from "@/components/expenses/diesel";
 
 const Repairing = () => {
   const router = useRouter();
@@ -44,6 +45,10 @@ const Repairing = () => {
       id: "LEASING",
       component: <LeasingForm />,
     },
+    {
+      id: "DIESEL",
+      component: <DieselExpense />,
+    },
   ];
   return (
     <div className="container mx-auto">
@@ -59,6 +64,7 @@ const Repairing = () => {
               <SelectItem value="FLIGHT">Рейс</SelectItem>
               <SelectItem value="OTHER">Общий</SelectItem>
               <SelectItem value="LEASING">Лизинг</SelectItem>
+              <SelectItem value="DIESEL">Дизель</SelectItem>
             </SelectContent>
           </Select>
         </div>

@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import Select, { SingleValue } from "react-select";
-import { CurrencyInputs } from "@/components/ui-items/currency-inputs";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   createCar,
@@ -25,6 +24,8 @@ import { useEffect, useState } from "react";
 import { Option } from "../warehouse/diesel";
 import { IModel } from "@/lib/types/cars.types";
 import { useRouter } from "next/router";
+import { Checkbox } from "@/components/ui/checkbox";
+import CurrencyInputWithSelect from "@/components/ui-items/currencySelect";
 
 interface FormValues {
   name: string;
@@ -35,9 +36,10 @@ interface FormValues {
   type_of_payment: string;
   leasing_period: string;
   fuel_type: string;
-  price_usd: number;
-  price_uzs: number;
+  price: string;
+  price_uzs: string;
   distance_travelled: string;
+  income_status: boolean;
 }
 
 export default function VehicleForm() {
@@ -53,13 +55,14 @@ export default function VehicleForm() {
     formState: { errors },
     setValue,
     watch,
+    reset
   } = methods;
   const [modelOptions, setModelOptions] = useState<Option[]>([]);
   const [selectedModel, setSelectedModel] = useState<Option | null>(null);
   const [model, setModel] = useState<string>("");
-  const [status, setStatus] = useState(true)
+  const [status, setStatus] = useState(true);
   const type_of_payment = watch("type_of_payment");
-  const { push } = useRouter()
+  const { push } = useRouter();
   const { data: models } = useQuery<IModel[]>({
     queryKey: ["models_all"],
     queryFn: () => fetchAllModels(),
@@ -79,6 +82,7 @@ export default function VehicleForm() {
       queryClient.invalidateQueries({ queryKey: ["cars"] });
       push(`/cars/car-info?id=${data?.id}`);
       toast.success(" Сохранено успешно!");
+      reset()
     },
     onError: () => {
       toast.error("Ошибка сохранения!");
@@ -87,28 +91,29 @@ export default function VehicleForm() {
   const onSubmit: SubmitHandler<FormValues> = (data) => {
     const formData = {
       ...data,
-      with_trailer: data?.with_trailer === "false" ? false :  true,
+      with_trailer: data?.with_trailer === "false" ? false : true,
       type_of_payment: data?.type_of_payment || "CASH",
       leasing_period: Number(data?.leasing_period),
       distance_travelled: Number(data?.distance_travelled),
-      // price_usd: Number(removeCommas(data?.price_usd?.toString())),
-      price_uzs: Number(removeCommas(data?.price_uzs?.toString())),
+      price: Number(removeCommas(data?.price)),
     };
     createMutation({ ...formData, model: selectedModel?.value as string });
+    console.log(data);
+    
   };
 
   const with_trailer = watch("with_trailer");
-  
+
   const handleSelectModel = (newValue: SingleValue<Option>) => {
     setSelectedModel(newValue);
-    setValue("model", newValue?.value as string)
+    setValue("model", newValue?.value as string);
   };
   const { mutate: createModelMutation } = useMutation({
     mutationFn: createModel,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["models_all"] });
       setSelectedModel({ label: data?.name, value: data?.id });
-      setValue("model", data?.id)
+      setValue("model", data?.id);
     },
   });
   const handleAddModel = () => {
@@ -117,7 +122,7 @@ export default function VehicleForm() {
     }
   };
   const enterModel = (event: React.KeyboardEvent) => {
-    setStatus(false)
+    setStatus(false);
     if (event?.key === "Enter") {
       createModelMutation({ name: model });
     }
@@ -166,7 +171,9 @@ export default function VehicleForm() {
                     Марка автомобиля*
                   </label>
                   <Select
-                  {...register("model", {required: "Введите марку автомобиля"})}
+                    {...register("model", {
+                      required: "Введите марку автомобиля",
+                    })}
                     options={modelOptions}
                     value={selectedModel}
                     onChange={handleSelectModel}
@@ -200,9 +207,9 @@ export default function VehicleForm() {
                     })}
                     placeholder="Введите номер"
                     className="mt-1"
-                    onChange={(e)=> {
-                      const value = e.target.value
-                      setValue("number", value.toUpperCase())
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setValue("number", value.toUpperCase());
                     }}
                   />
                   {errors.number && (
@@ -221,7 +228,7 @@ export default function VehicleForm() {
                   </label>
                   <Selector
                     {...register("with_trailer", {
-                      required: false
+                      required: false,
                       // "Поле обязательно для выбора",
                     })} // Set required validation here
                     defaultValue="false"
@@ -254,12 +261,17 @@ export default function VehicleForm() {
                   <Input
                     disabled={with_trailer === "false" ? true : false}
                     id="trailer_number"
-                    {...register("trailer_number", {required: with_trailer === "true" ? "Это значение является обязательным" : false})}
+                    {...register("trailer_number", {
+                      required:
+                        with_trailer === "true"
+                          ? "Это значение является обязательным"
+                          : false,
+                    })}
                     placeholder="Введите номер"
                     className="mt-1"
-                    onChange={(e)=> {
-                      const value = e.target.value
-                      setValue("trailer_number", value.toUpperCase())
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setValue("trailer_number", value.toUpperCase());
                     }}
                   />
                   {errors.trailer_number && (
@@ -336,7 +348,8 @@ export default function VehicleForm() {
                   >
                     Введите цену автомобиля*
                   </label>
-                  <CurrencyInputs name="price" />
+                  {/* <CurrencyInputs name="price" /> */}
+                  <CurrencyInputWithSelect name="price"/>
                 </div>
               </div>
 
@@ -350,7 +363,12 @@ export default function VehicleForm() {
                   </label>
                   <Input
                     id="leasing_period"
-                    {...register("leasing_period", {required: watch("type_of_payment") === "LEASING" ? "Это значение является обязательным" : false})}
+                    {...register("leasing_period", {
+                      required:
+                        watch("type_of_payment") === "LEASING"
+                          ? "Это значение является обязательным"
+                          : false,
+                    })}
                     type="number"
                     placeholder="Введите срок..."
                     className="mt-1"
@@ -386,7 +404,16 @@ export default function VehicleForm() {
                 </div>
               </div>
 
-              <div className="w-full flex justify-end">
+              <div className="w-full flex justify-between">
+                <div className="space-y-2 flex items-center gap-3">
+                  <Checkbox
+                    checked={watch("income_status")}
+                    onCheckedChange={(checked) =>
+                      setValue("income_status", checked as boolean)
+                    }
+                  />
+                  <label>Добавить на склад</label>
+                </div>
                 <Button
                   type="submit"
                   className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded-md"

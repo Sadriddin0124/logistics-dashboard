@@ -102,7 +102,6 @@ export default function IncomeOutcomeGraph() {
               color: "hsl(var(--chart-2))",
             },
           }}
-          className="h-[500px]"
         >
           <ResponsiveContainer width="100%" height="100%">
             <LineChart

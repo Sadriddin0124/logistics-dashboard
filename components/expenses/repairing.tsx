@@ -1,6 +1,5 @@
 import { useForm, FormProvider } from "react-hook-form";
 import { Textarea } from "@/components/ui/textarea";
-import { CurrencyInputs } from "../ui-items/currency-inputs";
 import { Button } from "../ui/button";
 import { useEffect, useState } from "react";
 import { Option } from "@/pages/warehouse/diesel";
@@ -14,10 +13,12 @@ import { toast } from "react-toastify";
 import { removeCommas } from "@/lib/utils";
 import { AutoPartsExpense } from "./auto-parts";
 import { useRouter } from "next/router";
+import CurrencyInputWithSelect from "../ui-items/currencySelect";
 
 interface FormValues {
   car?: string;
   amount_uzs: string;
+  amount: string;
   comment?: string;
   parts: {
     name: string;
@@ -99,7 +100,7 @@ export default function RepairingForm() {
     const formData = {
       car: data?.car,
       action: "OUTCOME",
-      amount_uzs: Number(removeCommas(data?.amount_uzs)),
+      amount: Number(removeCommas(data?.amount)),
       flight: "",
       employee: "",
       kind: id as string,
@@ -142,7 +143,7 @@ export default function RepairingForm() {
               <label className="text-sm font-medium">
                 Введите сумму на ремонт*
               </label>
-              <CurrencyInputs name="amount" />
+              <CurrencyInputWithSelect name="amount" />
             </div>
             <div className="space-y-2 col-span-2">
               <label className="text-sm font-medium">

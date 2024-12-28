@@ -4,11 +4,14 @@ import { PaginationResponse } from "./gas_station.types";
 export interface IEmployee {
     id?: string
   full_name: string;
-  license: string;
+  license?: string;
+  passport?: string;
+  license_photo?: string;
+  passport_photo?: string;
   phone: string;
   flight_type: string;
-  passport: string;
   balance_uzs: string;
+  bonus?: boolean;
 }
 
 

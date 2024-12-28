@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { CurrencyInputs } from "../ui-items/currency-inputs";
 import { IFlightData } from "@/lib/types/flight.types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient } from "../ui-items/ReactQueryProvider";
@@ -19,6 +18,7 @@ import { IRegion } from "@/lib/types/regions.types";
 import { fetchRegionsAll } from "@/lib/actions/region.action";
 import { removeCommas } from "@/lib/utils";
 import { useRouter } from "next/router";
+import CurrencyInputWithSelect from "../ui-items/currencySelect";
 
 export default function FlightForm() {
   const methods = useForm<IFlightData>();
@@ -27,6 +27,7 @@ export default function FlightForm() {
     handleSubmit,
     setValue,
     formState: { errors },
+    reset
   } = methods;
   const { push } = useRouter();
 
@@ -41,6 +42,7 @@ export default function FlightForm() {
       queryClient.invalidateQueries({ queryKey: ["recycled"] });
       toast.success(" Сохранено успешно!");
       push(`/flight`);
+      reset()
     },
     onError: () => {
       toast.error("Ошибка сохранения!");
@@ -49,12 +51,10 @@ export default function FlightForm() {
   const onSubmit = (data: IFlightData) => {
     createMutation({
       ...data,
-      driver_expenses_uzs: Number(
-        removeCommas(data?.driver_expenses_uzs as string)
-      ),
+      driver_expenses: Number(removeCommas(data?.driver_expenses as string)),
       arrival_date: data?.arrival_date || "2024-12-26",
       departure_date: data?.arrival_date || "2024-12-26",
-      price_uzs: Number(removeCommas(data?.price_uzs as string)),
+      price: Number(removeCommas(data?.price as string)),
       // upload: image?.id
     });
   };
@@ -109,7 +109,7 @@ export default function FlightForm() {
             <label className="text-sm font-medium">
               Введите стоимость рейса*
             </label>
-            <CurrencyInputs name="price" />
+            <CurrencyInputWithSelect name="price" />
             {errors?.price_uzs && (
               <p className="text-red-500">{errors?.price_uzs?.message}</p>
             )}
@@ -132,7 +132,7 @@ export default function FlightForm() {
           </div>
           <div className="space-y-2">
             <label className="text-sm font-medium">Расходы водителя*</label>
-            <CurrencyInputs name="driver_expenses" />
+            <CurrencyInputWithSelect name="driver_expenses" />
             {errors?.driver_expenses_uzs && (
               <p className="text-red-500">
                 {errors?.driver_expenses_uzs?.message}

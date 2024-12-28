@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['api.onurcompany.com', 'static.vecteezy.com'], // Add your external hostname here
+    domains: ['api.logic.sector-soft.ru', 'static.vecteezy.com'], // Add your external hostname here
   },
 };
 

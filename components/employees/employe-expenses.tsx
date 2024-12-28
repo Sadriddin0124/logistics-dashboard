@@ -17,6 +17,7 @@ import { useQuery } from "@tanstack/react-query";
 import { queryClient } from "../ui-items/ReactQueryProvider";
 import { fetchEmployeesExpenses } from "@/lib/actions/employees.action";
 import { PaginatedExpenseLog } from "@/lib/types/employee.types";
+import { formatDate } from "@/lib/functions";
 
 export function EmployeeExpensesTable() {
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -87,7 +88,7 @@ export function EmployeeExpensesTable() {
               <TableCell>
                 {flight.amount_uzs} сум
               </TableCell>
-              <TableCell>{flight?.created_at?.slice(0,10)}</TableCell>
+              <TableCell>{formatDate(flight?.created_at as string, "/")}</TableCell>
             </TableRow>
           ))}
         </TableBody>

@@ -34,7 +34,7 @@ export default function CitiesTable() {
     });
   }, [currentPage]);
 
-  const itemsPerPage = 10;
+  const itemsPerPage = 30
   const indexOfLastOrder = currentPage * itemsPerPage;
   const indexOfFirstOrder = (currentPage - 1) * itemsPerPage;
 
@@ -101,8 +101,7 @@ export default function CitiesTable() {
           <TableRow className="border-b border-gray-200">
             <TableHead className="font-bold"></TableHead>
             <TableHead className="font-bold">Имя</TableHead>
-            <TableHead className="font-bold">Цена отправления</TableHead>
-            <TableHead className="font-bold">Цена прибытия</TableHead>
+            <TableHead className="font-bold">Тип области</TableHead>
             <TableHead className="font-bold w-[50px]"></TableHead>
           </TableRow>
         </TableHeader>
@@ -111,8 +110,7 @@ export default function CitiesTable() {
             <TableRow key={index} className="border-b border-gray-200">
               <TableCell>{index + 1}</TableCell>
               <TableCell>{region?.name}</TableCell>
-              <TableCell>{region?.price1}</TableCell>
-              <TableCell>{region?.price2}</TableCell>
+              <TableCell>{region?.flight_type === "OUT" ? "За территории Узбекистана" : "На территории Узбекистана"}</TableCell>
               <TableCell className="flex items-center gap-1">
                 <Button
                   variant="ghost"

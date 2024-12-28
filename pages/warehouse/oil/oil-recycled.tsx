@@ -9,15 +9,15 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient } from "@/components/ui-items/ReactQueryProvider";
 import { toast } from "react-toastify";
 import { fetchOilRemaining, recycleOil } from "@/lib/actions/oil.action";
-import { CurrencyInputs } from "@/components/ui-items/currency-inputs";
 import { removeCommas } from "@/lib/utils";
 import { OilRemainingResponse } from "@/lib/types/oil.types";
 import UtilizedOilTable from "@/components/warehouse/oil/utilized-table";
+import CurrencyInputWithSelect from "@/components/ui-items/currencySelect";
 
 interface FormValues {
   quantity_utilized: number;
-  // price_usd?: string
-  price_uzs: string;
+  price: number
+  price_uzs: number;
 }
 
 export default function GasManagementForm() {
@@ -39,7 +39,7 @@ export default function GasManagementForm() {
     mutationFn: recycleOil,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["quantity"] });
-      // push(`/warehouse/oil/oil-info?id=${data?.id}`)
+      queryClient.invalidateQueries({ queryKey: ["oil_utilized"] });
       reset()
       toast.success(" Сохранено успешно!");
     },
@@ -48,12 +48,10 @@ export default function GasManagementForm() {
     },
   });
   const onSubmit = (data: FormValues) => {
-    console.log(data);
-
-    // price_usd: Number(removeCommas(data?.price_usd)),
     createMutation({
       ...data,
-      price_uzs: Number(removeCommas(data?.price_uzs)),
+      price_uzs: Number(removeCommas(data?.price_uzs?.toString())),
+      price: Number(removeCommas(data?.price?.toString())),
     });
   };
   const oil_volume = quantity?.results?.[0]?.remaining_oil_quantity;
@@ -70,7 +68,7 @@ export default function GasManagementForm() {
                   <label className="text-sm">
                     Цена на утилизированное масло (литр)
                   </label>
-                  <CurrencyInputs name="price" />
+                  <CurrencyInputWithSelect name="price" />
                   </div>
                 <div className="space-y-2">
                   <label className="text-sm">

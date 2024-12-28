@@ -1,6 +1,5 @@
 import { useForm, FormProvider } from "react-hook-form";
 import { Textarea } from "@/components/ui/textarea";
-import { CurrencyInputs } from "../ui-items/currency-inputs";
 import { Button } from "../ui/button";
 import { useEffect, useState } from "react";
 import { Option } from "@/pages/warehouse/diesel";
@@ -13,10 +12,12 @@ import { queryClient } from "../ui-items/ReactQueryProvider";
 import { toast } from "react-toastify";
 import { removeCommas } from "@/lib/utils";
 import { useRouter } from "next/router";
+import CurrencyInputWithSelect from "../ui-items/currencySelect";
 
 interface FormValues {
   car?: string;
   amount_uzs: string;
+  amount: string | number;
   comment?: string;
   parts: {
     name: string;
@@ -89,18 +90,14 @@ export default function LeasingForm() {
     const formData = {
       car: data?.car,
       action: "OUTCOME",
-      amount_uzs: Number(removeCommas(data?.amount_uzs)),
+      amount: Number(removeCommas(data?.amount as string)),
       flight: "",
       employee: "",
       kind: id as string,
     };
-    console.log(formData);
-
     createFinanceMutation(formData);
-    const item = {id: selectedCar?.value as string, leasing_payed_amount: Number(removeCommas(data?.amount_uzs)) + carAmount}
-    console.log(item);
-    
-    updateMutation({id: selectedCar?.value as string, leasing_payed_amount: Number(removeCommas(data?.amount_uzs)) + carAmount})
+    const item = {id: selectedCar?.value as string, leasing_payed_amount: data?.amount_uzs + carAmount}
+    updateMutation(item)
   };
 
 
@@ -129,7 +126,7 @@ export default function LeasingForm() {
               <label className="text-sm font-medium">
                 Введите сумму на car*
               </label>
-              <CurrencyInputs name="amount" />
+              <CurrencyInputWithSelect name="amount" />
             </div>
             <div className="space-y-2 col-span-2">
               <label className="text-sm font-medium">

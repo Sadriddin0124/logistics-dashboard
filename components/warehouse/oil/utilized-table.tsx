@@ -21,12 +21,12 @@ import { formatDate } from "@/lib/functions";
 export default function UtilizedOilTable() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const { data: utilized } = useQuery<OilUtilizedResponse>({
-    queryKey: ["oil_purchases", currentPage],
+    queryKey: ["oil_utilized", currentPage],
     queryFn: () => fetchUtilizedOils(currentPage),
   });
   useEffect(() => {
     queryClient.prefetchQuery({
-      queryKey: ["oil_purchases", currentPage + 1],
+      queryKey: ["oil_utilized", currentPage + 1],
       queryFn: () => fetchUtilizedOils(currentPage + 1),
     });
   }, [currentPage,]);

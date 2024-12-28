@@ -28,4 +28,7 @@ export  type IFlight = {
     status: "ACTIVE" | "INACTIVE"; // Status can either be ACTIVE or INACTIVE
   };
   
-  
+  export interface FileType  {
+    id: string, 
+    file: string
+  }

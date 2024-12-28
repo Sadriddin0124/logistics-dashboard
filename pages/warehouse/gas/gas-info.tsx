@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useRouter } from "next/router";
 import { FormProvider, useForm } from "react-hook-form";
-import { IGasStation, IGasStationTotal } from "@/lib/types/gas_station.types";
-import { CurrencyInputs } from "@/components/ui-items/currency-inputs";
+import { IGasCreate, IGasStation, IGasStationTotal } from "@/lib/types/gas_station.types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { addGas, deleteStation, fetchGasStationOne } from "@/lib/actions/gas.action";
 import { queryClient } from "@/components/ui-items/ReactQueryProvider";
@@ -16,6 +15,7 @@ import { removeCommas } from "@/lib/utils";
 import PurchasedGasTable from "@/components/warehouse/gas/purchased-table";
 import SalesGasTable from "@/components/warehouse/gas/gas-sales-table";
 import { ForceDeleteDialog } from "@/components/ui-items/force-delete";
+import CurrencyInputWithSelect from "@/components/ui-items/currencySelect";
 
 export default function GasManagementForm() {
   const methods = useForm<IGasStation>();
@@ -44,7 +44,7 @@ export default function GasManagementForm() {
       
   }, [setValue, payed_price_uzs, price_uzs]);
   const { mutate: updateMutation, isPending } = useMutation({
-    mutationFn: (data: { id: string; gasData: IGasStation }) =>
+    mutationFn: (data: { id: string; gasData: IGasCreate }) =>
       addGas(data.id, data.gasData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["station"] });
@@ -57,11 +57,9 @@ export default function GasManagementForm() {
     },
   });
   const onSubmit = (data: IGasStation) => {
-    const formData: IGasStation = {
+    const formData: IGasCreate = {
       amount: data?.remaining_gas,
-      price_usd: Number(removeCommas(data?.price_usd?.toString())),
       price_uzs: Number(removeCommas(data?.price_uzs?.toString())),
-      payed_price_usd: Number(removeCommas(data?.payed_price_usd?.toString())),
       payed_price_uzs: Number(removeCommas(data?.payed_price_uzs?.toString())),
     };
     updateMutation({ id: id as string, gasData: formData });
@@ -98,7 +96,7 @@ export default function GasManagementForm() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-">Оплаченная сумма</label>
-                  <CurrencyInputs name="payed_price" />
+                  <CurrencyInputWithSelect name="payed_price" />
                 </div>
               </div>
 
@@ -116,7 +114,7 @@ export default function GasManagementForm() {
 
                 <div className="space-y-2">
                   <label className="text-sm">Цена на газ (м3)</label>
-                  <CurrencyInputs name="price" />
+                  <CurrencyInputWithSelect name="price" />
                   {status && <p className="text-sm text-red-500">{status}</p>}
                 </div>
               </div>

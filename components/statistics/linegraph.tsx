@@ -120,10 +120,10 @@ import { useQuery } from "@tanstack/react-query";
 import { ResponseData } from "@/lib/types/stats.types";
 import YearGraph from "./income";
 type Props = {
-  start: string,
-  end: string
-}
-export default function IncomeOutcomeGraph({start, end}: Props) {
+  start: string;
+  end: string;
+};
+export default function IncomeOutcomeGraph({ start, end }: Props) {
   const getCurrentMonthDays = () => {
     const now = new Date();
     const daysInMonth = new Date(
@@ -147,7 +147,10 @@ export default function IncomeOutcomeGraph({start, end}: Props) {
   const { data: finance_info } = useQuery<ResponseData>({
     queryKey: ["finance_info", start, end],
     queryFn: () =>
-      fetchFinanceInfo(start || daysInMonth[0], end || daysInMonth[daysInMonth.length - 1]),
+      fetchFinanceInfo(
+        start || daysInMonth[0],
+        end || daysInMonth[daysInMonth.length - 1]
+      ),
   });
 
   // Map finance data to all days of the month
@@ -162,70 +165,70 @@ export default function IncomeOutcomeGraph({start, end}: Props) {
     };
   });
 
-
   return (
     <div className="flex flex-col items-center justify-center">
       <Card className="w-full mt-4">
-      <CardHeader>
-        <CardTitle>Доход против Расхода</CardTitle>
-        <CardDescription>
-          Ежедневный обзор финансов за месяц (в тысячах сум)
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <ChartContainer
-          config={{
-            income: {
-              label: "Приход",
-              color: "hsl(var(--chart-1))",
-            },
-            outcome: {
-              label: "Расход",
-              color: "hsl(var(--chart-2))",
-            },
-          }}
-          className="h-[500px]"
-        >
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart
-              data={chartData}
-              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis
-                dataKey="period"
-                tickFormatter={(date) =>
-                  new Date(date).toLocaleDateString("ru-RU", {
-                    day: "2-digit",
-                    month: "short",
-                  })
-                }
-              />
-              <YAxis />
-              <ChartTooltip content={<ChartTooltipContent />} />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="Приход"
-                stroke="var(--color-income)"
-                strokeWidth={2}
-                dot={false} // Remove dots
-                activeDot={{ r: 6 }}
-              />
-              <Line
-                type="monotone"
-                dataKey="Расход"
-                stroke="var(--color-outcome)"
-                strokeWidth={2}
-                dot={false} // Remove dots
-                activeDot={{ r: 6 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </ChartContainer>
-      </CardContent>
-    </Card>
-    <YearGraph/>
+        <CardHeader>
+          <CardTitle>Доход против Расхода</CardTitle>
+          <CardDescription>
+            Ежедневный обзор финансов за месяц (в тысячах сум)
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ChartContainer
+          className="w-[400px] md:w-auto"
+            config={{
+              income: {
+                label: "Приход",
+                color: "hsl(var(--chart-1))",
+              },
+              outcome: {
+                label: "Расход",
+                color: "hsl(var(--chart-2))",
+              },
+            }}
+            // className="h-[500px]"
+          >
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                data={chartData}
+                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="period"
+                  tickFormatter={(date) =>
+                    new Date(date).toLocaleDateString("ru-RU", {
+                      day: "2-digit",
+                      month: "short",
+                    })
+                  }
+                />
+                <YAxis />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="Приход"
+                  stroke="var(--color-income)"
+                  strokeWidth={2}
+                  dot={false} // Remove dots
+                  activeDot={{ r: 6 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="Расход"
+                  stroke="var(--color-outcome)"
+                  strokeWidth={2}
+                  dot={false} // Remove dots
+                  activeDot={{ r: 6 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </ChartContainer>
+        </CardContent>
+      </Card>
+      <YearGraph />
     </div>
   );
 }

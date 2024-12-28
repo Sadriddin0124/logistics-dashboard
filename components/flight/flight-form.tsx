@@ -12,7 +12,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { useEffect, useState } from "react";
 import { ImageType } from "@/lib/types/file.types";
 import { FileUploader } from "../ui-items/FileUploader";
-import { CurrencyInputs, formatNumberWithCommas } from "../ui-items/currency-inputs";
 import { IFlightData } from "@/lib/types/flight.types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient } from "../ui-items/ReactQueryProvider";
@@ -28,6 +27,7 @@ import { IEmployee } from "@/lib/types/employee.types";
 import { fetchEmployeesAll } from "@/lib/actions/employees.action";
 import { removeCommas } from "@/lib/utils";
 import { useRouter } from "next/router";
+import CurrencyInputWithSelect from "../ui-items/currencySelect";
 
 export default function FlightForm() {
   const [image, setImage] = useState<ImageType>({ id: "", file: "" });
@@ -37,14 +37,15 @@ export default function FlightForm() {
   const [selectedCar, setSelectedCar] = useState<Option | null>(null);
   const methods = useForm<IFlightData>({
     defaultValues: {
-      price_uzs: ""
-    }
+      price_uzs: "",
+    },
   });
   const {
     register,
     handleSubmit,
     setValue,
     watch,
+    reset,
     formState: { errors },
   } = methods;
   const flight_type = watch("flight_type");
@@ -94,13 +95,14 @@ export default function FlightForm() {
       setValue("cargo_info", "");
     }
   }, [flight_type, setValue, image, regions, watch]);
-  
+
   const { mutate: createMutation } = useMutation({
     mutationFn: createFlight,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["recycled"] });
       toast.success(" Сохранено успешно!");
       push(`/flight`);
+      reset();
     },
     onError: () => {
       toast.error("Ошибка сохранения!");
@@ -111,10 +113,16 @@ export default function FlightForm() {
       ...data,
       upload: image?.id,
       driver_expenses_uzs: Number(
-        removeCommas(data?.driver_expenses_uzs as string)
+        removeCommas(data?.driver_expenses_uzs?.toString())
       ),
+      driver_expenses: Number(
+        removeCommas(data?.driver_expenses_uzs?.toString())
+      ),
+      price_uzs: Number(removeCommas(data?.price_uzs?.toString())),
+      price: Number(removeCommas(data?.price_uzs?.toString())),
+      flight_expenses: Number(removeCommas(data?.flight_expenses?.toString())),
+      other_expenses: Number(removeCommas(data?.other_expenses?.toString())),
       arrival_date: data?.arrival_date || "2024-12-26",
-      price_uzs: Number(removeCommas(data?.price_uzs as string)),
       // upload: image?.id
     });
   };
@@ -169,7 +177,9 @@ export default function FlightForm() {
           <div className="space-y-2">
             <label className="text-sm font-medium">Выберите автомобиль*</label>
             <Select
-              {...register("car", { required: "Это значение является обязательным" })}
+              {...register("car", {
+                required: "Это значение является обязательным",
+              })}
               options={carOptions}
               value={selectedCar}
               onChange={handleSelectCar}
@@ -214,7 +224,9 @@ export default function FlightForm() {
           <div className="space-y-2">
             <label className="text-sm font-medium">Выберите водителя*</label>
             <Select
-              {...register("driver", { required: "Это значение является обязательным" })}
+              {...register("driver", {
+                required: "Это значение является обязательным",
+              })}
               options={driverOptions}
               value={selectedDriver}
               onChange={handleSelectDriver}
@@ -251,7 +263,7 @@ export default function FlightForm() {
             <label className="text-sm font-medium">
               Введите стоимость рейса*
             </label>
-            <CurrencyInputs name="price" />
+            <CurrencyInputWithSelect name="price" />
             {/* {errors?.price_uzs && (
               <p className="text-red-500">{errors?.price_uzs?.message}</p>
             )} */}
@@ -263,7 +275,9 @@ export default function FlightForm() {
             <Input
               type="date"
               placeholder="Введите дату"
-              {...register("departure_date", { required: "Это значение является обязательным" })}
+              {...register("departure_date", {
+                required: "Это значение является обязательным",
+              })}
             />
             {errors?.departure_date && (
               <p className="text-red-500">{errors?.departure_date?.message}</p>
@@ -273,7 +287,7 @@ export default function FlightForm() {
           {/* Spending */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Расходы водителя*</label>
-            <CurrencyInputs name="driver_expenses" />
+            <CurrencyInputWithSelect name="driver_expenses" />
             {/* {errors?.driver_expenses_uzs && (
               <p className="text-red-500">{errors?.driver_expenses_uzs?.message}</p>
             )} */}
@@ -281,14 +295,15 @@ export default function FlightForm() {
 
           {/* Arrival Date */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">
-              Введите дату прибытия*
-            </label>
+            <label className="text-sm font-medium">Введите дату прибытия</label>
             <Input
               type="date"
               placeholder="Введите дату"
               {...register("arrival_date", {
-                required: route === "BEEN_TO" ? "Это значение является обязательным" : false,
+                required:
+                  route === "BEEN_TO"
+                    ? "Это значение является обязательным"
+                    : false,
               })}
             />
             {errors?.arrival_date && (
@@ -298,29 +313,28 @@ export default function FlightForm() {
           {flight_type === "OUT" && (
             <div className="space-y-2">
               <label className="text-sm font-medium">Расход на питание</label>
-              <Input
-                {...register(`other_expenses`, {required: flight_type === "OUT" ? "Затраты на питание обязательны" : false})}
-                placeholder="Цена..."
-                onInput={(e) => {
-                  const rawValue = e.currentTarget.value.replace(/,/g, "");
-
-                  if (rawValue === "0") {
-                    // If the user types 0, allow it without formatting
-                    e.currentTarget.value = "0";
-                  } else {
-                    const parsedValue = parseFloat(rawValue);
-                    // Apply formatting if it's not 0
-                    e.currentTarget.value = formatNumberWithCommas(parsedValue);
-                  }
-                }}
-              />
-              {errors?.other_expenses && (
-                <p className="text-red-500">
-                  {errors?.other_expenses?.message}
-                </p>
-              )}
+              <CurrencyInputWithSelect name="other_expenses" />
             </div>
           )}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Расходы на Рейс*</label>
+            <CurrencyInputWithSelect name="flight_expenses" />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">
+              Введите текущий пробег*
+            </label>
+            <Input
+              placeholder="Текущий пробег"
+              {...register("start_km", {
+                required: "Введите текущий пробег",
+                valueAsNumber: true,
+              })}
+            />
+            {errors?.start_km && (
+              <p className="text-red-500">{errors?.start_km?.message}</p>
+            )}
+          </div>
         </div>
 
         {/* Cargo Information */}

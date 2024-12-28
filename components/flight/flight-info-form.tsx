@@ -8,12 +8,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { useEffect, useState } from "react";
 import { ImageType } from "@/lib/types/file.types";
 import { FileUploader } from "../ui-items/FileUploader";
-import { CurrencyInputs } from "../ui-items/currency-inputs";
-import { IFlightCreate, IFlightFormEdit } from "@/lib/types/flight.types";
+import { IFlightFormEdit } from "@/lib/types/flight.types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient } from "../ui-items/ReactQueryProvider";
 import { toast } from "react-toastify";
@@ -28,25 +26,32 @@ import { IEmployee } from "@/lib/types/employee.types";
 import { fetchEmployeesAll } from "@/lib/actions/employees.action";
 import { useRouter } from "next/router";
 import EndFlight from "./end-flight";
+import CurrencyInputWithSelect from "../ui-items/currencySelect";
 import { removeCommas } from "@/lib/utils";
 
 export default function FlightInfoForm() {
-  const methods = useForm<IFlightCreate>();
+  const methods = useForm<IFlightFormEdit>();
   const {
     register,
     handleSubmit,
     setValue,
     watch,
+    reset,
     formState: { errors },
   } = methods;
+
   const [image, setImage] = useState<ImageType>({ id: "", file: "" });
   const region = watch("region");
   const flight_type = watch("flight_type");
+
   const [driverOptions, setDriverOptions] = useState<Option[]>([]);
   const [selectedDriver, setSelectedDriver] = useState<Option | null>(null);
   const [carOptions, setCarOptions] = useState<Option[]>([]);
   const [selectedCar, setSelectedCar] = useState<Option | null>(null);
+  const [driver, setDriver] = useState<IEmployee | null>(null);
   const { id } = useRouter()?.query;
+
+  // Fetch Data
   const { data: cars } = useQuery<ICars[]>({
     queryKey: ["cars"],
     queryFn: fetchCarNoPage,
@@ -64,17 +69,21 @@ export default function FlightInfoForm() {
     queryFn: () => fetchFlight(id as string),
     enabled: !!id,
   });
+
+  // Map options
   useEffect(() => {
     if (employeeList) {
       const driverOption = employeeList.map((driver) => ({
-        label: driver?.full_name,
-        value: driver?.id,
+        label: driver.full_name,
+        value: driver.id,
       }));
-      const driverDefault = driverOption.find(
-        (driver) => driver?.value === flight?.driver
-      );
       setDriverOptions(driverOption as Option[]);
-      setSelectedDriver((driverDefault as Option) || null);
+      const driver = employeeList?.find((item) => item?.id === flight?.driver);
+      setDriver(driver as IEmployee);
+      const driverDefault = driverOption.find(
+        (driver) => driver.value === flight?.driver
+      );
+      setSelectedDriver(driverDefault as Option);
     }
 
     if (cars) {
@@ -82,61 +91,71 @@ export default function FlightInfoForm() {
         label: `${car?.name} ${car?.number}`,
         value: car?.id,
       }));
-      const carDefault = carOption.find(
-        (car) => car?.value === flight?.car?.id
-      );
       setCarOptions(carOption as Option[]);
-      setSelectedCar((carDefault as Option) || null);
+      let carId: string | undefined;
+      if (typeof flight?.car === "object" && "id" in flight.car) {
+        carId = flight.car.id;
+      }
+      const carDefault = carOption.find((car) => car.value === carId);
+      setSelectedCar(carDefault as Option);
     }
-    
-    
-  }, [cars, employeeList, flight]);
-  
+  }, [employeeList, cars, flight]);
+
+  // Reset form on flight data change
   useEffect(() => {
     if (flight) {
-      setValue("arrival_date", flight?.arrival_date);
-      setValue("departure_date", flight?.departure_date);
-      setValue("car", flight?.car?.id as string);
-      setValue("driver", flight?.driver);
-      setValue("region", flight?.region?.id as string);
-      setValue("cargo_info", flight?.cargo_info);
-      setValue("price_uzs", Number(flight?.price_uzs));
-      setValue("driver_expenses_uzs", Number(flight?.driver_expenses_uzs));
-      setValue("flight_type", flight?.flight_type);
+      reset(flight);
+      setImage({
+        id: flight?.upload?.id || "",
+        file: flight?.upload?.file || "",
+      });
     }
-    setImage({id: flight?.upload?.id || "", file: flight?.upload?.file || ""})
-  }, [flight, setValue]);
+  }, [flight, reset, setValue]);
+
+  // Mutation for form submission
   const { mutate: createMutation } = useMutation({
     mutationFn: updateFlightData,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["recycled"] });
-      toast.success(" Сохранено успешно!");
+      toast.success("Сохранено успешно!");
     },
     onError: () => {
       toast.error("Ошибка сохранения!");
     },
   });
-  const onSubmit = (data: IFlightCreate) => {
+
+  // Form submission handler
+  const onSubmit = (data: IFlightFormEdit) => {
+    let regionId: string | undefined;
+    if (typeof flight?.region === "object" && "id" in flight.region) {
+      regionId = flight.region.id;
+    }
+    console.log(data);
+    
     createMutation({
       ...data,
       id: id as string,
-      driver_expenses_uzs: Number(removeCommas(data?.driver_expenses_uzs as string)),
-      price_uzs: Number(removeCommas(data?.price_uzs as string)),
-      price_usd: Number(data?.price_usd),
-      upload: image?.id
+      region: regionId as string,
+      car: selectedCar?.value as string,
+      upload: image.id,
+      price: data?.price != null ? (typeof data.price === "string" ? Number(removeCommas(data.price)) : data.price) : undefined,
+      flight_expenses: typeof data?.flight_expenses === "string" ? Number(removeCommas(data?.flight_expenses as string)) : data?.flight_expenses,
+      other_expenses: typeof data?.other_expenses === "string" ? Number(removeCommas(data?.other_expenses as string)) : data?.other_expenses,
+      driver_expenses: data?.driver_expenses != null ? (typeof data?.driver_expenses === "string" ? Number(removeCommas(data?.driver_expenses as string)) : data?.driver_expenses) : undefined,
     });
   };
 
+  // Handlers for select components
   const handleSelectChange = (value: string, name: string) => {
     setValue(name as "region", value);
   };
   const handleSelectCar = (newValue: SingleValue<Option>) => {
     setSelectedCar(newValue);
-    setValue("car", newValue?.value as string);
+    setValue("car", newValue?.value || "");
   };
   const handleSelectDriver = (newValue: SingleValue<Option>) => {
     setSelectedDriver(newValue);
-    setValue("driver", newValue?.value as string);
+    setValue("driver", newValue?.value || "");
   };
   return (
     <FormProvider {...methods}>
@@ -182,18 +201,24 @@ export default function FlightInfoForm() {
           <div className="space-y-2">
             <label className="text-sm font-medium">Выберите область*</label>
             <Selector
-              value={flight?.region?.id || ""}
+              value={
+                typeof flight?.region === "object" && "id" in flight.region
+                  ? (flight?.region?.id as string)
+                  : ""
+              }
               onValueChange={(value) => handleSelectChange(value, "region")}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Выберите..." />
               </SelectTrigger>
               <SelectContent>
-              {regions?.filter(item=> item?.flight_type === flight_type)?.map((region) => (
-                      <SelectItem key={region.id} value={region.id as string}>
-                        {region.name}
-                      </SelectItem>
-                    ))}
+                {regions
+                  ?.filter((item) => item?.flight_type === flight_type)
+                  ?.map((region) => (
+                    <SelectItem key={region.id} value={region.id as string}>
+                      {region.name}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Selector>
           </div>
@@ -202,7 +227,9 @@ export default function FlightInfoForm() {
           <div className="space-y-2">
             <label className="text-sm font-medium">Выберите водителя*</label>
             <Select
-              {...register("driver", { required: "Это значение является обязательным" })}
+              {...register("driver", {
+                required: "Это значение является обязательным",
+              })}
               options={driverOptions}
               value={selectedDriver}
               onChange={handleSelectDriver}
@@ -225,8 +252,8 @@ export default function FlightInfoForm() {
                 <SelectValue placeholder="Выберите..." />
               </SelectTrigger>
               <SelectContent>
-              <SelectItem value={"GONE_TO"}>Иду</SelectItem>
-              <SelectItem value={"BEEN_TO"}>Прихожу</SelectItem>
+                <SelectItem value={"GONE_TO"}>Иду</SelectItem>
+                <SelectItem value={"BEEN_TO"}>Прихожу</SelectItem>
               </SelectContent>
             </Selector>
           </div>
@@ -236,7 +263,7 @@ export default function FlightInfoForm() {
             <label className="text-sm font-medium">
               Введите стоимость рейса*
             </label>
-            <CurrencyInputs name="price" />
+            <CurrencyInputWithSelect name="price" />
           </div>
 
           {/* Departure Date */}
@@ -252,7 +279,7 @@ export default function FlightInfoForm() {
           {/* Spending */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Расходы водителя*</label>
-            <CurrencyInputs name="driver_expenses" />
+            <CurrencyInputWithSelect name="driver_expenses" />
           </div>
 
           {/* Arrival Date */}
@@ -266,26 +293,42 @@ export default function FlightInfoForm() {
               {...register("arrival_date", { required: true })}
             />
           </div>
+          {flight_type === "OUT" && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Расход на питание</label>
+              <CurrencyInputWithSelect name="other_expenses" />
+            </div>
+          )}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Расходы на Рейс*</label>
+            <CurrencyInputWithSelect name="flight_expenses" />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Баланс Рейса</label>
+            <Input value={flight?.flight_balance} className="bg-muted" readOnly/>
+          </div>
         </div>
 
         {/* Cargo Information */}
-        <div className="space-y-2">
+        {/* <div className="space-y-2">
           <label className="text-sm font-medium">Информация о грузе</label>
           <Textarea
             placeholder="Введите информацию о грузе"
             className="min-h-[100px]"
             {...register("cargo_info")}
           />
-        </div>
+        </div> */}
 
         {/* Expenses */}
-        {region !== "На территории Узбекистана." && (
+        {region !== "IN_UZB" && (
           <div className="grid grid-cols-2 gap-6">
             <FileUploader image={image} setImage={setImage} type=".xlsx" />
           </div>
         )}
         <div className="w-full flex justify-end gap-6">
-          {flight && <EndFlight id={id as string} />}
+          {flight && (
+            <EndFlight id={id as string} driver={driver as IEmployee} />
+          )}
           <Button
             type="submit"
             className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded-md"

@@ -17,6 +17,7 @@ import { useQuery } from "@tanstack/react-query";
 import { queryClient } from "../ui-items/ReactQueryProvider";
 import { fetchEmployeesFlight } from "@/lib/actions/employees.action";
 import { PaginatedRouteLog } from "@/lib/types/cars.types";
+import { formatDate } from "@/lib/functions";
 
 export function EmployeeFlightTable() {
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -86,8 +87,8 @@ export function EmployeeFlightTable() {
             <TableRow key={i} className="border-b-gray-300 border-b">
               <TableCell>{i + 1}</TableCell>
               <TableCell>{flight?.car?.name}</TableCell>
-              <TableCell>{flight?.departure_date?.slice(0, 10)}</TableCell>
-              <TableCell>{flight?.arrival_date?.slice(0, 10)}</TableCell>
+              <TableCell>{formatDate(flight?.departure_date as string, "/")}</TableCell>
+              <TableCell>{formatDate(flight?.arrival_date as string, "/")}</TableCell>
               <TableCell>
                  {flight.price_uzs} сум
               </TableCell>

@@ -27,7 +27,7 @@ export interface ICars {
   leasing_period: number;
   models?: IModel
   fuel_type: string;
-  price_usd: number;
+  price: number;
   price_uzs: number | string;
   distance_travelled: number;
   oil_recycle_distance?: number
@@ -35,6 +35,7 @@ export interface ICars {
   updated_at?: string
   monthly_payment?: number
   leasing_payed_amount?: number
+  income_status?: boolean
 
 }
 
@@ -55,6 +56,7 @@ interface Car {
   price_usd: number;
   distance_travelled: number;
   trailer_number: string;
+  created_at: string;
 }
 
 export interface CarListResponse {

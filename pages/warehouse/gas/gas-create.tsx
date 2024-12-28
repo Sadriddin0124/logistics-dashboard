@@ -4,27 +4,27 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useMutation } from "@tanstack/react-query";
-import { CurrencyInputs } from "@/components/ui-items/currency-inputs";
 import { addGas, createGasStation } from "@/lib/actions/gas.action";
 import { queryClient } from "@/components/ui-items/ReactQueryProvider";
 import { toast } from "react-toastify";
 import { removeCommas } from "@/lib/utils";
-import { IGasStation } from "@/lib/types/gas_station.types";
+import { IGasCreate, IGasStation } from "@/lib/types/gas_station.types";
 import { useRouter } from "next/router";
+import CurrencyInputWithSelect from "@/components/ui-items/currencySelect";
 
 interface FormValues {
   name?: string;
   remaining_gas?: number;
-  price_usd: string;
-  price_uzs: string;
-  payed_price_usd: string;
-  payed_price_uzs: string;
+  price_usd: number;
+  price_uzs: number;
+  payed_price_usd: number;
+  payed_price_uzs: number;
   amount: string
 }
 
 export default function GasManagementForm() {
   const methods = useForm<FormValues>();
-  const { register, handleSubmit, watch, setValue } = methods;
+  const { register, handleSubmit, watch, setValue, reset } = methods;
   const [addGasData, setAddGasData] = useState<IGasStation | null>(null);
   const [status, setStatus] = useState<string>("")
   const payed_price_uzs = watch("payed_price_uzs");
@@ -33,8 +33,8 @@ export default function GasManagementForm() {
   const { push } = useRouter()
   useEffect(() => {
       const result =
-        Number(removeCommas(payed_price_uzs)) /
-        Number(removeCommas(price_uzs));
+        Number(removeCommas(payed_price_uzs?.toString())) /
+        Number(removeCommas(price_uzs?.toString()));
         if (price_uzs && payed_price_uzs) {
           setValue("remaining_gas", Number(result.toFixed(2)) || 0);
         }
@@ -44,8 +44,8 @@ export default function GasManagementForm() {
   }, [price_uzs, payed_price_uzs, setValue]);
 
   const { mutate: addMutation } = useMutation({
-    mutationFn: (data: { id: string; gasData: IGasStation }) =>
-      addGas(data.id, data.gasData),
+    mutationFn: (data: { id: string; gasData: IGasCreate }) =>
+      addGas(data.id, data?.gasData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["gas_stations"] });
       push(`/warehouse/gas/gas-info?id=${gasId}`)
@@ -62,10 +62,9 @@ export default function GasManagementForm() {
       setGasId(data?.id)
       addMutation({
         id: data.id,
-        gasData: addGasData as IGasStation,
+        gasData: addGasData as IGasCreate,
       });
-      console.log(addGasData);
-      
+      reset()      
       toast.success("Сохранено успешно!");
     },
     onError: () => {
@@ -74,19 +73,15 @@ export default function GasManagementForm() {
   });
 
   const onSubmit = (data: FormValues) => {
-    const formData: IGasStation = {
-      price_usd: Number(removeCommas(data?.price_usd)),
-      price_uzs: Number(removeCommas(data?.price_uzs)),
-      payed_price_usd: Number(removeCommas(data?.payed_price_usd)),
-      payed_price_uzs: Number(removeCommas(data?.payed_price_uzs)),
+    const formData: IGasCreate = {
+      price_uzs: Number(removeCommas(data?.price_uzs.toString())),
+      payed_price_uzs: Number(removeCommas(data?.payed_price_uzs.toString())),
     };
     setAddGasData({
       amount: data?.remaining_gas as number,
       ...formData,
     } as IGasStation);
-    createMutation({ ...formData, name: data?.name });
-    console.log(formData);
-    
+    createMutation({ ...formData, name: data?.name });    
   };
 
   return (
@@ -106,7 +101,7 @@ export default function GasManagementForm() {
 
                 <div className="space-y-2">
                   <label className="text-">Оплаченная сумма</label>
-                  <CurrencyInputs name="payed_price" />
+                  <CurrencyInputWithSelect name="payed_price" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm">
@@ -122,7 +117,7 @@ export default function GasManagementForm() {
 
                 <div className="space-y-2">
                   <label className="text-sm">Цена на газ (м3)</label>
-                  <CurrencyInputs name="price" />
+                  <CurrencyInputWithSelect name="price" />
                   {status && <p className="text-sm text-red-500">{status}</p>}
                 </div>
               </div>

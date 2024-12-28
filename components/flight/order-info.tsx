@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { CurrencyInputs } from "../ui-items/currency-inputs";
 import { IFlightData, IOrderedFlight } from "@/lib/types/flight.types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient } from "../ui-items/ReactQueryProvider";
@@ -24,6 +23,7 @@ import { removeCommas } from "@/lib/utils";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import EndOrderedFlight from "./end-ordered";
+import CurrencyInputWithSelect from "../ui-items/currencySelect";
 
 export default function OrderFlightFormInfo() {
   const methods = useForm<IFlightData>();
@@ -74,12 +74,12 @@ export default function OrderFlightFormInfo() {
       ...data,
       region: data?.region,
       status: data?.status?.toUpperCase(),
-      driver_expenses_uzs: Number(
-        removeCommas(data?.driver_expenses_uzs as string)
+      driver_expenses: Number(
+        removeCommas(data?.driver_expenses as string)
       ),
       arrival_date: data?.arrival_date || "2024-12-26",
       departure_date: data?.arrival_date || "2024-12-26",
-      price_uzs: Number(removeCommas(data?.price_uzs as string)),
+      price: Number(removeCommas(data?.price as string)),
     });
   };
 
@@ -134,7 +134,7 @@ export default function OrderFlightFormInfo() {
             <label className="text-sm font-medium">
               Введите стоимость рейса*
             </label>
-            <CurrencyInputs name="price" />
+            <CurrencyInputWithSelect name="price" />
             {errors?.price_uzs && (
               <p className="text-red-500">{errors?.price_uzs?.message}</p>
             )}
@@ -156,7 +156,7 @@ export default function OrderFlightFormInfo() {
           </div>
           <div className="space-y-2">
             <label className="text-sm font-medium">Расходы водителя*</label>
-            <CurrencyInputs name="driver_expenses" />
+            <CurrencyInputWithSelect name="driver_expenses" />
             {errors?.driver_expenses_uzs && (
               <p className="text-red-500">
                 {errors?.driver_expenses_uzs?.message}

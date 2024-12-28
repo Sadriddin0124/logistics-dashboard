@@ -24,14 +24,17 @@ import { toast } from "react-toastify";
 import { DeleteAlertDialog } from "../ui-items/delete-dialog";
 import { EmployeeFlightTable } from "./employee.flight";
 import { EmployeeExpensesTable } from "./employe-expenses";
+import { FileType } from "@/lib/types/general.types";
+import { FileUploader } from "../ui-items/FileUploader";
 
 interface FormValues {
   full_name: string;
-  license: string;
+  license_photo: string;
+  passport_photo: string;
   phone: string;
   flight_type: string;
-  passport: string;
   balance_uzs: string;
+  bonus?: boolean 
 }
 
 export function areObjectsEqual(obj1: IEmployee, obj2: IEmployee): boolean {
@@ -46,27 +49,38 @@ export function areObjectsEqual(obj1: IEmployee, obj2: IEmployee): boolean {
 export default function EmployeesInfoForm() {
   const router = useRouter();
   const { id } = router?.query;
-  
+
   const { data: employee } = useQuery<IEmployee>({
     queryKey: ["employee"],
     queryFn: () => fetchEmployee(id as string),
   });
-  const { control, handleSubmit, reset, watch, getValues } =
-    useForm<FormValues>({
-      defaultValues: {
-        flight_type: employee?.flight_type
-      }
-    });
+  const {
+    control,
+    handleSubmit,
+    reset,
+    watch,
+    getValues,
+    setValue,
+    formState: { errors },
+  } = useForm<FormValues>({
+    defaultValues: {
+      flight_type: employee?.flight_type,
+    },
+  });
   const [isChanged, setIsChanged] = useState(false);
 
   const balance = watch("balance_uzs");
-  console.log(balance);
-  
+  const [passport, setPassport] = React.useState<FileType | null>(null);
+  const [license, setLicense] = React.useState<FileType | null>(null);
+  React.useEffect(() => {}, [setValue, passport, license]);
+
   useEffect(() => {
+    setValue("license_photo", license?.id as string);
+    setValue("passport_photo", passport?.id as string);
     if (employee) {
       reset(employee);
     }
-  }, [employee, reset]);
+  }, [employee, reset, passport, license, setValue]);
   useEffect(() => {
     const subscription = watch((_, { name, type }) => {
       const currentValues = getValues();
@@ -76,8 +90,6 @@ export default function EmployeesInfoForm() {
         console.log(`${name} changed (${type})`);
       }
     });
-
-    console.log(isChanged);
     return () => subscription.unsubscribe();
   }, [employee, watch, getValues, isChanged]);
   const { mutate: updateMutation } = useMutation({
@@ -150,7 +162,6 @@ export default function EmployeesInfoForm() {
           <Controller
             name="flight_type"
             control={control}
-            
             render={({ field }) => (
               <Select value={field?.value} onValueChange={field.onChange}>
                 <SelectTrigger>
@@ -167,32 +178,62 @@ export default function EmployeesInfoForm() {
           />
         </div>
 
-        <div>
-          <label className="text-sm font-medium mb-2 block">
-            ID водительских прав
-          </label>
-          <Controller
-            name="license"
-            control={control}
-            defaultValue=""
-            render={({ field }) => (
-              <Input {...field} placeholder="Введите..." />
+        <div className="col-span-2 grid grid-cols-2 gap-4">
+          <div>
+            <label className="text-sm font-medium mb-2 block">
+              ID водительских прав
+            </label>
+            <Controller
+              name="license_photo"
+              control={control}
+              rules={{ required: "Требуется номер лицензии" }}
+              render={({ field }) => {
+                console.log(field);
+                return (
+                  <FileUploader
+                    type=".png, .jpg"
+                    image={license as FileType}
+                    setImage={
+                      setLicense as React.Dispatch<
+                        React.SetStateAction<FileType>
+                      >
+                    }
+                  />
+                );
+              }}
+            />
+            {errors.license_photo && (
+              <p className="text-red-500 text-xs">{errors.license_photo.message}</p>
             )}
-          />
-        </div>
+          </div>
 
-        <div>
-          <label className="text-sm font-medium mb-2 block">
-            ID паспорта водителя
-          </label>
-          <Controller
-            name="passport"
-            control={control}
-            defaultValue=""
-            render={({ field }) => (
-              <Input {...field} placeholder="Введите..." />
+          <div>
+            <label className="text-sm font-medium block">
+              ID паспорта водителя
+            </label>
+            <Controller
+              name="passport_photo"
+              rules={{ required: "Требуется номер паспорта" }}
+              control={control}
+              render={({ field }) => {
+                console.log(field);
+                return (
+                  <FileUploader
+                    type=".png, .jpg"
+                    image={passport as FileType}
+                    setImage={
+                      setPassport as React.Dispatch<
+                        React.SetStateAction<FileType>
+                      >
+                    }
+                  />
+                );
+              }}
+            />
+            {errors.passport_photo && (
+              <p className="text-red-500 text-xs">{errors.passport_photo.message}</p>
             )}
-          />
+          </div>
         </div>
         <div className="flex col-span-2 justify-end gap-4 mt-8">
           {!balance && (

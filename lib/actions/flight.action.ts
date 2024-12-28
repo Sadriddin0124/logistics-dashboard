@@ -51,8 +51,8 @@ export const updateOrderedStatus = async (id: string) => {
   return response.data;
 };
 
-export const updateFlight = async (id: string) => {
-  const response = await $api.patch(`/flight/${id}/`, {status: "INACTIVE" });
+export const updateFlight = async (data: {id: string, endKm: number}) => {
+  const response = await $api.patch(`/flight/${data?.id}/`, {end_km: data?.endKm, status: "INACTIVE" });
   return response.data;
 };
 
