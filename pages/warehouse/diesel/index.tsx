@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { FormProvider, useForm } from "react-hook-form";
 import Select, { SingleValue } from "react-select";
-import { CurrencyInputs } from "@/components/ui-items/currency-inputs";
 import {
   IDieselPaginated,
   IDieselType,
@@ -22,6 +21,7 @@ import { removeCommas } from "@/lib/utils";
 import PurchasedDiesel from "@/components/warehouse/diesel/purchased";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import TableSkeleton from "@/components/ui-items/SkeletonTable";
+import CurrencyInputWithSelect from "@/components/ui-items/currencySelect";
 
 
 export interface Option {
@@ -108,7 +108,7 @@ export default function GasManagementForm() {
     // price_usd: Number(removeCommas(data?.price_usd?.toString())),
     createMutation({
       ...data,
-      price_uzs: Number(removeCommas(data?.price_uzs?.toString())),
+      price: Number(removeCommas(data?.price as string)),
     });
   };
   const handleSelectCar = (newValue: SingleValue<Option>) => {
@@ -150,7 +150,7 @@ export default function GasManagementForm() {
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-sm">Цена на cаларка (литр)</label>
-                  <CurrencyInputs name="price" />
+                  <CurrencyInputWithSelect name="price" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm">

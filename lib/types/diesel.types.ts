@@ -3,14 +3,14 @@ import { PaginationResponse } from "./gas_station.types";
 
 export interface IDieselType {
   volume: string;
-  price_usd: number;
+  price: number | string;
   price_uzs: number;
   car: string;
   remaining_volume?: string;
 }
 export interface IDieselTypeForPagination {
   volume: string;
-  price_usd: number;
+  price: number;
   price_uzs: number;
   car: ICars;
   remaining_volume?: {volume: number};
