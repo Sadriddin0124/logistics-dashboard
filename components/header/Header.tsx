@@ -1,11 +1,13 @@
 "use client";
 
-import { Dispatch, SetStateAction} from "react";
+import { Dispatch, SetStateAction } from "react";
 // import { PasswordChangeDialog } from "./auth/change-password";
 import Breadcrumb from "../ui-items/BreadCrumb";
 import { SidebarTrigger } from "../ui/sidebar";
 import { Menu } from "lucide-react";
 import NotificationsPopover from "./notifications";
+import { Switch } from "../ui/switch";
+import { useStringContext } from "../ui-items/CurrencyProvider";
 export default function Header({
   setSideBar,
   sideBar,
@@ -14,7 +16,7 @@ export default function Header({
   sideBar: boolean;
 }) {
   // const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
-
+  const { currencyStatus, setCurrencyStatus } = useStringContext();
   return (
     <header className="bg-white shadow-sm w-full">
       {/* <PasswordChangeDialog setIsDialogOpen={setIsDialogOpen} isDialogOpen={isDialogOpen}/> */}
@@ -31,8 +33,19 @@ export default function Header({
           </div>
           <Breadcrumb />
         </div>
-        <NotificationsPopover/>
-        
+        <div className="flex gap-3 items-center">
+          <Switch
+            checked={currencyStatus}
+            onCheckedChange={() => {
+              localStorage.setItem(
+                "currencyStatus",
+                (!currencyStatus).toString()
+              );
+              setCurrencyStatus(!currencyStatus);
+            }}
+          />
+          <NotificationsPopover />
+        </div>
       </div>
     </header>
   );

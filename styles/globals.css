@@ -114,3 +114,13 @@ input[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
+.expandable-text {
+  max-height: 20px; /* Initial height */
+  overflow: hidden;
+  transition: max-height 0.2s ease-in-out;
+}
+
+.expandable-text:hover {
+  max-height: 200px; /* Adjust to fit the content */
+}

@@ -23,6 +23,10 @@ import { useQuery } from "@tanstack/react-query";
 import { ExchangeRate } from "@/lib/types/general.types";
 import { getExchangeRate } from "@/lib/actions/general";
 import { CurrencyStatus } from "./currency-status";
+import CustomCurrency from "./custom-currency";
+import { useStringContext } from "./CurrencyProvider";
+import Logo from "@/public/images/logo.webp"
+import Image from "next/image";
 
 type MenuItem = {
   id?: string;
@@ -155,6 +159,7 @@ export const AppSidebar: React.FC<SideBarProps> = ({
     localStorage.removeItem("accessToken");
     push("/login");
   };
+  const { currencyStatus } = useStringContext();
   return (
     <aside className="fixed top-0 left-0 h-full z-50">
       <Sidebar
@@ -171,8 +176,8 @@ export const AppSidebar: React.FC<SideBarProps> = ({
           <div className="bg-white shadow-lg w-full h-full justify-start flex flex-col gap-1">
             <div className="flex w-full mb-3 justify-start py-3 px-6 items-center gap-[90px]">
               <div className="text-[20px] font-[800] flex items-center">
-                <span className="text-[#4880FF]">Logi</span>
-                <span>Track</span>
+                <Image src={Logo} alt="logo" width={100} height={100}/>
+                {/* <span>Track</span> */}
               </div>
               <div
                 className="relative py-2  w-12 h-8 rounded-md px-3 hover:bg-slate-100 ease-linear duration-200"
@@ -206,21 +211,27 @@ export const AppSidebar: React.FC<SideBarProps> = ({
                 </div>
               );
             })}
-            <div className="h-full flex flex-col items-end justify-end gap-2 p-6">
-              {EXCHANGE_RATE?.map((rate, index) => (
-                <CurrencyStatus
-                  key={index}
-                  currency={rate?.Ccy as string}
-                  value={rate?.Rate as string}
-                  change={rate?.Diff as string}
-                />
-              ))}
-              <Button
-                onClick={logOut}
-                className="w-full mt-10 bg-[#4880FF] text-white ml-3 hover:bg-blue-600"
-              >
-                Выйти
-              </Button>
+            <div className="h-full flex flex-col items-end justify-end p-6 gap-2">
+              {currencyStatus ? (
+                <CustomCurrency />
+              ) : (
+                EXCHANGE_RATE?.map((rate, index) => (
+                  <CurrencyStatus
+                    key={index}
+                    currency={rate?.Ccy as string}
+                    value={rate?.Rate as string}
+                    change={rate?.Diff as string}
+                  />
+                ))
+              )}
+              <div className="flex justify-center w-full">
+                <Button
+                  onClick={logOut}
+                  className="w-full bg-[#4880FF] text-white hover:bg-blue-600"
+                >
+                  Выйти
+                </Button>
+              </div>
             </div>
           </div>
           {subItemStatus && (

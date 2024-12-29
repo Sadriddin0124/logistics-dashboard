@@ -32,7 +32,7 @@ const CurrencyInputWithSelect: React.FC<CurrencyInputWithSelectProps> = ({
     queryKey: ["exchangeRates"],
     queryFn: getExchangeRate,
   });
-  const {value, setSelectedCurrency} = useStringContext()
+  const {value, setSelectedCurrency, dollar, ruble, tenge, currencyStatus } = useStringContext()
   const {
     register,
     watch,
@@ -55,24 +55,31 @@ const CurrencyInputWithSelect: React.FC<CurrencyInputWithSelectProps> = ({
     if (exchangeRatesMap && inputValue) {
       const parsedInput = parseAndValidateNumber(inputValue);
       if (parsedInput !== null) {
-        const usdRate = exchangeRatesMap["USD"];
-        const rubRate = exchangeRatesMap["RUB"];
-        const kztRate = exchangeRatesMap["KZT"];
-
+        const usdRate = currencyStatus ? Number(dollar) : exchangeRatesMap["USD"] ?? 1;
+        const rubRate = currencyStatus ? Number(ruble) : exchangeRatesMap["RUB"] ?? 1;
+        const kztRate = currencyStatus ? Number(tenge) : exchangeRatesMap["KZT"] ?? 1;
+  
         const convertedValue =
           value === "USD"
             ? parsedInput
             : value === "RUB"
             ? parsedInput * (rubRate / usdRate)
             : parsedInput * (kztRate / usdRate);
-
-        setValue(`${name}_uzs`, convertedValue);
-        setValue(`${name}_type`, value);
-        
+  
+        // Check if the current value in the form is different before setting it
+        const currentUZS = watch(`${name}_uzs`);
+        if (currentUZS !== convertedValue) {
+          setValue(`${name}_uzs`, convertedValue, { shouldValidate: true });
+        }
+  
+        const currentType = watch(`${name}_type`);
+        if (currentType !== value) {
+          setValue(`${name}_type`, value, { shouldValidate: true });
+        }
       }
     }
-  }, [inputValue, value, exchangeRatesMap, setValue, name]);
-
+  }, [inputValue, value, exchangeRatesMap, setValue, watch, name, currencyStatus, dollar, ruble, tenge]);
+  
   return (
     <div className="flex gap-2 items-start">
       <div className="flex flex-col gap-2 w-full relative">

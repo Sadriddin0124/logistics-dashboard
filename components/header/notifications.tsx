@@ -1,19 +1,27 @@
-"use client"
+"use client";
 
-import { Bell, Check } from 'lucide-react'
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { useMutation, useQuery } from '@tanstack/react-query'
-import { fetchNotification, patchNotification } from '@/lib/actions/notification.action'
-import { queryClient } from '../ui-items/ReactQueryProvider'
-import { toast } from 'react-toastify'
+import { Bell, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  fetchNotification,
+  patchNotification,
+} from "@/lib/actions/notification.action";
+import { queryClient } from "../ui-items/ReactQueryProvider";
+import { toast } from "react-toastify";
+// import { useState } from 'react'
 
 interface Notification {
-  id?: string
-  message: string
-  created_at: string
-  is_read: boolean
+  id?: string;
+  message: string;
+  created_at: string;
+  is_read: boolean;
 }
 
 export default function NotificationsPopover() {
@@ -22,7 +30,8 @@ export default function NotificationsPopover() {
     queryFn: fetchNotification,
   });
 
-  const unreadCount = notification?.filter((n) => !n.is_read).length
+  const unreadCount = notification?.filter((n) => !n.is_read).length;
+  // const [status, setStatus] = useState(false)
   const { mutate: updateMutation } = useMutation({
     mutationFn: patchNotification,
     onSuccess: () => {
@@ -33,17 +42,20 @@ export default function NotificationsPopover() {
     },
   });
   const markAsRead = (id: string) => {
-    updateMutation(id)
-  }
+    updateMutation(id);
+  };
 
   const calculateTimeAgo = (createdAt: string) => {
     const createdDate = new Date(createdAt);
     const now = new Date();
-    const difference = Math.floor((now.getTime() - createdDate.getTime()) / 1000); // in seconds
+    const difference = Math.floor(
+      (now.getTime() - createdDate.getTime()) / 1000
+    ); // in seconds
 
     if (difference < 60) return "Прямо сейчас";
     if (difference < 3600) return `${Math.floor(difference / 60)} минут назад`;
-    if (difference < 86400) return `${Math.floor(difference / 3600)}часов назад`;
+    if (difference < 86400)
+      return `${Math.floor(difference / 3600)} часов назад`;
     return createdDate.toLocaleDateString(); // Format as date
   };
 
@@ -72,8 +84,12 @@ export default function NotificationsPopover() {
                   className="flex items-start gap-2 px-2 py-2 hover:bg-gray-50 rounded-md cursor-pointer"
                 >
                   <div className="flex-1">
-                    <p className="text-sm font-medium">{notification.message}</p>
-                    <p className="text-xs text-muted-foreground">{calculateTimeAgo(notification?.created_at)}</p>
+                    <p className="text-sm font-medium expandable-text">
+                      {notification.message}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {calculateTimeAgo(notification?.created_at)}
+                    </p>
                   </div>
                   <Button
                     variant="ghost"
@@ -93,5 +109,5 @@ export default function NotificationsPopover() {
         </Card>
       </PopoverContent>
     </Popover>
-  )
+  );
 }
