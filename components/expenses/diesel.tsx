@@ -155,7 +155,7 @@ export default function DieselExpense() {
                 )}
               <div className="space-y-2">
                 <label className="text-sm font-medium">
-                Введите количество дизельного топлива*
+                Стартовая дистанция*
                 </label>
                 <Input {...register("km", {required: "Обязательно указывается количество дизельного топлива.", valueAsNumber: true})} />
               </div>
@@ -164,7 +164,7 @@ export default function DieselExpense() {
                 )}
               <div className="space-y-2">
                 <label className="text-sm font-medium">
-                Введите количество дизельного топлива*
+                Финишное расстояние*
                 </label>
                 <Input {...register("km_car", {required: "Обязательно указывается количество дизельного топлива.", valueAsNumber: true})} />
               </div>
