@@ -109,6 +109,9 @@ export default function FlightInfoForm() {
         id: flight?.upload?.id || "",
         file: flight?.upload?.file || "",
       });
+      setValue("region", typeof flight?.region === "object" && "id" in flight.region
+        ? (flight?.region?.id as string)
+        : "")
     }
   }, [flight, reset, setValue]);
 
@@ -220,11 +223,6 @@ export default function FlightInfoForm() {
             <div className="space-y-2">
               <label className="text-sm font-medium">Выберите область*</label>
               <Selector
-                value={
-                  typeof flight?.region === "object" && "id" in flight.region
-                    ? (flight?.region?.id as string)
-                    : ""
-                }
                 onValueChange={(value) => handleSelectChange(value, "region")}
               >
                 <SelectTrigger>

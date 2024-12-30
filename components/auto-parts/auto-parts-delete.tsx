@@ -93,6 +93,7 @@ export function AutoPartsDelete({
             </div>
             <Button
               type="submit"
+              disabled={id.length > 0 ? false : true}
               className="bg-blue-500 text-white hover:bg-blue-600 w-full rounded-md"
             >
               Утилизировать

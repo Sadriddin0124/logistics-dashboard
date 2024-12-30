@@ -130,7 +130,7 @@ export default function DieselFill() {
               <label className="text-sm">
                 Оставшееся количество cаларка (литр)
               </label>
-              <Input readOnly placeholder="0" value={diesel_volume?.volume as number} />
+              <Input readOnly placeholder="0" className="bg-muted" value={diesel_volume?.volume as number} />
             </div>
           </div>
         </CardContent>
