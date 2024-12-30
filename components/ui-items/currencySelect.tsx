@@ -80,7 +80,9 @@ const CurrencyInputWithSelect: React.FC<CurrencyInputWithSelectProps> = ({
             ? parsedInput
             : selectedCurrency === "RUB"
             ? parsedInput * (rubRate / usdRate)
-            : parsedInput * (kztRate / usdRate);
+            : selectedCurrency === "KZT"
+            ? parsedInput * (kztRate / usdRate)
+            : parsedInput / usdRate;
 
         // Check if the current value in the form is different before setting it
         const currentUZS = watch(`${name}_uzs`);
@@ -171,6 +173,7 @@ const CurrencyInputWithSelect: React.FC<CurrencyInputWithSelectProps> = ({
           <option value="USD">Доллар</option>
           <option value="RUB">Рубль</option>
           <option value="KZT">Тенге</option>
+          <option value="UZS">Сум</option>
         </select>
       </div>
     </div>
