@@ -200,6 +200,7 @@ export default function Expenses() {
         </TableHeader>
         <TableBody>
           {financeList?.results?.map((finance, index) => (
+            finance?.amount_uzs &&
             <TableRow key={index} className="border-b border-gray-200">
               <TableCell className="px-5">
                 {finance.action?.toLowerCase() === "outcome"
@@ -209,7 +210,7 @@ export default function Expenses() {
               <TableCell className="px-5">
                 {handleChange(finance?.kind as string) || "-"}
               </TableCell>
-              <TableCell className="px-5">{finance.amount_uzs} $</TableCell>
+              <TableCell className="px-5">{(finance.amount_uzs as number).toFixed(2)} $</TableCell>
               <TableCell className="px-5">
                 <span className="line-clamp-1 overflow-hidden">
                   {finance.comment}
