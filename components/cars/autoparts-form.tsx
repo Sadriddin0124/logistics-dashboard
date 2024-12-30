@@ -23,14 +23,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { formatNumberWithCommas } from "../ui-items/currency-inputs";
 import { Skeleton } from "../ui/skeleton";
+import CurrencyInputWithSelect from "../ui-items/currencySelect";
 interface FormValues {
   id?: string;
   name: string;
   id_detail: string;
   in_sklad: boolean;
-  price_uzs: string;
+  price_uzs: number;
+  price?: string;
 }
 
 export function AutoPartsForm() {
@@ -83,7 +84,8 @@ export function AutoPartsForm() {
             name: detail.name,
             in_sklad: detail?.in_sklad,
             id_detail: detail.id_detail,
-            price_uzs: String(detail.price_uzs),
+            price_uzs: detail.price_uzs,
+            price: String(detail.price),
           });
         }
       });
@@ -107,7 +109,7 @@ export function AutoPartsForm() {
   const onSubmit = (data: { parts: FormValues[] }) => {
     const formData = data.parts.map((item) => ({
       ...item,
-      price_uzs: Number(removeCommas(item?.price_uzs)),
+      price: Number(removeCommas(item?.price as string)),
       car: id as string,
     }));
     createMutation(formData);
@@ -121,7 +123,7 @@ export function AutoPartsForm() {
     return (
       lastField?.id_detail?.trim() &&
       lastField?.name?.trim() &&
-      lastField?.price_uzs?.trim()
+      lastField?.price?.trim()
     );
   };
   const handleDelete = (item: FormValues, index: number) => {
@@ -259,7 +261,8 @@ export function AutoPartsForm() {
                   </div>
                   <div className="flex-1">
                     <label className="text-sm mb-2 block">Цена</label>
-                    <Input
+                    <CurrencyInputWithSelect name={`parts.${index}.price`}/>
+                    {/* <Input
                       {...register(`parts.${index}.price_uzs`)}
                       placeholder="Цена..."
                       onInput={(e) => {
@@ -278,7 +281,7 @@ export function AutoPartsForm() {
                             formatNumberWithCommas(parsedValue);
                         }
                       }}
-                    />
+                    /> */}
                   </div>
 
                   <div className=" self-end">
@@ -334,7 +337,7 @@ export function AutoPartsForm() {
                     append({
                       name: "",
                       id_detail: "",
-                      price_uzs: "",
+                      price_uzs: 0,
                       in_sklad: false,
                     });
                   }}

@@ -91,7 +91,7 @@ export default function AutoPartsTable({ setSelectedParts, selectedParts }: { se
               </TableCell>
               <TableCell>{part.name}</TableCell>
               <TableCell>{part.car?.name}</TableCell>
-              <TableCell>{part?.price_uzs} сум</TableCell>
+              <TableCell>{part?.price_uzs} $</TableCell>
               <TableCell>{part?.id_detail}</TableCell>
               <TableCell>{part?.in_sklad ? "В Склате" : "Не в Склате"}</TableCell>
             </TableRow>

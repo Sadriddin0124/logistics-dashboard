@@ -84,7 +84,7 @@ export default function UtilizedOilTable() {
             <TableRow key={utilized.id} className="border-b border-gray-200">
               <TableCell>{index + 1}</TableCell>
               <TableCell>
-                {splitToHundreds(Number(utilized.price_uzs))} сум
+                {splitToHundreds(Number(utilized.price_uzs))} $
               </TableCell>
               <TableCell>{utilized?.quantity_utilized} литр</TableCell>
               <TableCell>

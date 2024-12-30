@@ -8,13 +8,14 @@ import { toast } from "react-toastify";
 import { useMutation } from "@tanstack/react-query";
 import { Input } from "../ui/input";
 import { removeCommas } from "@/lib/utils";
-import { formatNumberWithCommas } from "../ui-items/currency-inputs";
 import { Checkbox } from "../ui/checkbox";
+import CurrencyInputWithSelect from "../ui-items/currencySelect";
 interface FormValues {
   id?: string;
   name: string;
   id_detail: string;
-  price_uzs: string;
+  price_uzs: number;
+  price?: string;
   in_sklad: boolean;
 }
 
@@ -25,7 +26,7 @@ export function OldPartsForm() {
         {
           name: "",
           id_detail: "",
-          price_uzs: "",
+          price: "",
           in_sklad: false,
         },
       ],
@@ -66,7 +67,7 @@ export function OldPartsForm() {
   const onSubmit = (data: { parts: FormValues[] }) => {
     const formData = data.parts.map((item) => ({
       ...item,
-      price_uzs: Number(removeCommas(item?.price_uzs)),
+      price: Number(removeCommas(item?.price as string)),
       car: id as string,
     }));
     console.log(data?.parts);
@@ -81,7 +82,7 @@ export function OldPartsForm() {
     return (
       lastField?.id_detail?.trim() &&
       lastField?.name?.trim() &&
-      lastField?.price_uzs?.trim()
+      lastField?.price?.trim()
     );
   };
 
@@ -120,7 +121,8 @@ export function OldPartsForm() {
                 </div>
                 <div className="flex-1">
                   <label className="text-sm mb-2 block">Цена</label>
-                  <Input
+                  <CurrencyInputWithSelect name={`parts.${index}.price`}/>
+                  {/* <Input
                     {...register(`parts.${index}.price_uzs`)}
                     placeholder="Цена..."
                     onInput={(e) => {
@@ -136,7 +138,7 @@ export function OldPartsForm() {
                           formatNumberWithCommas(parsedValue);
                       }
                     }}
-                  />
+                  /> */}
                 </div>
                 <div className="flex justify-between">
                   <div className="space-y-2 flex flex-col">
@@ -177,7 +179,8 @@ export function OldPartsForm() {
                   append({
                     name: "",
                     id_detail: "",
-                    price_uzs: "",
+                    price: "",
+                    price_uzs: 0,
                     in_sklad: false,
                   });
                 }}

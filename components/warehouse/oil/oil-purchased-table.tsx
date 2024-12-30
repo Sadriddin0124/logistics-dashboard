@@ -86,11 +86,11 @@ export default function PurchasedOilTable() {
             <TableRow key={purchased.id} className="border-b border-gray-200">
               <TableCell>{index + 1}</TableCell>
               <TableCell>
-                {splitToHundreds(Number(purchased.amount_uzs))} сум
+                {splitToHundreds(Number(purchased.amount_uzs))} $
               </TableCell>
               <TableCell>{purchased.oil_volume} литр</TableCell>
               <TableCell>
-                {splitToHundreds(Number(purchased.price_uzs ))} сум
+                {splitToHundreds(Number(purchased.price_uzs ))} $
               </TableCell>
               <TableCell>
                 {formatDate(purchased.created_at as string, "/")}

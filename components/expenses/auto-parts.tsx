@@ -1,8 +1,8 @@
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "../ui/input";
-import { formatNumberWithCommas } from "../ui-items/currency-inputs";
 import { Checkbox } from "../ui/checkbox";
+import CurrencyInputWithSelect from "../ui-items/currencySelect";
 
 export function AutoPartsExpense() {
   const { control, register, setValue, watch } = useFormContext();
@@ -17,8 +17,7 @@ export function AutoPartsExpense() {
     const lastField = watchedFields?.[watchedFields.length - 1];
     return (
       lastField?.name?.trim() &&
-      lastField?.id_detail?.trim() &&
-      lastField?.price_uzs?.trim()
+      lastField?.id_detail?.trim()
     );
   };
   console.log(fields.length);
@@ -45,21 +44,7 @@ export function AutoPartsExpense() {
           </div>
           <div className="space-y-2">
             <label>Цена</label>
-            <Input
-              {...register(`parts.${index}.price_uzs`)}
-              placeholder="Цена..."
-              onInput={(e) => {
-                const rawValue = e.currentTarget.value.replace(/,/g, "");
-
-                if (rawValue === "0") {
-                  // If the user types 0, allow it without formatting
-                  e.currentTarget.value = "0";
-                } else {
-                  const parsedValue = parseFloat(rawValue);
-                  // Apply formatting if it's not 0
-                  e.currentTarget.value = formatNumberWithCommas(parsedValue);
-                }
-              }}
+            <CurrencyInputWithSelect name="price"
             />
           </div>
           <div className="flex justify-between w-full">
@@ -91,7 +76,8 @@ export function AutoPartsExpense() {
           append({
             name: "",
             id_detail: "",
-            price_uzs: "",
+            price_uzs: 0,
+            price: "",
             in_sklad: false,
           })
         }

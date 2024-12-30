@@ -86,7 +86,7 @@ export default function SalesGasTable() {
               <TableCell>{index + 1}</TableCell>
               <TableCell>{sales?.car?.name}</TableCell>
               <TableCell>{sales?.station?.name}</TableCell>
-              <TableCell>{formatDate(sales?.created_at as string, "/")} сум</TableCell>
+              <TableCell>{formatDate(sales?.created_at as string, "/")} $</TableCell>
               <TableCell>{sales?.amount?.toFixed(2)}</TableCell>
             </TableRow>
           ))}

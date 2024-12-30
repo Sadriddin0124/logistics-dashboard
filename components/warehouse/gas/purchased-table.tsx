@@ -76,10 +76,10 @@ const buttons = getPaginationButtons();
           {purchased?.results?.map((purchased, index) => (
             <TableRow key={purchased.id}  className='border-b border-gray-200'>
               <TableCell>{index + 1}</TableCell>
-              <TableCell>{purchased.payed_price_uzs} сум</TableCell>
+              <TableCell>{purchased.payed_price_uzs} $</TableCell>
               <TableCell>{purchased?.amount?.toFixed(2)}</TableCell>
               <TableCell>{formatDate(purchased?.created_at as string, "/")}</TableCell>
-              <TableCell>{purchased.price_uzs} сум</TableCell>
+              <TableCell>{purchased.price_uzs} $</TableCell>
               <TableCell>
                 <Button variant="secondary" size="sm" className='bg-green-100 text-green-400'>
                 Куплено

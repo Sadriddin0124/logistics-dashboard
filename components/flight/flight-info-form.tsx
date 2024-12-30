@@ -131,17 +131,33 @@ export default function FlightInfoForm() {
       regionId = flight.region.id;
     }
     console.log(data);
-    
+
     createMutation({
       ...data,
       id: id as string,
       region: regionId as string,
       car: selectedCar?.value as string,
       upload: image.id,
-      price: data?.price != null ? (typeof data.price === "string" ? Number(removeCommas(data.price)) : data.price) : undefined,
-      flight_expenses: typeof data?.flight_expenses === "string" ? Number(removeCommas(data?.flight_expenses as string)) : data?.flight_expenses,
-      other_expenses: typeof data?.other_expenses === "string" ? Number(removeCommas(data?.other_expenses as string)) : data?.other_expenses,
-      driver_expenses: data?.driver_expenses != null ? (typeof data?.driver_expenses === "string" ? Number(removeCommas(data?.driver_expenses as string)) : data?.driver_expenses) : undefined,
+      price:
+        data?.price != null
+          ? typeof data.price === "string"
+            ? Number(removeCommas(data.price))
+            : data.price
+          : undefined,
+      flight_expenses:
+        typeof data?.flight_expenses === "string"
+          ? Number(removeCommas(data?.flight_expenses as string))
+          : data?.flight_expenses,
+      other_expenses:
+        typeof data?.other_expenses === "string"
+          ? Number(removeCommas(data?.other_expenses as string))
+          : data?.other_expenses,
+      driver_expenses:
+        data?.driver_expenses != null
+          ? typeof data?.driver_expenses === "string"
+            ? Number(removeCommas(data?.driver_expenses as string))
+            : data?.driver_expenses
+          : undefined,
     });
   };
 
@@ -158,159 +174,168 @@ export default function FlightInfoForm() {
     setValue("driver", newValue?.value || "");
   };
   return (
-    <FormProvider {...methods}>
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="space-y-6 w-full container mx-auto mt-8 bg-white p-12 rounded-2xl"
-      >
-        <div className="grid grid-cols-2 gap-6">
-          {/* Region Selection */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Выберите регион*</label>
-            <Selector
-              value={flight?.flight_type || ""}
-              onValueChange={(value) =>
-                handleSelectChange(value, "flight_type")
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Выберите..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="OUT">За территории Узбекистана</SelectItem>
-                <SelectItem value="IN_UZB">
-                  На территории Узбекистана.
-                </SelectItem>
-              </SelectContent>
-            </Selector>
-          </div>
-
-          {/* Car Selection */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Выберите автомобиль*</label>
-            <Select
-              options={carOptions}
-              value={selectedCar}
-              onChange={handleSelectCar}
-              placeholder={"Isuzu 01A111AA"}
-              noOptionsMessage={() => "Не найдено"}
-            />
-          </div>
-
-          {/* City Selection */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Выберите область*</label>
-            <Selector
-              value={
-                typeof flight?.region === "object" && "id" in flight.region
-                  ? (flight?.region?.id as string)
-                  : ""
-              }
-              onValueChange={(value) => handleSelectChange(value, "region")}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Выберите..." />
-              </SelectTrigger>
-              <SelectContent>
-                {regions
-                  ?.filter((item) => item?.flight_type === flight_type)
-                  ?.map((region) => (
-                    <SelectItem key={region.id} value={region.id as string}>
-                      {region.name}
-                    </SelectItem>
-                  ))}
-              </SelectContent>
-            </Selector>
-          </div>
-
-          {/* Driver Selection */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Выберите водителя*</label>
-            <Select
-              {...register("driver", {
-                required: "Это значение является обязательным",
-              })}
-              options={driverOptions}
-              value={selectedDriver}
-              onChange={handleSelectDriver}
-              placeholder={"Выберите водителя"}
-              noOptionsMessage={() => "Не найдено"}
-            />
-            {errors?.driver && (
-              <p className="text-red-500">{errors?.driver?.message}</p>
-            )}
-          </div>
-
-          {/* Route Selection */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Маршрут*</label>
-            <Selector
-              value={flight?.route || ""}
-              onValueChange={(value) => handleSelectChange(value, "route")}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Выберите..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={"GONE_TO"}>Иду</SelectItem>
-                <SelectItem value={"BEEN_TO"}>Прихожу</SelectItem>
-              </SelectContent>
-            </Selector>
-          </div>
-
-          {/* Trip Price */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">
-              Введите стоимость рейса*
-            </label>
-            <CurrencyInputWithSelect name="price" />
-          </div>
-
-          {/* Departure Date */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Введите дату отъезда*</label>
-            <Input
-              type="date"
-              placeholder="Введите дату"
-              {...register("departure_date", { required: true })}
-            />
-          </div>
-
-          {/* Spending */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Расходы водителя*</label>
-            <CurrencyInputWithSelect name="driver_expenses" />
-          </div>
-
-          {/* Arrival Date */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">
-              Введите дату прибытия*
-            </label>
-            <Input
-              type="date"
-              placeholder="Введите дату"
-              {...register("arrival_date", { required: true })}
-            />
-          </div>
-          {flight_type === "OUT" && (
+    <div className="mt-8 bg-white p-12 rounded-2xl">
+      <FormProvider {...methods}>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="space-y-6 w-full container mx-auto"
+        >
+          <div className="grid grid-cols-2 gap-6">
+            {/* Region Selection */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">Расход на питание</label>
-              <CurrencyInputWithSelect name="other_expenses" />
+              <label className="text-sm font-medium">Выберите регион*</label>
+              <Selector
+                value={flight?.flight_type || ""}
+                onValueChange={(value) =>
+                  handleSelectChange(value, "flight_type")
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Выберите..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="OUT">За территории Узбекистана</SelectItem>
+                  <SelectItem value="IN_UZB">
+                    На территории Узбекистана.
+                  </SelectItem>
+                </SelectContent>
+              </Selector>
             </div>
-          )}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Расходы на Рейс*</label>
-            <CurrencyInputWithSelect name="flight_expenses" />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Баланс Рейса</label>
-            <Input value={flight?.flight_balance} className="bg-muted" readOnly/>
-          </div>
-        </div>
 
-        {/* Cargo Information */}
-        {/* <div className="space-y-2">
+            {/* Car Selection */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">
+                Выберите автомобиль*
+              </label>
+              <Select
+                options={carOptions}
+                value={selectedCar}
+                onChange={handleSelectCar}
+                placeholder={"Isuzu 01A111AA"}
+                noOptionsMessage={() => "Не найдено"}
+              />
+            </div>
+
+            {/* City Selection */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Выберите область*</label>
+              <Selector
+                value={
+                  typeof flight?.region === "object" && "id" in flight.region
+                    ? (flight?.region?.id as string)
+                    : ""
+                }
+                onValueChange={(value) => handleSelectChange(value, "region")}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Выберите..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {regions
+                    ?.filter((item) => item?.flight_type === flight_type)
+                    ?.map((region) => (
+                      <SelectItem key={region.id} value={region.id as string}>
+                        {region.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Selector>
+            </div>
+
+            {/* Driver Selection */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Выберите водителя*</label>
+              <Select
+                {...register("driver", {
+                  required: "Это значение является обязательным",
+                })}
+                options={driverOptions}
+                value={selectedDriver}
+                onChange={handleSelectDriver}
+                placeholder={"Выберите водителя"}
+                noOptionsMessage={() => "Не найдено"}
+              />
+              {errors?.driver && (
+                <p className="text-red-500">{errors?.driver?.message}</p>
+              )}
+            </div>
+
+            {/* Route Selection */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Маршрут*</label>
+              <Selector
+                value={flight?.route || ""}
+                onValueChange={(value) => handleSelectChange(value, "route")}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Выберите..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={"GONE_TO"}>Иду</SelectItem>
+                  <SelectItem value={"BEEN_TO"}>Прихожу</SelectItem>
+                </SelectContent>
+              </Selector>
+            </div>
+
+            {/* Trip Price */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">
+                Введите стоимость рейса*
+              </label>
+              <CurrencyInputWithSelect name="price" />
+            </div>
+
+            {/* Departure Date */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">
+                Введите дату отъезда*
+              </label>
+              <Input
+                type="date"
+                placeholder="Введите дату"
+                {...register("departure_date", { required: true })}
+              />
+            </div>
+
+            {/* Spending */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Расходы водителя*</label>
+              <CurrencyInputWithSelect name="driver_expenses" />
+            </div>
+
+            {/* Arrival Date */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">
+                Введите дату прибытия*
+              </label>
+              <Input
+                type="date"
+                placeholder="Введите дату"
+                {...register("arrival_date", { required: true })}
+              />
+            </div>
+            {flight_type === "OUT" && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Расход на питание</label>
+                <CurrencyInputWithSelect name="other_expenses" />
+              </div>
+            )}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Расходы на Рейс*</label>
+              <CurrencyInputWithSelect name="flight_expenses" />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Баланс Рейса</label>
+              <Input
+                value={flight?.flight_balance}
+                className="bg-muted"
+                readOnly
+              />
+            </div>
+          </div>
+
+          {/* Cargo Information */}
+          {/* <div className="space-y-2">
           <label className="text-sm font-medium">Информация о грузе</label>
           <Textarea
             placeholder="Введите информацию о грузе"
@@ -319,24 +344,31 @@ export default function FlightInfoForm() {
           />
         </div> */}
 
-        {/* Expenses */}
-        {region !== "IN_UZB" && (
-          <div className="grid grid-cols-2 gap-6">
-            <FileUploader image={image} setImage={setImage} type=".xlsx" />
-          </div>
-        )}
-        <div className="w-full flex justify-end gap-6">
-          {flight && (
-            <EndFlight id={id as string} driver={driver as IEmployee} />
+          {/* Expenses */}
+          {region !== "IN_UZB" && (
+            <div className="grid grid-cols-2 gap-6">
+              <FileUploader image={image} setImage={setImage} type=".xlsx" />
+            </div>
           )}
-          <Button
-            type="submit"
-            className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded-md"
-          >
-            Сохранить
-          </Button>
-        </div>
-      </form>
-    </FormProvider>
+          <div className="w-full flex justify-end gap-6">
+            <Button
+              type="submit"
+              className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded-md"
+            >
+              Сохранить
+            </Button>
+          </div>
+        </form>
+      </FormProvider>
+      <div className="w-full flex justify-end gap-6 mt-3">
+        {flight && (
+          <EndFlight
+            id={id as string}
+            balance={flight?.flight_balance}
+            driver={driver as IEmployee}
+          />
+        )}
+      </div>
+    </div>
   );
 }

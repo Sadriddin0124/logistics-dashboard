@@ -50,11 +50,11 @@ export function CarCard({
         </div>
         <div className="flex justify-between w-full">
           <div className="text-md font-medium">Баланс лизинга</div> {/* Translation: "Leasing Balance" */}
-          <div>{splitToHundreds(item?.price_uzs as number) || 0} сум</div>
+          <div>{splitToHundreds(item?.price_uzs as number) || 0} $</div>
         </div>
         <div className="flex justify-between w-full">
           <div className="text-md font-medium">Оплаченный лизинг</div> {/* Translation: "Paid leasing" */}
-          <div>{splitToHundreds(item?.leasing_payed_amount) || 0} сум</div>
+          <div>{splitToHundreds(item?.leasing_payed_amount) || 0} $</div>
         </div>
         <div className="flex justify-between w-full">
           <div className="text-md font-medium">Пробег</div> {/* Translation: "Paid leasing" */}

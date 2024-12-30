@@ -14,6 +14,8 @@ import { updateEmployeeBalance } from "@/lib/actions/employees.action";
 interface EndFlightProps {
   id: string;
   driver: IEmployee
+  balance: number;
+
 }
 
 interface EndFlightForm {
@@ -21,7 +23,7 @@ interface EndFlightForm {
   balance: number;
 }
 
-const EndFlight: React.FC<EndFlightProps> = ({ id, driver }) => {
+const EndFlight: React.FC<EndFlightProps> = ({ id, driver, balance }) => {
   const [open, setOpen] = React.useState(false);
   const { push } = useRouter();
 
@@ -39,8 +41,8 @@ const EndFlight: React.FC<EndFlightProps> = ({ id, driver }) => {
   });
 
   useEffect(()=> {
-   setValue("balance", Number(driver?.balance_uzs))
-  },[setValue, driver?.balance_uzs])
+   setValue("balance", balance)
+  },[setValue, balance])
 
   const { mutate: updateMutation } = useMutation({
     mutationFn: updateFlight,
@@ -66,10 +68,12 @@ const EndFlight: React.FC<EndFlightProps> = ({ id, driver }) => {
       toast.error("Ошибка при завершении рейса!");
     },
   });
+  console.log(balance, driver?.balance_uzs);
+  
 
   const onSubmit = (data: EndFlightForm) => {
     updateMutation({ id, endKm: data?.endKm });
-    changeMutation({ id: driver?.id as string, balance_usz: data?.balance + Number(driver?.balance_uzs) });
+    changeMutation({ id: driver?.id as string, balance_usz: Number(data?.balance) + Number(driver?.balance_uzs) });
   };
 
   return (

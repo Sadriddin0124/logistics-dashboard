@@ -87,7 +87,7 @@ export function RouteLog() {
               <TableCell>{i + 1}</TableCell>
               <TableCell>{route?.driver?.full_name}</TableCell>
               <TableCell>
-                {route.price_uzs} сум
+                {route.price_uzs} $
               </TableCell>
               <TableCell>{formatDate(route?.departure_date as string, "/")}</TableCell>
               <TableCell>{formatDate(route?.arrival_date as string, "/")}</TableCell>

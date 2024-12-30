@@ -25,8 +25,9 @@ import { getExchangeRate } from "@/lib/actions/general";
 import { CurrencyStatus } from "./currency-status";
 import CustomCurrency from "./custom-currency";
 import { useStringContext } from "./CurrencyProvider";
-import Logo from "@/public/images/logo.webp"
+import Logo from "@/public/images/logo.webp";
 import Image from "next/image";
+import { Switch } from "../ui/switch";
 
 type MenuItem = {
   id?: string;
@@ -144,7 +145,6 @@ export const AppSidebar: React.FC<SideBarProps> = ({
   const EXCHANGE_RATE = exchange?.filter((item) =>
     ["USD", "RUB", "KZT"]?.includes(item?.Ccy)
   );
-  console.log(EXCHANGE_RATE);
 
   const handleLink = (item: MenuItem) => {
     setActiveSubItem(item.children as MenuItem[]);
@@ -159,7 +159,7 @@ export const AppSidebar: React.FC<SideBarProps> = ({
     localStorage.removeItem("accessToken");
     push("/login");
   };
-  const { currencyStatus } = useStringContext();
+  const { currencyStatus, setCurrencyStatus } = useStringContext();
   return (
     <aside className="fixed top-0 left-0 h-full z-50">
       <Sidebar
@@ -176,7 +176,7 @@ export const AppSidebar: React.FC<SideBarProps> = ({
           <div className="bg-white shadow-lg w-full h-full justify-start flex flex-col gap-1">
             <div className="flex w-full mb-3 justify-start py-3 px-6 items-center gap-[90px]">
               <div className="text-[20px] font-[800] flex items-center">
-                <Image src={Logo} alt="logo" width={100} height={100}/>
+                <Image src={Logo} alt="logo" width={100} height={100} />
                 {/* <span>Track</span> */}
               </div>
               <div
@@ -212,6 +212,19 @@ export const AppSidebar: React.FC<SideBarProps> = ({
               );
             })}
             <div className="h-full flex flex-col items-end justify-end p-6 gap-2">
+              <div className="flex items-center gap-3 justify-between w-full p-2 py-3 rounded-md border border-gray-300 text-sm">
+                <span>{currencyStatus ? "Ручной ввод" : "Автоматический расчет"}</span>
+                <Switch
+                  checked={currencyStatus}
+                  onCheckedChange={() => {
+                    localStorage.setItem(
+                      "currencyStatus",
+                      (!currencyStatus).toString()
+                    );
+                    setCurrencyStatus(!currencyStatus);
+                  }}
+                />
+              </div>
               {currencyStatus ? (
                 <CustomCurrency />
               ) : (

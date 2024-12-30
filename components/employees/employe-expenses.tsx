@@ -86,7 +86,7 @@ export function EmployeeExpensesTable() {
             <TableRow key={i} className="border-b-gray-300 border-b">
               <TableCell>{i + 1}</TableCell>
               <TableCell>
-                {flight.amount_uzs} сум
+                {flight.amount_uzs} $
               </TableCell>
               <TableCell>{formatDate(flight?.created_at as string, "/")}</TableCell>
             </TableRow>

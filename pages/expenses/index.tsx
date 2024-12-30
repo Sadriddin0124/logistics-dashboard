@@ -209,7 +209,7 @@ export default function Expenses() {
               <TableCell className="px-5">
                 {handleChange(finance?.kind as string) || "-"}
               </TableCell>
-              <TableCell className="px-5">{finance.amount_uzs} сум</TableCell>
+              <TableCell className="px-5">{finance.amount_uzs} $</TableCell>
               <TableCell className="px-5">
                 <span className="line-clamp-1 overflow-hidden">
                   {finance.comment}

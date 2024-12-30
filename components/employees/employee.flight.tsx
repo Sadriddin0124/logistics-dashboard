@@ -90,7 +90,7 @@ export function EmployeeFlightTable() {
               <TableCell>{formatDate(flight?.departure_date as string, "/")}</TableCell>
               <TableCell>{formatDate(flight?.arrival_date as string, "/")}</TableCell>
               <TableCell>
-                 {flight.price_uzs} сум
+                 {flight.price_uzs} $
               </TableCell>
               <TableCell>
                 <p className="line-clamp-1 overflow-hidden">

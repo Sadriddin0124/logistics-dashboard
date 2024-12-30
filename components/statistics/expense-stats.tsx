@@ -33,7 +33,7 @@ export function ExpenseStats({start, end, setStart, setEnd}: Props) {
 
   const { data: stats } = useQuery<StatsPaginated>({
     queryKey: ["stats", 1, start, end],
-    queryFn: () => fetchFinanceStats(1, start, end, "PAY_SALARY"),
+    queryFn: () => fetchFinanceStats(1, start, end, ""),
   });
   const { data: stations } = useQuery<IGasStation[]>({
     queryKey: ["all_stations"],

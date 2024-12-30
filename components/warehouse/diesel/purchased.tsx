@@ -33,7 +33,7 @@ const PurchasedDiesel = ({ data }: { data: IDieselTypeForPagination[] }) => {
                     </TableCell>
                     <TableCell>{item?.volume}</TableCell>
                     <TableCell>
-                      {item?.price_uzs} сум
+                      {item?.price_uzs} $
                     </TableCell>
                     <TableCell>
                       {formatDate(item?.created_at as string, "/")} 

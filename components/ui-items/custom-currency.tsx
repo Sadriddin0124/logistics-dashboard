@@ -3,9 +3,19 @@ import { Input } from "../ui/input";
 import { useStringContext } from "./CurrencyProvider";
 
 const CustomCurrency: React.FC = () => {
-  const { dollar, setDollar, ruble, setRuble, tenge, setTenge } = useStringContext();
+  const {
+    dollar,
+    setDollar,
+    ruble,
+    setRuble,
+    tenge,
+    setTenge,
+  } = useStringContext();
 
-  const saveCurrency = (value: string, currency: "dollar" | "ruble" | "tenge") => {
+  const saveCurrency = (
+    value: string,
+    currency: "dollar" | "ruble" | "tenge"
+  ) => {
     // Save the value to localStorage and update the context state
     localStorage.setItem(currency, value || "");
     if (currency === "dollar") {

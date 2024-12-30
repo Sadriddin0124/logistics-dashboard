@@ -33,6 +33,7 @@ export interface ICars {
   oil_recycle_distance?: number
   next_oil_recycle_distance?: number
   updated_at?: string
+  created_at?: string
   monthly_payment?: number
   leasing_payed_amount?: number
   income_status?: boolean
@@ -80,7 +81,7 @@ export interface ICarsDetail {
   in_sklad: boolean;
   car: string; // Assuming this is a UUID as a string
   price_uzs: number;
-  price_usd?: number;
+  price?: number;
 }
 
 export interface ICarsDetail2 {
@@ -90,7 +91,7 @@ export interface ICarsDetail2 {
   in_sklad: boolean;
   car: ICars; // Assuming this is a UUID as a string
   price_uzs: number;
-  price_usd?: number;
+  price?: number;
 }
 
 interface FuelLog {

@@ -49,9 +49,9 @@ export default function VehicleInfoCard({ car }: { car: ICars }) {
         <div className="flex items-center space-x-4">
           <Calendar className="h-6 w-6 text-primary" />
           <div>
-            <p className="text-sm font-medium">Дата следующего обслуживания</p>
+            <p className="text-sm font-medium">Дата добавления машины</p>
             <p className="text-xl font-medium">
-              {formatDate(car?.updated_at as string, "/")}
+              {formatDate(car?.created_at as string, "/")}
             </p>
           </div>
         </div>
@@ -82,7 +82,7 @@ export default function VehicleInfoCard({ car }: { car: ICars }) {
             
             <p>
               <span className="font-medium">Оставшаяся сумма:</span>{" "}
-              {(Number(car?.price_uzs) || 0) - (Number(car?.leasing_payed_amount) || 0)} сум
+              {(Number(car?.price_uzs) || 0) - (Number(car?.leasing_payed_amount) || 0)} $
             </p>
           </div>
         </div>
