@@ -44,7 +44,7 @@ export default function Expenses() {
     });
   }, [currentPage, startDate, endDate, expenseType, action]);
 
-  const itemsPerPage = 10;
+  const itemsPerPage = 30;
   const indexOfLastOrder = currentPage * itemsPerPage;
   const indexOfFirstOrder = (currentPage - 1) * itemsPerPage;
 
@@ -199,8 +199,7 @@ export default function Expenses() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {financeList?.results?.map((finance, index) => (
-            finance?.amount_uzs &&
+          {financeList?.results?.filter(item=> (item?.amount_uzs as number) > 0)?.map((finance, index) => (
             <TableRow key={index} className="border-b border-gray-200">
               <TableCell className="px-5">
                 {finance.action?.toLowerCase() === "outcome"

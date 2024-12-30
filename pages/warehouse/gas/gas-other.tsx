@@ -16,7 +16,7 @@ import { useRouter } from "next/router";
 import { FormProvider, useForm } from "react-hook-form";
 import { Option } from "../diesel";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { fetchCarNoPage } from "@/lib/actions/cars.action";
+import { fetchCarNoPage, updateCarDistance } from "@/lib/actions/cars.action";
 import Select, { SingleValue } from "react-select";
 import { ICars } from "@/lib/types/cars.types";
 import { queryClient } from "@/components/ui-items/ReactQueryProvider";
@@ -36,6 +36,7 @@ import CurrencyInputWithSelect from "@/components/ui-items/currencySelect";
 
 export default function GasManagementForm() {
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [distance, setDistance] = useState(0);
   const methods = useForm<AnotherStation>();
   const { register, handleSubmit, setValue, reset } = methods;
   const { data: carsList } = useQuery<ICars[]>({
@@ -99,27 +100,48 @@ export default function GasManagementForm() {
         };
       }) as Option[];
     setCarOptions(carOptions);
-  }, [carsList]);
+    const distance = carsList?.find(
+      (item) => item?.id === selectedCar?.value
+    )?.distance_travelled;
+    setDistance(distance as number);
+  }, [carsList, selectedCar]);
   const { id } = useRouter().query;
   const { mutate: createMutation } = useMutation({
     mutationFn: createAnotherStation,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["another-stations", currentPage] });
+      queryClient.invalidateQueries({
+        queryKey: ["another-stations", currentPage],
+      });
       toast.success(" Сохранено успешно!");
-      reset()
-      setSelectedCar(null)
+      reset();
+      setSelectedCar(null);
     },
     onError: () => {
       toast.error("Ошибка сохранения!");
     },
   });
+
+    const { mutate: updateMutation } = useMutation({
+      mutationFn: updateCarDistance,
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["gas_stations"] });
+        setSelectedCar(null);
+      },
+      onError: () => {
+        toast.error("Ошибка сохранения!");
+      },
+    });
+
   const onSubmit = (data: AnotherStation) => {
     createMutation({
       ...data,
       payed_price_uzs: Number(removeCommas(data?.payed_price_uzs?.toString())),
       payed_price: Number(removeCommas(data?.payed_price?.toString())),
     });
-    console.log(data);
+    updateMutation({
+      id: selectedCar?.value as string,
+      distance_travelled: data?.next_gas_distance as number,
+    });
   };
   const handleSelectCar = (newVale: SingleValue<Option>) => {
     setSelectedCar(newVale);
@@ -146,7 +168,9 @@ export default function GasManagementForm() {
                 <div className="space-y-2">
                   <label className="text-sm">Выберите автомобиль</label>
                   <Select
-                  {...register("car", {required: "Это значение является обязательным"})}
+                    {...register("car", {
+                      required: "Это значение является обязательным",
+                    })}
                     options={carOptions}
                     value={selectedCar}
                     onChange={handleSelectCar}
@@ -163,7 +187,7 @@ export default function GasManagementForm() {
                     Количество купленного газа (м3)
                   </label>
                   <Input
-                  type="number"
+                    type="number"
                     disabled={id ? true : false}
                     {...register("purchased_volume", {
                       valueAsNumber: true,
@@ -171,6 +195,30 @@ export default function GasManagementForm() {
                     })}
                     placeholder="0"
                   />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm">Расстояние автомобиля</label>
+                  <Input
+                    type="number"
+                    {...register("next_gas_distance", {
+                      valueAsNumber: true,
+                      required: "Расстояние автомобиля",
+                      validate: (value) =>
+                        distance === undefined || distance === null
+                          ? true
+                          : (value ?? 0) >= distance ||
+                            `Значение должно быть больше ${distance}`,
+                    })}
+                    placeholder="0"
+                  />
+                  {methods.formState.errors.next_gas_distance && (
+                    <p className="text-red-500 text-sm">
+                      {
+                        methods.formState.errors.next_gas_distance
+                          .message as string
+                      }
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -203,7 +251,9 @@ export default function GasManagementForm() {
                   <TableCell>{entry?.car?.name}</TableCell>
                   <TableCell>{entry?.purchased_volume}</TableCell>
                   <TableCell>{entry?.payed_price_uzs}</TableCell>
-                  <TableCell>{formatDate(entry?.created_at as string, "/")}</TableCell>
+                  <TableCell>
+                    {formatDate(entry?.created_at as string, "/")}
+                  </TableCell>
                   <TableCell>
                     <Button
                       variant="secondary"

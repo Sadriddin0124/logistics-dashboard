@@ -44,6 +44,7 @@ export interface AnotherStation {
   car: string;
   name: string;
   purchased_volume: number;
+  next_gas_distance?: number;
   payed_price_uzs: number | string;
   payed_price: number | string;
 }
