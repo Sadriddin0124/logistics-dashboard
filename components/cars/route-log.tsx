@@ -87,7 +87,7 @@ export function RouteLog() {
               <TableCell>{i + 1}</TableCell>
               <TableCell>{route?.driver?.full_name}</TableCell>
               <TableCell>
-                {route.price_uzs} $
+                {Number(route.price_uzs).toFixed(2)} $
               </TableCell>
               <TableCell>{formatDate(route?.departure_date as string, "/")}</TableCell>
               <TableCell>{formatDate(route?.arrival_date as string, "/")}</TableCell>

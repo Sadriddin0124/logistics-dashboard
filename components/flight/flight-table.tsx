@@ -109,7 +109,7 @@ export default function FlightTable({
               <TableCell className="px-5">{flight?.car?.name} {flight?.car?.models?.name} {flight?.car?.number}</TableCell>
               <TableCell className="px-5">{flight?.region?.name}</TableCell>
               <TableCell className="px-5">{flight?.status.toLowerCase() === "active" ? "Активный" : "Завершенный"}</TableCell>
-              <TableCell className="px-5">{flight?.price_uzs} $</TableCell>
+              <TableCell className="px-5">{Number(flight?.price_uzs).toFixed(2)} $</TableCell>
               <TableCell className="px-5">
                 <Link href={`/flight/flight-info?id=${flight?.id}`}>
                   <Button variant="ghost" size="icon" className="h-8 w-8">

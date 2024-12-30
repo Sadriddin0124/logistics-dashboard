@@ -16,7 +16,6 @@ import { queryClient } from "@/components/ui-items/ReactQueryProvider";
 import { useRouter } from "next/router";
 import { OilResponse } from "@/lib/types/oil.types";
 import { fetchOilPurchase } from "@/lib/actions/oil.action";
-import { splitToHundreds } from "@/lib/utils";
 import { formatDate } from "@/lib/functions";
 
 export default function PurchasedOilTable() {
@@ -86,11 +85,11 @@ export default function PurchasedOilTable() {
             <TableRow key={purchased.id} className="border-b border-gray-200">
               <TableCell>{index + 1}</TableCell>
               <TableCell>
-                {splitToHundreds(Number(purchased.amount_uzs))} $
+                {Number(purchased.amount_uzs).toFixed(2)} $
               </TableCell>
               <TableCell>{purchased.oil_volume} литр</TableCell>
               <TableCell>
-                {splitToHundreds(Number(purchased.price_uzs ))} $
+                {Number(purchased.price_uzs).toFixed(2)} $
               </TableCell>
               <TableCell>
                 {formatDate(purchased.created_at as string, "/")}

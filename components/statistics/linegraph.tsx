@@ -142,14 +142,34 @@ export default function IncomeOutcomeGraph({ start, end }: Props) {
     return dates;
   };
 
-  const daysInMonth = useMemo(() => getCurrentMonthDays(), []);
+  const getCurrentYearMonths = () => {
+    const year = new Date().getFullYear(); // Get the current year
+    const months = [];
+    for (let month = 0; month < 12; month++) {
+      if (month === 0) {
+        months.push(
+          new Date(year + 1, month, 1).toISOString().slice(0, 7) // Format: YYYY-MM
+        );
+      }
+      months.push(
+        new Date(year, month, 1).toISOString().slice(0, 7) // Format: YYYY-MM
+      );
+    }
+    months.splice(1, 1);
+    return months;
+  };
 
+  const monthsInYear = useMemo(() => getCurrentYearMonths(), []);
+
+  const daysInMonth = useMemo(() => getCurrentMonthDays(), []);
+  console.log(monthsInYear);
+  
   const { data: finance_info } = useQuery<ResponseData>({
     queryKey: ["finance_info", start, end],
     queryFn: () =>
       fetchFinanceInfo(
-        start || daysInMonth[0],
-        end || daysInMonth[daysInMonth.length - 1]
+        start || `${monthsInYear[1]}-01`,
+        end || `${monthsInYear[0]}-31`
       ),
   });
 

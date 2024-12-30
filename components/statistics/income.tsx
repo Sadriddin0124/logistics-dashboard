@@ -52,16 +52,13 @@ export default function IncomeOutcomeGraph() {
   };
 
   const monthsInYear = useMemo(() => getCurrentYearMonths(), []);
-  console.log(monthsInYear);
-
-  console.log(`${monthsInYear[2]}-01`, `${monthsInYear[0]}-30`); // Debug: Ensure correct months are printed
 
   const { data: finance_info } = useQuery<ResponseData>({
     queryKey: ["finance_info"],
     queryFn: () =>
       fetchFinanceInfo(
-        `${monthsInYear[2]}-01`, // Start of the year
-        `${monthsInYear[0]}-30` // End of the year (ensuring we capture December)
+        `${monthsInYear[1]}-01`, // Start of the year
+        `${monthsInYear[0]}-31` // End of the year (ensuring we capture December)
       ),
   });
   // Map finance data to all months of the year

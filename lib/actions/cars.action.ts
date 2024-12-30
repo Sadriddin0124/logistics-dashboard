@@ -110,8 +110,8 @@ export const deleteModel = async (id: string) => {
 
 //Details
 
-export const fetchAllAutoDetails = async (page: number) => {
-  const response = await $api.get(`/cars/detail/?page=${page}`);
+export const fetchAllAutoDetails = async (status: string, page: number) => {
+  const response = await $api.get(`/cars/detail/?page=${page}&in_sklad=${status}`);
   return response.data;
 };
 

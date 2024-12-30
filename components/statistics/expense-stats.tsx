@@ -56,7 +56,6 @@ export function ExpenseStats({start, end, setStart, setEnd}: Props) {
     return total + (oil.oil_volume ?? 0);
   }, 0);
   const diesel_volume = diesel?.results?.[0]?.remaining_volume?.volume;
-  console.log(diesel_volume);
 
   return (
     <div>

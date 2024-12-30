@@ -107,7 +107,7 @@ export default function OrderedFlightTable({
               <TableCell className="px-5">{flight?.car_number}</TableCell>
               <TableCell className="px-5">{flight?.status}</TableCell>
               <TableCell className="px-5">
-                {flight?.price_uzs} $
+                {Number(flight?.price_uzs).toFixed(2)} $
               </TableCell>
               <TableCell className="px-5">
                 <Link href={`/flight/order-info?id=${flight?.id}`}>

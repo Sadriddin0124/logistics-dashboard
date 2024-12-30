@@ -24,8 +24,8 @@ import { useEffect, useState } from "react";
 import { Option } from "../warehouse/diesel";
 import { IModel } from "@/lib/types/cars.types";
 import { useRouter } from "next/router";
-import { Checkbox } from "@/components/ui/checkbox";
 import CurrencyInputWithSelect from "@/components/ui-items/currencySelect";
+// import { Checkbox } from "@/components/ui/checkbox";
 
 interface FormValues {
   name: string;
@@ -98,8 +98,6 @@ export default function VehicleForm() {
       price: Number(removeCommas(data?.price)),
     };
     createMutation({ ...formData, model: selectedModel?.value as string });
-    console.log(data);
-    
   };
 
   const with_trailer = watch("with_trailer");
@@ -404,8 +402,8 @@ export default function VehicleForm() {
                 </div>
               </div>
 
-              <div className="w-full flex justify-between">
-                <div className="space-y-2 flex items-center gap-3">
+              <div className="w-full flex justify-end">
+                {/* <div className="space-y-2 flex items-center gap-3">
                   <Checkbox
                     checked={watch("income_status")}
                     onCheckedChange={(checked) =>
@@ -413,7 +411,7 @@ export default function VehicleForm() {
                     }
                   />
                   <label>Добавить на склад</label>
-                </div>
+                </div> */}
                 <Button
                   type="submit"
                   className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded-md"

@@ -163,6 +163,7 @@ export default function GasManagementForm() {
                     Количество купленного газа (м3)
                   </label>
                   <Input
+                  type="number"
                     disabled={id ? true : false}
                     {...register("purchased_volume", {
                       valueAsNumber: true,

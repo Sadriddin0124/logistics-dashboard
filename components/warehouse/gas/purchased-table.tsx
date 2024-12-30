@@ -79,7 +79,7 @@ const buttons = getPaginationButtons();
               <TableCell>{purchased.payed_price_uzs} $</TableCell>
               <TableCell>{purchased?.amount?.toFixed(2)}</TableCell>
               <TableCell>{formatDate(purchased?.created_at as string, "/")}</TableCell>
-              <TableCell>{purchased.price_uzs} $</TableCell>
+              <TableCell>{Number(purchased.price_uzs).toFixed(2)} $</TableCell>
               <TableCell>
                 <Button variant="secondary" size="sm" className='bg-green-100 text-green-400'>
                 Куплено

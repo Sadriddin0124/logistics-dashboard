@@ -33,7 +33,7 @@ const PurchasedDiesel = ({ data }: { data: IDieselTypeForPagination[] }) => {
                     </TableCell>
                     <TableCell>{item?.volume}</TableCell>
                     <TableCell>
-                      {item?.price_uzs} $
+                      {item?.price_uzs.toFixed(2)} $
                     </TableCell>
                     <TableCell>
                       {formatDate(item?.created_at as string, "/")} 

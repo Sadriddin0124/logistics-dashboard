@@ -22,7 +22,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { queryClient } from "@/components/ui-items/ReactQueryProvider";
 import { DeleteCars } from "@/components/cars/cars-delete";
-import { removeCommas, splitToHundreds } from "@/lib/utils";
+import { removeCommas } from "@/lib/utils";
 import { OilLog } from "@/components/cars/oil-log";
 import VehicleInfoCard from "@/components/cars/info";
 import { GasLog } from "@/components/cars/gas-log";
@@ -87,7 +87,7 @@ export default function VehicleForm() {
       const transformedCarData = {
         ...car,
         with_trailer: car.with_trailer === true,
-        price_uzs: splitToHundreds(car?.price_uzs as number),
+        price_uzs: Number(car?.price_uzs).toFixed(2),
         distance_travelled: car.distance_travelled,
         leasing_period: car.leasing_period,
       };

@@ -10,19 +10,19 @@ import { queryClient } from "../ui-items/ReactQueryProvider";
 import { PaginatedCarDetail } from "@/lib/types/cars.types";
 import { Button } from "../ui/button";
 
-export default function AutoPartsTable({ setSelectedParts, selectedParts }: { setSelectedParts: React.Dispatch<React.SetStateAction<string[]>>, selectedParts: string[] }) {
+export default function AutoPartsTable({ setSelectedParts, selectedParts, status }: { setSelectedParts: React.Dispatch<React.SetStateAction<string[]>>, selectedParts: string[], status: string }) {
   const [currentPage, setCurrentPage] = React.useState<number>(1);
   const { data: detailList } = useQuery<PaginatedCarDetail>({
-    queryKey: ["details", currentPage],
-    queryFn: () => fetchAllAutoDetails(currentPage),
+    queryKey: ["details", status, currentPage],
+    queryFn: () => fetchAllAutoDetails(status, currentPage),
   });
 
   React.useEffect(() => {
     queryClient.prefetchQuery({
-      queryKey: ["details", currentPage + 1],
-      queryFn: () => fetchAllAutoDetails(currentPage + 1),
+      queryKey: ["details", status, currentPage + 1],
+      queryFn: () => fetchAllAutoDetails(status, currentPage + 1),
     });
-  }, [currentPage]);
+  }, [status, currentPage]);
 
   const itemsPerPage = 10;
   const indexOfLastOrder = currentPage * itemsPerPage;
@@ -91,9 +91,9 @@ export default function AutoPartsTable({ setSelectedParts, selectedParts }: { se
               </TableCell>
               <TableCell>{part.name}</TableCell>
               <TableCell>{part.car?.name}</TableCell>
-              <TableCell>{part?.price_uzs} $</TableCell>
+              <TableCell>{part?.price_uzs.toFixed(2)} $</TableCell>
               <TableCell>{part?.id_detail}</TableCell>
-              <TableCell>{part?.in_sklad ? "В Склате" : "Не в Склате"}</TableCell>
+              <TableCell>{part?.in_sklad ? "В Склате" : "Не в машине"}</TableCell>
             </TableRow>
           ))}
         </TableBody>

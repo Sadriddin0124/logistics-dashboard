@@ -34,6 +34,7 @@ export default function GasSold() {
     register,
     handleSubmit,
     // formState: { errors },
+    setValue,
     reset,
   } = methods;
   const [carOptions, setCarOptions] = useState<Option[]>([]);
@@ -118,9 +119,11 @@ export default function GasSold() {
 
   const handleSelectStation = (newValue: SingleValue<Option>) => {
     setSelectedStation(newValue);
+    setValue("station", newValue?.value as string);
   };
   const handleSelectCar = (newValue: SingleValue<Option>) => {
     setSelectedCar(newValue);
+    setValue("car", newValue?.value as string);
   };
 
   return (
@@ -133,6 +136,9 @@ export default function GasSold() {
                 <div className="space-y-2">
                   <label className="mb-2">Выберите автомобиль</label>
                   <Select
+                    {...register("car", {
+                      required: "Обязателен выбор автомобиля",
+                    })}
                     options={carOptions}
                     value={selectedCar}
                     onChange={handleSelectCar}
@@ -140,6 +146,11 @@ export default function GasSold() {
                     noOptionsMessage={() => "Не найдено"}
                     isClearable
                   />
+                  {methods.formState.errors.car && (
+                    <p className="text-red-500 text-sm">
+                      {methods.formState.errors.car.message as string}
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm">
@@ -151,8 +162,10 @@ export default function GasSold() {
                       valueAsNumber: true,
                       required: "Это значение является обязательным",
                       validate: (value) =>
-                        value <= remaining ||
-                        `Значение не должно превышать ${remaining}`,
+                        remaining === undefined || remaining === null
+                          ? true
+                          : value <= remaining ||
+                            `Значение не должно превышать ${remaining}`,
                     })}
                     placeholder="0"
                   />
@@ -165,6 +178,9 @@ export default function GasSold() {
                 <div className="space-y-2">
                   <label className="mb-2">Выберите заправку</label>
                   <Select
+                    {...register("station", {
+                      required: "Обязательно выбрать заправку",
+                    })}
                     options={stationOptions}
                     value={selectedStation}
                     onChange={handleSelectStation}
@@ -172,16 +188,24 @@ export default function GasSold() {
                     noOptionsMessage={() => "Не найдено"}
                     isClearable
                   />
+                  {methods.formState.errors.station && (
+                    <p className="text-red-500 text-sm">
+                      {methods.formState.errors.station.message as string}
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm">Расстояние автомобиля</label>
                   <Input
+                    type="number"
                     {...register("next_gas_distance", {
                       valueAsNumber: true,
                       required: "Расстояние автомобиля",
                       validate: (value) =>
-                        value >= distance ||
-                        `Значение должно быть больше ${distance}`,
+                        distance === undefined || distance === null
+                          ? true
+                          : value >= distance ||
+                            `Значение должно быть больше ${distance}`,
                     })}
                     placeholder="0"
                   />
