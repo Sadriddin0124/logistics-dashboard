@@ -112,7 +112,6 @@ const CurrencyInputWithSelect: React.FC<CurrencyInputWithSelectProps> = ({
 
   return (
     <div className="flex gap-2 items-start">
-      {currencyStatus ? "lala" : "alal"}
       <div className="flex flex-col gap-2 w-full relative">
         <Label htmlFor={name} className="absolute right-3 top-3">
           ({selectedCurrency})

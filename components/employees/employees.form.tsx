@@ -76,7 +76,7 @@ export default function EmployeesInfoForm() {
             )}
           />
           {errors.full_name && (
-            <p className="text-red-500 text-xs">{errors.full_name.message}</p>
+            <p className="text-red-500 text-sm mt-1">{errors.full_name.message}</p>
           )}
         </div>
 
@@ -93,7 +93,7 @@ export default function EmployeesInfoForm() {
             )}
           />
           {errors.phone && (
-            <p className="text-red-500 text-xs">{errors.phone.message}</p>
+            <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>
           )}
         </div>
 
@@ -121,7 +121,7 @@ export default function EmployeesInfoForm() {
             )}
           />
           {errors.flight_type && (
-            <p className="text-red-500 text-xs">{errors.flight_type.message}</p>
+            <p className="text-red-500 text-sm mt-1">{errors.flight_type.message}</p>
           )}
         </div>
 
@@ -150,7 +150,7 @@ export default function EmployeesInfoForm() {
               }}
             />
             {errors.license_photo && (
-              <p className="text-red-500 text-xs">{errors.license_photo.message}</p>
+              <p className="text-red-500 text-sm mt-1">{errors.license_photo.message}</p>
             )}
           </div>
 
@@ -178,7 +178,7 @@ export default function EmployeesInfoForm() {
               }}
             />
             {errors.passport_photo && (
-              <p className="text-red-500 text-xs">{errors.passport_photo.message}</p>
+              <p className="text-red-500 text-sm mt-1">{errors.passport_photo.message}</p>
             )}
           </div>
         </div>
