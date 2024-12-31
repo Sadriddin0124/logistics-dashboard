@@ -57,7 +57,7 @@ export default function DieselExpense() {
       });
     setFlightOptions(flightOption as Option[]);
     const carOption = cars
-      ?.filter((item) => item?.type_of_payment === "LEASING")
+      ?.filter((item) => item?.type_of_payment === "LEASING" && item?.fuel_type === "DIESEL")
       ?.map((car) => ({
         label: `${car?.name} ${car?.number}`,
         value: car?.id,
@@ -152,24 +152,6 @@ export default function DieselExpense() {
               </div>
               {errors?.volume && (
                   <p className="text-red-500">{errors?.volume?.message}</p>
-                )}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                Стартовая дистанция*
-                </label>
-                <Input {...register("km", {required: "Обязательно указывается количество дизельного топлива.", valueAsNumber: true})} />
-              </div>
-              {errors?.km && (
-                  <p className="text-red-500">{errors?.km?.message}</p>
-                )}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                Финишное расстояние*
-                </label>
-                <Input {...register("km_car", {required: "Обязательно указывается количество дизельного топлива.", valueAsNumber: true})} />
-              </div>
-              {errors?.km_car && (
-                  <p className="text-red-500">{errors?.km_car?.message}</p>
                 )}
             </div>
 

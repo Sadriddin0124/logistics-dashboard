@@ -2,6 +2,8 @@
 
 import {
   fetchFinanceStats,
+  fetchOtherExpenses,
+  fetchSalaries,
 } from "@/lib/actions/stats.ction";
 import { StatCard } from "./stat-card";
 import {
@@ -10,6 +12,7 @@ import {
   TrendingDownIcon,
   AwardIcon,
   PlaneTakeoff,
+  PlaneTakeoffIcon,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { StatsPaginated } from "@/lib/types/stats.types";
@@ -21,6 +24,7 @@ import { IDieselPaginated } from "@/lib/types/diesel.types";
 import { fetchDiesel } from "@/lib/actions/diesel.action";
 import { Input } from "../ui/input";
 import { Dispatch, SetStateAction } from "react";
+import { fetchFlightStats, fetchOrderedFlights } from "@/lib/actions/flight.action";
 
 type Props = {
   start: string,
@@ -35,6 +39,14 @@ export function ExpenseStats({start, end, setStart, setEnd}: Props) {
     queryKey: ["stats", 1, start, end],
     queryFn: () => fetchFinanceStats(1, start, end, ""),
   });
+  const { data: salaries } = useQuery<StatsPaginated>({
+    queryKey: ["salaries", 1, start, end],
+    queryFn: () => fetchSalaries(1, start, end, "PAY_SALARY"),
+  });
+  const { data: other_expenses } = useQuery<StatsPaginated>({
+    queryKey: ["other_expenses", 1, start, end],
+    queryFn: () => fetchOtherExpenses(1, start, end, "OTHER"),
+  });
   const { data: stations } = useQuery<IGasStation[]>({
     queryKey: ["all_stations"],
     queryFn: fetchAllGasStation,
@@ -46,6 +58,18 @@ export function ExpenseStats({start, end, setStart, setEnd}: Props) {
   const { data: diesel } = useQuery<IDieselPaginated>({
     queryKey: ["diesel"],
     queryFn: () => fetchDiesel(1),
+  });
+  const { data: flights_in_uzb } = useQuery<IDieselPaginated>({
+    queryKey: ["flights_in_uzb"],
+    queryFn: () => fetchFlightStats(1, "IN_UZB"),
+  });
+  const { data: flights_out } = useQuery<IDieselPaginated>({
+    queryKey: ["flights_out"],
+    queryFn: () => fetchFlightStats(1, "OUT"),
+  });
+  const { data: ordered_flights } = useQuery<IDieselPaginated>({
+    queryKey: ["ordered_flights"],
+    queryFn: () => fetchOrderedFlights(1),
   });
 
   const data = stats?.results[0];
@@ -83,6 +107,24 @@ export function ExpenseStats({start, end, setStart, setEnd}: Props) {
             icon={PlaneTakeoff}
             url="/flight/info/"
           />
+            <StatCard
+              title="Рейсы в Узбекистане"
+              value={flights_in_uzb?.count || 0}
+              icon={PlaneIcon}
+              url="/flight/info/?action=OUTCOME"
+            />
+            <StatCard
+              title="Рейсы за пределы Узбекистана"
+              value={flights_out?.count || 0}
+              icon={PlaneTakeoffIcon}
+              url="/flight/info/?action=OUTCOME"
+            />
+            <StatCard
+              title="Рейс на заказ"
+              value={ordered_flights?.count || 0}
+              icon={PlaneTakeoffIcon}
+              url="/flight/info/?action=OUTCOME"
+            />
           <StatCard
             title="Сумма дохода"
             value={data?.income_sum?.toFixed(2) || 0}
@@ -92,6 +134,18 @@ export function ExpenseStats({start, end, setStart, setEnd}: Props) {
           <StatCard
             title="Сумма расхода"
             value={data?.outcome_sum?.toFixed(2) || 0}
+            icon={TrendingDownIcon}
+            url="/flight/info/?action=OUTCOME"
+          />
+          <StatCard
+            title="Расходы на сотрудников"
+            value={salaries?.results[0]?.outcome_sum?.toFixed(2) || 0}
+            icon={TrendingDownIcon}
+            url="/flight/info/?action=OUTCOME"
+          />
+          <StatCard
+            title="Нелетные расходы"
+            value={other_expenses?.results[0]?.outcome_sum?.toFixed(2) || 0}
             icon={TrendingDownIcon}
             url="/flight/info/?action=OUTCOME"
           />

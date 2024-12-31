@@ -12,6 +12,30 @@ export const fetchFinanceStats = async (
   return response.data;
 };
 
+export const fetchSalaries = async (
+  page: number,
+  start?: string,
+  end?: string,
+  kind?: string
+) => {
+  const response = await $api.get(
+    `/finance/filter?page=${page}&start_date=${start}&end_date=${end}&kind=${kind}`
+  );
+  return response.data;
+};
+
+export const fetchOtherExpenses = async (
+  page: number,
+  start?: string,
+  end?: string,
+  kind?: string
+) => {
+  const response = await $api.get(
+    `/finance/filter?page=${page}&start_date=${start}&end_date=${end}&kind=${kind}`
+  );
+  return response.data;
+};
+
 export const fetchFlightsStatsAll = async () => {
   const response = await $api.get(`/flight/`);
   return response.data;

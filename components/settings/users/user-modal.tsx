@@ -23,7 +23,7 @@ export function UserModal({ isOpen, onClose, onSave, user }: UserModalProps) {
   } = useForm<IUser>({
     defaultValues: {
       id: "",
-      phone: "",
+      phone: "+998",
       full_name: "",
       password: "",
     },
@@ -37,7 +37,7 @@ export function UserModal({ isOpen, onClose, onSave, user }: UserModalProps) {
     } else {
       reset({
         id: "",
-        phone: "",
+        phone: "+998",
         full_name: "",
         password: "",
       });
@@ -128,7 +128,7 @@ export function UserModal({ isOpen, onClose, onSave, user }: UserModalProps) {
           </div>
 
           <DialogFooter>
-            <Button type="submit">Сохранить</Button>
+            <Button type="submit" className="bg-blue-500">Сохранить</Button>
           </DialogFooter>
         </form>
       </DialogContent>

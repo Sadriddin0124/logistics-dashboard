@@ -293,7 +293,7 @@ export default function VehicleForm() {
         )}
 
         <div className="space-y-2 bg-white p-8 rounded-2xl">
-          <h2 className="text-lg font-semibold">Данные получения нефти</h2>
+          <h2 className="text-lg font-semibold">Данные получения масла</h2>
           <OilLog />
         </div>
 

@@ -118,7 +118,7 @@ export default function UserManagement() {
     <div className="container mx-auto p-4">
       <div className="flex justify-between w-full">
       <h1 className="text-2xl font-bold mb-4">Управление пользователями</h1>
-      <Button onClick={handleAddUser} className="mb-4">
+      <Button onClick={handleAddUser} className="mb-4 bg-blue-500">
         Добавить пользователя
       </Button>
       </div>

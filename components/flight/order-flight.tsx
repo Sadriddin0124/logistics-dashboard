@@ -54,7 +54,6 @@ export default function FlightForm() {
       driver_expenses: Number(removeCommas(data?.driver_expenses as string)),
       arrival_date: data?.arrival_date || "2024-12-26",
       departure_date: data?.arrival_date || "2024-12-26",
-      price: Number(removeCommas(data?.price as string)),
       // upload: image?.id
     });
   };
@@ -103,15 +102,6 @@ export default function FlightForm() {
             />
             {errors?.driver_name && (
               <p className="text-red-500">{errors?.driver_name?.message}</p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">
-              Введите стоимость рейса*
-            </label>
-            <CurrencyInputWithSelect name="price" />
-            {errors?.price_uzs && (
-              <p className="text-red-500">{errors?.price_uzs?.message}</p>
             )}
           </div>
 
