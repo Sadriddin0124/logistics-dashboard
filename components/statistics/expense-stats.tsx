@@ -160,8 +160,6 @@ export function ExpenseStats({start, end, setStart, setEnd}: Props) {
             value={data?.total_leasing_paid?.toFixed(2) || 0}
             icon={AwardIcon}
           />
-        </div>
-        <div className="grid grid-cols-3 gap-4">
           <StatCard
             status={true}
             title="Газ"
@@ -185,7 +183,7 @@ export function ExpenseStats({start, end, setStart, setEnd}: Props) {
             icon={AwardIcon}
             url="/oil/oil-info/?type=purchase"
             url2="/oil/oil-info/?type=recycle"
-          />
+            />
         </div>
       </div>
     </div>
