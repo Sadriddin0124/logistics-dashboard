@@ -199,7 +199,7 @@ export default function Expenses() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {financeList?.results?.filter(item=> (item?.amount_uzs as number) > 0)?.map((finance, index) => (
+          {financeList?.results?.map((finance, index) => (
             <TableRow key={index} className="border-b border-gray-200">
               <TableCell className="px-5">
                 {finance.action?.toLowerCase() === "outcome"
