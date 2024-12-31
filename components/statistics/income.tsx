@@ -87,7 +87,8 @@ export default function IncomeOutcomeGraph() {
           Ежемесячный обзор финансов за год (в тысячах сум)
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent           className="w-auto"
+      >
         <ChartContainer
           config={{
             income: {

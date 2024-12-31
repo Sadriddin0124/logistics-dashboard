@@ -196,7 +196,7 @@ export default function IncomeOutcomeGraph({ start, end }: Props) {
         </CardHeader>
         <CardContent>
           <ChartContainer
-          className="w-[400px] md:w-auto"
+          className="w-auto"
             config={{
               income: {
                 label: "Приход",

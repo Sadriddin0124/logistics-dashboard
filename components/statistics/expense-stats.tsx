@@ -83,18 +83,18 @@ export function ExpenseStats({start, end, setStart, setEnd}: Props) {
 
   return (
     <div>
-      <div className="flex items-center gap-2 p-4 bg-white rounded-2xl mb-4">
+      <div className="flex sm:items-center flex-col sm:flex-row gap-2 p-4 bg-white rounded-2xl mb-4">
         <div className="space-y-1">
           <label className="text-sm">Дата начала</label>
-          <Input type="date" className="w-[300px]" onChange={(e)=>setStart(e.target.value)}/>
+          <Input type="date" className="w-[250px] sm:w-[300px]" onChange={(e)=>setStart(e.target.value)}/>
         </div>
         <div className="space-y-1">
           <label className="text-sm">Дата окончания</label>
-          <Input type="date" className="w-[300px]" onChange={(e)=>setEnd(e.target.value)}/>
+          <Input type="date" className="w-[250px] sm:w-[300px]" onChange={(e)=>setEnd(e.target.value)}/>
         </div>
       </div>
       <div className="flex flex-col gap-4">
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           <StatCard
             title="Рейсы"
             value={data?.flight_count || 0}
