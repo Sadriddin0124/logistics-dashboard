@@ -34,7 +34,7 @@ export default function ModelsTable() {
     });
   }, [currentPage]);
 
-  const itemsPerPage = 10;
+  const itemsPerPage = 30;
   const indexOfLastOrder = currentPage * itemsPerPage;
   const indexOfFirstOrder = (currentPage - 1) * itemsPerPage;
 

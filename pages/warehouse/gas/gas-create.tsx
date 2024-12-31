@@ -42,7 +42,7 @@ export default function GasManagementForm() {
           setValue("remaining_gas", Number(result.toFixed(2)) || 0);
         }
         if (result < 1) {
-          setStatus("gaz narxi to'langan summadan baland bo'lmasligi kerak")
+          setStatus("Цена газа не должна быть выше уплаченной суммы.")
         }
   }, [price_uzs, payed_price_uzs, setValue]);
 

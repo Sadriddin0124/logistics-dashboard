@@ -125,7 +125,7 @@ export default function GasManagementForm() {
                   disabled={isPending}
                   className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded"
                 >
-                  {isPending ? "Zagruska" : "Добавить"}
+                  {isPending ? "Загруска..." : "Добавить"}
                 </Button>
               </div>
             </form>

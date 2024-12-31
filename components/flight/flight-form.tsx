@@ -122,7 +122,7 @@ export default function FlightForm() {
       price: Number(removeCommas(data?.price_uzs?.toString())),
       flight_expenses: Number(removeCommas(data?.flight_expenses?.toString())),
       other_expenses: Number(removeCommas(data?.other_expenses?.toString())),
-      arrival_date: data?.arrival_date || "2024-12-26",
+      arrival_date: data?.arrival_date || null,
       // upload: image?.id
     });
   };
@@ -310,12 +310,6 @@ export default function FlightForm() {
               <p className="text-red-500">{errors?.arrival_date?.message}</p>
             )}
           </div>
-          {flight_type === "OUT" && (
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Расход на питание</label>
-              <CurrencyInputWithSelect name="other_expenses" />
-            </div>
-          )}
           <div className="space-y-2">
             <label className="text-sm font-medium">Расходы на Рейс*</label>
             <CurrencyInputWithSelect name="flight_expenses" />
@@ -335,6 +329,12 @@ export default function FlightForm() {
               <p className="text-red-500">{errors?.start_km?.message}</p>
             )}
           </div>
+          {flight_type === "OUT" && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Расход на питание</label>
+              <CurrencyInputWithSelect name="other_expenses" />
+            </div>
+          )}
         </div>
 
         {/* Cargo Information */}

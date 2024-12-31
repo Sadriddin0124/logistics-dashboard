@@ -2,7 +2,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { type LucideIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import { downloadExcelFile } from "@/lib/functions";
-import { splitToHundreds } from "@/lib/utils";
 import { ICars } from "@/lib/types/cars.types";
 
 interface StatCardProps {
@@ -50,11 +49,11 @@ export function CarCard({
         </div>
         <div className="flex justify-between w-full">
           <div className="text-md font-medium">Баланс лизинга</div> {/* Translation: "Leasing Balance" */}
-          <div>{splitToHundreds(item?.price_uzs as number) || 0} $</div>
+          <div>{(item?.price_uzs as number).toFixed(2) || 0} $</div>
         </div>
         <div className="flex justify-between w-full">
           <div className="text-md font-medium">Оплаченный лизинг</div> {/* Translation: "Paid leasing" */}
-          <div>{splitToHundreds(item?.leasing_payed_amount) || 0} $</div>
+          <div>{(item?.leasing_payed_amount as number).toFixed(2) || 0} $</div>
         </div>
         <div className="flex justify-between w-full">
           <div className="text-md font-medium">Пробег</div> {/* Translation: "Paid leasing" */}

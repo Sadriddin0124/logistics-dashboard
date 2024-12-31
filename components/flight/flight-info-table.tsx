@@ -90,7 +90,7 @@ export default function FlightTable() {
     });
   }, [id, currentPage]);
 
-  const itemsPerPage = 10;
+  const itemsPerPage = 30;
   const indexOfLastOrder = currentPage * itemsPerPage;
   const indexOfFirstOrder = (currentPage - 1) * itemsPerPage;
 
@@ -153,7 +153,7 @@ export default function FlightTable() {
             <TableRow key={index} className="border-b border-gray-200">
               <TableCell className="px-5">{finance.action?.toLowerCase() === "outcome" ? "Расход" : "Приход"}</TableCell>
               <TableCell className="px-5">{handleChange(finance?.kind as string)}</TableCell>
-              <TableCell className="px-5">{finance.amount_uzs} $</TableCell>
+              <TableCell className="px-5">{Number(finance.amount_uzs).toFixed(2)} $</TableCell>
               {/* <TableCell className="px-5">{finance?.driver_expenses} $</TableCell> */}
               <TableCell className="px-5">
                 <span className="line-clamp-1 overflow-hidden">

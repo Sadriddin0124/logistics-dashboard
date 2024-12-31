@@ -249,11 +249,31 @@
 import Cars from "@/components/statistics/cars";
 import { ExpenseStats } from "@/components/statistics/expense-stats";
 import IncomeOutcomeGraph from "@/components/statistics/linegraph";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const FormWrapper: React.FC = () => {
   const [startDate, setStartDate] = useState<string>("")
   const [endDate, setEndDate] = useState<string>("")
+  useEffect(() => {
+    const today = new Date();
+    // Calculate the start and end dates of the last month
+    const firstDayLastMonth = new Date(today.getFullYear(), today.getMonth() , 1);
+    const lastDayLastMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+    console.log(firstDayLastMonth);
+    console.log(lastDayLastMonth);
+    
+    // Format the dates as YYYY-MM-DD
+    const formatDate = (date: Date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0"); // Ensure 2 digits
+      const day = String(date.getDate()).padStart(2, "0"); // Ensure 2 digits
+      return `${year}-${month}-${day}`;
+    };
+
+    // Set the default start and end dates
+    setStartDate(formatDate(firstDayLastMonth));
+    setEndDate(formatDate(lastDayLastMonth));
+  }, []);
   return (
     <div>
       <ExpenseStats end={endDate} setEnd={setEndDate} start={startDate} setStart={setStartDate} />

@@ -88,6 +88,7 @@ export default function LeasingForm() {
   });
   const onSubmit = (data: FormValues) => {
     const formData = {
+      ...data,
       car: data?.car,
       action: "OUTCOME",
       amount: Number(removeCommas(data?.amount as string)),

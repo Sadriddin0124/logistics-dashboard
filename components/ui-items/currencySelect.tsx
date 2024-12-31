@@ -50,8 +50,9 @@ const CurrencyInputWithSelect: React.FC<CurrencyInputWithSelectProps> = ({
     formState: { errors },
   } = useFormContext();
   const [selectedCurrency, setSelectedCurrency] = useState("USD");
+  
   const inputValue = watch(name);
-
+  
   // Precomputed exchange rates
   const exchangeRatesMap = exchangeRates?.reduce<Record<string, number>>(
     (acc, rate) => {
@@ -60,40 +61,38 @@ const CurrencyInputWithSelect: React.FC<CurrencyInputWithSelectProps> = ({
     },
     {}
   );
-
+  
   useEffect(() => {
-    if (exchangeRatesMap && inputValue) {
-      const parsedInput = parseAndValidateNumber(inputValue);
-      if (parsedInput !== null) {
-        const usdRate = currencyStatus
-          ? Number(dollar)
-          : exchangeRatesMap["USD"] ?? 1;
-        const rubRate = currencyStatus
-          ? Number(ruble)
-          : exchangeRatesMap["RUB"] ?? 1;
-        const kztRate = currencyStatus
-          ? Number(tenge)
-          : exchangeRatesMap["KZT"] ?? 1;
-
-        const convertedValue =
-          selectedCurrency === "USD"
-            ? parsedInput
-            : selectedCurrency === "RUB"
-            ? parsedInput * (rubRate / usdRate)
-            : selectedCurrency === "KZT"
-            ? parsedInput * (kztRate / usdRate)
-            : parsedInput / usdRate;
-
-        // Check if the current value in the form is different before setting it
-        const currentUZS = watch(`${name}_uzs`);
-        if (currentUZS !== convertedValue) {
-          setValue(`${name}_uzs`, convertedValue, { shouldValidate: true });
-        }
-
-        const currentType = watch(`${name}_type`);
-        if (currentType !== selectedCurrency) {
-          setValue(`${name}_type`, selectedCurrency, { shouldValidate: true });
-        }
+    
+    if (!exchangeRatesMap || !inputValue) return;
+  
+    const parsedInput = parseAndValidateNumber(inputValue);
+    if (parsedInput !== null) {
+      const usdRate = currencyStatus
+        ? Number(dollar)
+        : exchangeRatesMap["USD"] ?? 1;
+      const rubRate = currencyStatus
+        ? Number(ruble)
+        : exchangeRatesMap["RUB"] ?? 1;
+      const kztRate = currencyStatus
+        ? Number(tenge)
+        : exchangeRatesMap["KZT"] ?? 1;
+  
+      const convertedValue =
+        selectedCurrency === "USD"
+          ? parsedInput
+          : selectedCurrency === "RUB"
+          ? parsedInput * (rubRate / usdRate)
+          : selectedCurrency === "KZT"
+          ? parsedInput * (kztRate / usdRate)
+          : parsedInput / usdRate;
+  
+      if (watch(`${name}_uzs`) !== convertedValue) {
+        setValue(`${name}_uzs`, convertedValue, { shouldValidate: true });
+      }
+  
+      if (watch(`${name}_type`) !== selectedCurrency) {
+        setValue(`${name}_type`, selectedCurrency, { shouldValidate: true });
       }
     }
   }, [
@@ -101,16 +100,19 @@ const CurrencyInputWithSelect: React.FC<CurrencyInputWithSelectProps> = ({
     selectedCurrency,
     exchangeRatesMap,
     setValue,
-    watch,
     name,
-    currencyStatus,
+    currencyStatus, // currencyStatus dependency
     dollar,
     ruble,
     tenge,
+    watch,
   ]);
+  
+  
 
   return (
     <div className="flex gap-2 items-start">
+      {currencyStatus ? "lala" : "alal"}
       <div className="flex flex-col gap-2 w-full relative">
         <Label htmlFor={name} className="absolute right-3 top-3">
           ({selectedCurrency})

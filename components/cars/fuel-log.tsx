@@ -34,7 +34,7 @@ export function FuelLog() {
     });
   }, [currentPage, id]);
 
-  const itemsPerPage = 10;
+  const itemsPerPage = 30;
   const indexOfLastOrder = currentPage * itemsPerPage;
   const indexOfFirstOrder = (currentPage - 1) * itemsPerPage;
 

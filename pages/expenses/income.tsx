@@ -108,9 +108,9 @@ import { createFinance } from "@/lib/actions/finance.action";
 import { toast } from "react-toastify";
 import { removeCommas } from "@/lib/utils";
 import { queryClient } from "@/components/ui-items/ReactQueryProvider";
-import { CurrencyInputs } from "@/components/ui-items/currency-inputs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import CurrencyInputWithSelect from "@/components/ui-items/currencySelect";
 
 // interface PartField {
 //   name: string;
@@ -122,7 +122,7 @@ import { Input } from "@/components/ui/input";
 interface PartsFormData {
   action: string;
   amount_uzs: string;
-  amount_usd: string;
+  amount: string | number;
   kind: string;
   flight: string;
   driver: string;
@@ -156,8 +156,7 @@ export default function IncomeForm() {
     const formData = {
       ...data,
       action: "INCOME",
-      amount_uzs: Number(removeCommas(data?.amount_uzs)),
-      amount_usd: Number(removeCommas(data?.amount_usd)),
+      amount: Number(removeCommas(data?.amount as string)),
       car: "",
       flight: "",
       employee: "",
@@ -186,10 +185,10 @@ export default function IncomeForm() {
                 <label className="text-sm font-medium">
                   Введите сумму прихода.*
                 </label>
-                <CurrencyInputs name="amount" />
+                <CurrencyInputWithSelect name="amount" />
               </div>
-              {errors?.amount_usd && (
-                <p className="text-red-500">{errors?.amount_usd?.message}</p>
+              {errors?.amount_uzs && (
+                <p className="text-red-500">{errors?.amount_uzs?.message}</p>
               )}
             </div>
 

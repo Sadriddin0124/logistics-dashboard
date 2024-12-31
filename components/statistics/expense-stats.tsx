@@ -38,38 +38,47 @@ export function ExpenseStats({start, end, setStart, setEnd}: Props) {
   const { data: stats } = useQuery<StatsPaginated>({
     queryKey: ["stats", 1, start, end],
     queryFn: () => fetchFinanceStats(1, start, end, ""),
+      refetchOnWindowFocus: true
   });
   const { data: salaries } = useQuery<StatsPaginated>({
     queryKey: ["salaries", 1, start, end],
     queryFn: () => fetchSalaries(1, start, end, "PAY_SALARY"),
+      refetchOnWindowFocus: true
   });
   const { data: other_expenses } = useQuery<StatsPaginated>({
     queryKey: ["other_expenses", 1, start, end],
     queryFn: () => fetchOtherExpenses(1, start, end, "OTHER"),
+      refetchOnWindowFocus: true
   });
   const { data: stations } = useQuery<IGasStation[]>({
     queryKey: ["all_stations"],
     queryFn: fetchAllGasStation,
+      refetchOnWindowFocus: true
   });
   const { data: oil } = useQuery<IOilType[]>({
     queryKey: ["all_oil"],
     queryFn: fetchWholeOils,
+      refetchOnWindowFocus: true
   });
   const { data: diesel } = useQuery<IDieselPaginated>({
     queryKey: ["diesel"],
     queryFn: () => fetchDiesel(1),
+      refetchOnWindowFocus: true
   });
   const { data: flights_in_uzb } = useQuery<IDieselPaginated>({
     queryKey: ["flights_in_uzb"],
     queryFn: () => fetchFlightStats(1, "IN_UZB"),
+      refetchOnWindowFocus: true
   });
   const { data: flights_out } = useQuery<IDieselPaginated>({
     queryKey: ["flights_out"],
     queryFn: () => fetchFlightStats(1, "OUT"),
+      refetchOnWindowFocus: true
   });
   const { data: ordered_flights } = useQuery<IDieselPaginated>({
     queryKey: ["ordered_flights"],
     queryFn: () => fetchOrderedFlights(1),
+      refetchOnWindowFocus: true
   });
 
   const data = stats?.results[0];

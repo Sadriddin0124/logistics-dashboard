@@ -149,8 +149,8 @@ export default function EmployeesInfoForm() {
                 );
               }}
             />
-            {errors.license && (
-              <p className="text-red-500 text-xs">{errors.license.message}</p>
+            {errors.license_photo && (
+              <p className="text-red-500 text-xs">{errors.license_photo.message}</p>
             )}
           </div>
 
@@ -177,8 +177,8 @@ export default function EmployeesInfoForm() {
                 );
               }}
             />
-            {errors.passport && (
-              <p className="text-red-500 text-xs">{errors.passport.message}</p>
+            {errors.passport_photo && (
+              <p className="text-red-500 text-xs">{errors.passport_photo.message}</p>
             )}
           </div>
         </div>

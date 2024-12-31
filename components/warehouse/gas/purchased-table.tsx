@@ -28,7 +28,7 @@ export default function PurchasedGasTable() {
     });
 }, [currentPage, id]);
 
-const itemsPerPage = 10;
+const itemsPerPage = 30;
 const indexOfLastOrder = currentPage * itemsPerPage;
 const indexOfFirstOrder = (currentPage - 1) * itemsPerPage;
 
@@ -76,7 +76,7 @@ const buttons = getPaginationButtons();
           {purchased?.results?.map((purchased, index) => (
             <TableRow key={purchased.id}  className='border-b border-gray-200'>
               <TableCell>{index + 1}</TableCell>
-              <TableCell>{purchased.payed_price_uzs} $</TableCell>
+              <TableCell>{purchased.payed_price_uzs.toFixed(2)} $</TableCell>
               <TableCell>{purchased?.amount?.toFixed(2)}</TableCell>
               <TableCell>{formatDate(purchased?.created_at as string, "/")}</TableCell>
               <TableCell>{Number(purchased.price_uzs).toFixed(2)} $</TableCell>

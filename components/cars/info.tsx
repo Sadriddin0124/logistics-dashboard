@@ -72,17 +72,17 @@ export default function VehicleInfoCard({ car }: { car: ICars }) {
             </p>}
             {car?.type_of_payment !== "CASH" && <p>
               <span className="font-medium">Ежемесячный платеж:</span>{" "}
-              {car?.monthly_payment}
+              {car?.monthly_payment?.toFixed(2)}
             </p>}
             {car?.type_of_payment !== "CASH" && <p>
               <span className="font-medium">Сумма оплаченных денег:</span>{" "}
-              {car?.leasing_payed_amount}
+              {car?.leasing_payed_amount?.toFixed(2)}
             </p>}
           
             
             <p>
               <span className="font-medium">Оставшаяся сумма:</span>{" "}
-              {(Number(car?.price_uzs) || 0) - (Number(car?.leasing_payed_amount) || 0)} $
+              {((Number(car?.price_uzs) || 0) - (Number(car?.leasing_payed_amount) || 0)).toFixed(2)} $
             </p>
           </div>
         </div>

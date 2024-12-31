@@ -204,12 +204,12 @@ export default function Expenses() {
               <TableCell className="px-5">
                 {finance.action?.toLowerCase() === "outcome"
                   ? "Расход"
-                  : "Приход"}
+                  : "Приход"} 
               </TableCell>
               <TableCell className="px-5">
                 {handleChange(finance?.kind as string) || "-"}
               </TableCell>
-              <TableCell className="px-5">{(finance.amount_uzs as number).toFixed(2)} $</TableCell>
+              <TableCell className="px-5">{(finance.amount_uzs as number)?.toFixed(2) || "0"} $</TableCell>
               <TableCell className="px-5">
                 <span className="line-clamp-1 overflow-hidden">
                   {finance.comment}
