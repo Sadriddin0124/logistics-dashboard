@@ -221,6 +221,7 @@ export const AppSidebar: React.FC<SideBarProps> = ({
                       "currencyStatus",
                       (!currencyStatus).toString()
                     );
+                    window.location.reload()
                     setCurrencyStatus(!currencyStatus);
                   }}
                 />
