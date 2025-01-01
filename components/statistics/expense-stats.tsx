@@ -109,60 +109,70 @@ export function ExpenseStats({start, end, setStart, setEnd}: Props) {
             value={data?.flight_count || 0}
             icon={PlaneIcon}
             url="/flight/info/"
+            name="Информация о Рейсе"
           />
           <StatCard
             title="Активные рейсы"
             value={data?.active_flight_count || 0}
             icon={PlaneTakeoff}
             url="/flight/info/"
+            name="Информация о Рейсе"
           />
             <StatCard
               title="Рейсы в Узбекистане"
               value={flights_in_uzb?.count || 0}
               icon={PlaneIcon}
               url="/flight/info/?action=OUTCOME"
+              name="Информация о Рейсе"
             />
             <StatCard
               title="Рейсы за пределы Узбекистана"
               value={flights_out?.count || 0}
               icon={PlaneTakeoffIcon}
               url="/flight/info/?action=OUTCOME"
+              name="Информация о Рейсе"
             />
             <StatCard
               title="Рейс на заказ"
               value={ordered_flights?.count || 0}
               icon={PlaneTakeoffIcon}
               url="/flight/info/?action=OUTCOME"
-            />
+              name="Информация о Рейсе"
+              />
           <StatCard
             title="Сумма дохода"
             value={data?.income_sum?.toFixed(2) || 0}
             icon={TrendingUpIcon}
             url="/finance/export-logs/?action=INCOME"
-          />
+            name="финансовая информация"
+            />
           <StatCard
             title="Сумма расхода"
             value={data?.outcome_sum?.toFixed(2) || 0}
             icon={TrendingDownIcon}
             url="/flight/info/?action=OUTCOME"
+            name="финансовая информация"
           />
           <StatCard
             title="Расходы на сотрудников"
             value={salaries?.results[0]?.outcome_sum?.toFixed(2) || 0}
             icon={TrendingDownIcon}
             url="/flight/info/?action=OUTCOME"
+            name="финансовая информация"
           />
           <StatCard
             title="Нелетные расходы"
             value={other_expenses?.results[0]?.outcome_sum?.toFixed(2) || 0}
             icon={TrendingDownIcon}
             url="/flight/info/?action=OUTCOME"
+            name="финансовая информация"
           />
           <StatCard
             title="Лизинговый баланс"
             value={data?.leasing_balance?.toFixed(2) || 0}
             icon={TrendingDownIcon}
             url="/flight/info/?action=OUTCOME"
+            name="финансовая информация"
           />
           <StatCard
             title={"Сумма лизинга выплачена"}
@@ -176,6 +186,7 @@ export function ExpenseStats({start, end, setStart, setEnd}: Props) {
             icon={AwardIcon}
             url="/gas/gaz-info/?type=purchase"
             url2="/gas/gaz-info/?type=sale"
+            name="информация о добыче газа"
           />
           <StatCard
             status={true}
@@ -184,6 +195,7 @@ export function ExpenseStats({start, end, setStart, setEnd}: Props) {
             icon={AwardIcon}
             url="/oil/oil-info/?type=purchase"
             url2="/oil/oil-info/?type=recycle"
+            name="о производстве масла"
           />
           <StatCard
             status={true}
@@ -192,6 +204,7 @@ export function ExpenseStats({start, end, setStart, setEnd}: Props) {
             icon={AwardIcon}
             url="/oil/oil-info/?type=purchase"
             url2="/oil/oil-info/?type=recycle"
+            name="о производстве саларки"
             />
         </div>
       </div>

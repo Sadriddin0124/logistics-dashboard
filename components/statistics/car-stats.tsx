@@ -22,7 +22,7 @@ export function CarCard({
           <Button
             variant={"ghost"}
             size={"sm"}
-            onClick={() => downloadExcelFile(`/cars/car-infos/${item?.id}`)}
+            onClick={() => downloadExcelFile(`/cars/car-infos/${item?.id}`, "информация об автомобиле")}
           >
             <Icon />
           </Button>
@@ -41,7 +41,7 @@ export function CarCard({
             <Button
               variant={"ghost"}
               size={"sm"}
-              onClick={() => downloadExcelFile(`/gas/gaz-info/?type=another&car_id=${item?.id}`)}
+              onClick={() => downloadExcelFile(`/gas/gaz-info/?type=another&car_id=${item?.id}`, "информация о добыче газа")}
             >
               {item?.fuel_type === "GAS" ? "Газ" : "Дизель"} {/* Translation: "Download" = "Загрузить" */}
             </Button>

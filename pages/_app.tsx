@@ -17,8 +17,8 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <ReactQueryProvider>
       <Head>
-        <title>Logistics dashboard</title>
-        <meta name="description" content="Welcome to Logistics" />
+        <title>MEGASTROY dashboard</title>
+        <meta name="description" content="Welcome to MEGASTROY" />
       </Head>
       <Layout>
         <StringProvider>

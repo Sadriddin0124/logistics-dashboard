@@ -241,7 +241,9 @@ export default function VehicleForm() {
                   disabled={!with_trailer}
                   id="trailer_number"
                   {...register("trailer_number", {
-                    required: with_trailer ? "Это значение является обязательным" : false,
+                    required: with_trailer
+                      ? "Это значение является обязательным"
+                      : false,
                   })}
                   placeholder="Введите номер"
                   className="mt-1"
@@ -258,19 +260,19 @@ export default function VehicleForm() {
               </div>
 
               <div className="w-full col-span-2 flex justify-end">
-                <div className="">
-                  <DeleteCars onDelete={handleDelete} />
-                </div>
                 <Button
                   disabled={!isChanged}
                   type="submit"
-                  className="bg-[#4880FF] text-white ml-3 hover:bg-blue-600 w-[250px] rounded-md"
+                  className="bg-[#4880FF] text-white ml-3 hover:bg-blue-600 w-[200px] rounded-md"
                 >
                   Сохранять
                 </Button>
               </div>
             </form>
           </FormProvider>
+          <div className="w-full col-span-2 mt-3 flex justify-end">
+            <DeleteCars onDelete={handleDelete} />
+          </div>
         </div>
       </div>
       <div className="mt-8">
@@ -282,12 +284,16 @@ export default function VehicleForm() {
 
         {car?.fuel_type === "GAS" ? (
           <div className="space-y-2 bg-white p-8 rounded-2xl">
-            <h2 className="text-lg font-semibold">Дата получения топлива (Газ)</h2>
+            <h2 className="text-lg font-semibold">
+              Дата получения топлива (Газ)
+            </h2>
             <GasLog />
           </div>
         ) : (
           <div className="space-y-2 bg-white p-8 rounded-2xl">
-            <h2 className="text-lg font-semibold">Дата получения топлива (Дизель)</h2>
+            <h2 className="text-lg font-semibold">
+              Дата получения топлива (Дизель)
+            </h2>
             <FuelLog />
           </div>
         )}

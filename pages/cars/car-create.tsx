@@ -98,6 +98,7 @@ export default function VehicleForm() {
       price: Number(removeCommas(data?.price)),
     };
     createMutation({ ...formData, model: selectedModel?.value as string });
+    reset()
   };
 
   const with_trailer = watch("with_trailer");

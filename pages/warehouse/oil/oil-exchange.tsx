@@ -10,7 +10,10 @@ import { queryClient } from "@/components/ui-items/ReactQueryProvider";
 import { toast } from "react-toastify";
 import { IOilExchange, IOilType } from "@/lib/types/oil.types";
 import { createOilExchange, fetchWholeOils } from "@/lib/actions/oil.action";
-import { fetchCarNoPage, updateCarDistanceOil } from "@/lib/actions/cars.action";
+import {
+  fetchCarNoPage,
+  updateCarDistanceOil,
+} from "@/lib/actions/cars.action";
 import { ICars } from "@/lib/types/cars.types";
 import { useRouter } from "next/router";
 
@@ -26,13 +29,13 @@ export default function OilExchange() {
     handleSubmit,
     setValue,
     formState: { errors },
-    reset
+    reset,
   } = methods;
   const [stationOptions, setOilOptions] = useState<Option[]>([]);
   const [selectedOil, setSelectedOil] = useState<Option | null>(null);
   const [carOptions, setCarOptions] = useState<Option[]>([]);
   const [selectedCar, setSelectedCar] = useState<Option | null>(null);
-  const [oilVolume, setOilVolume] = useState(0)
+  const [oilVolume, setOilVolume] = useState(0);
   const { push } = useRouter();
   const { data: cars } = useQuery<ICars[]>({
     queryKey: ["cars"],
@@ -65,8 +68,10 @@ export default function OilExchange() {
       )?.distance_travelled;
       setValue("oil_recycle_distance", car as number);
     }
-    const oil_volume = oil?.find(item=> item?.id === selectedOil?.value)?.oil_volume
-    setOilVolume(oil_volume as number)
+    const oil_volume = oil?.find(
+      (item) => item?.id === selectedOil?.value
+    )?.oil_volume;
+    setOilVolume(oil_volume as number);
   }, [cars, oil, selectedCar, setValue, selectedOil]);
 
   const { mutate: createMutation } = useMutation({
@@ -76,7 +81,7 @@ export default function OilExchange() {
       push(`/warehouse/oil/`);
       setSelectedOil(null);
       toast.success("Сохранено успешно!");
-      reset()
+      reset();
     },
     onError: () => {
       toast.error("Ошибка сохранения!");
@@ -95,8 +100,7 @@ export default function OilExchange() {
       ...data,
       car: selectedCar?.value as string,
       oil: selectedOil?.value as string,
-      next_oil_recycle_distance:
-        data?.next_oil_recycle_distance,
+      next_oil_recycle_distance: data?.next_oil_recycle_distance,
     });
     updateMutation({
       id: selectedCar?.value as string,
@@ -136,9 +140,15 @@ export default function OilExchange() {
                     {...register("remaining_oil", {
                       valueAsNumber: true,
                       required: true,
+                      validate: (value) =>
+                        value < oilVolume ||
+                        `Значение должно быть меньше ${oilVolume}`, // Custom validation
                     })}
                     placeholder="0"
                   />
+                  {errors.remaining_oil && (
+                    <p className="text-red-500">{errors.remaining_oil.message}</p> // Display error message
+                  )}
                 </div>
                 <div className="space-y-2">
                   <label className="mb-2">Выберите масло</label>
@@ -158,8 +168,6 @@ export default function OilExchange() {
                   <Input
                     {...register("amount", {
                       required: "Введите объем переработанного масла", // Required validation
-                      validate: (value) =>
-                        value < oilVolume || `Значение должно быть меньше ${oilVolume}`, // Custom validation
                     })}
                     placeholder="0"
                     onChange={(e) => {

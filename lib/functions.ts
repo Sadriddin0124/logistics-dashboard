@@ -31,7 +31,7 @@ export const formatDate = (value: string, symbol: string) => {
 };
 
 
-export const downloadExcelFile = async (link: string) => {
+export const downloadExcelFile = async (link: string, name: string) => {
   try {
     const response = await $api.get(link, {
       responseType: "blob", // Set response type to blob to handle binary data
@@ -39,10 +39,7 @@ export const downloadExcelFile = async (link: string) => {
         "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       },
     });
-    console.log(response);
     const url = window.URL.createObjectURL(new Blob([response.data]));
-    console.log(decodeURIComponent(url.split(/[-_]/).join(" ")))
-    const name = link?.split("/")[1]
     // Create a temporary link element and trigger download
     const a = document.createElement("a");
     a.href = url;

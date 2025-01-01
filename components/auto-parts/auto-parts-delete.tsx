@@ -16,8 +16,7 @@ import { queryClient } from "../ui-items/ReactQueryProvider";
 import { toast } from "react-toastify";
 import { deleteAutoDetail } from "@/lib/actions/cars.action";
 import { FormProvider, useForm } from "react-hook-form";
-import { CurrencyInputs } from "../ui-items/currency-inputs";
-import { removeCommas } from "@/lib/utils";
+import CurrencyInputWithSelect from "../ui-items/currencySelect";
 
 interface DeleteDialogProps {
   id: string[]; // The ids of the items to delete
@@ -27,8 +26,8 @@ interface DeleteDialogProps {
 
 interface DeleteType {
   id: string; // ID of the item being deleted
-  amount_usd?: string;
-  amount_uzs: string;
+  amount_usd?: number;
+  amount_uzs: number;
 }
 
 export function AutoPartsDelete({
@@ -39,7 +38,6 @@ export function AutoPartsDelete({
   const methods = useForm<DeleteType>({
     defaultValues: {
       // amount_usd: "",
-      amount_uzs: "",
     },
   });
   const [open, setOpen] = React.useState(false)
@@ -60,7 +58,7 @@ export function AutoPartsDelete({
   const onDelete = (data: DeleteType) => {
     const payload = {
       id: id,
-      sell_price: Number(removeCommas(data.amount_uzs)),
+      sell_price: data.amount_uzs,
     };
     deleteMutation(payload); // Pass the mapped payload to the mutation
   };
@@ -89,7 +87,7 @@ export function AutoPartsDelete({
               <label htmlFor="amount" className="block text-sm font-medium">
                 Сумма
               </label>
-              <CurrencyInputs name="amount" />
+              <CurrencyInputWithSelect name="amount" />
             </div>
             <Button
               type="submit"
