@@ -141,6 +141,7 @@ export default function FlightInfoForm() {
       region: regionId as string,
       car: selectedCar?.value as string,
       upload: image.id,
+      arrival_date: null,
       price:
         data?.price != null
           ? typeof data.price === "string"
@@ -291,7 +292,7 @@ export default function FlightInfoForm() {
               <Input
                 type="date"
                 placeholder="Введите дату"
-                {...register("departure_date", { required: true })}
+                {...register("departure_date")}
               />
             </div>
 
@@ -309,7 +310,7 @@ export default function FlightInfoForm() {
               <Input
                 type="date"
                 placeholder="Введите дату"
-                {...register("arrival_date", { required: true })}
+                {...register("arrival_date")}
               />
             </div>
             {flight_type === "OUT" && (

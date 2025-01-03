@@ -320,6 +320,7 @@ export default function FlightForm() {
             </label>
             <Input
               placeholder="Текущий пробег"
+              type="number"
               {...register("start_km", {
                 required: "Введите текущий пробег",
                 valueAsNumber: true,
