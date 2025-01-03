@@ -141,7 +141,7 @@ export default function FlightInfoForm() {
       region: regionId as string,
       car: selectedCar?.value as string,
       upload: image.id,
-      arrival_date: null,
+      arrival_date: data?.arrival_date || null,
       price:
         data?.price != null
           ? typeof data.price === "string"
