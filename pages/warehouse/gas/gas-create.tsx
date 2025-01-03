@@ -43,6 +43,8 @@ export default function GasManagementForm() {
         }
         if (result < 1) {
           setStatus("Цена газа не должна быть выше уплаченной суммы.")
+        }else {
+          setStatus("")
         }
   }, [price_uzs, payed_price_uzs, setValue]);
 

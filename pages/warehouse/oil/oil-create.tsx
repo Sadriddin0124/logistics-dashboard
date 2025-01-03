@@ -36,7 +36,9 @@ export default function GasManagementForm() {
       const result = payedPrice / pricePerLiter;
       console.log(result);
       if (result < 1) {
-        setStatus("gaz narxi to'langan summadan baland bo'lmasligi kerak");
+        setStatus("Цена на масла не должна быть выше уплаченной суммы.");
+      }else {
+        setStatus("")
       }
       setValue("oil_volume", Number(result.toFixed(2)));
     } else {

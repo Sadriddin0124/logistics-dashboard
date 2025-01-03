@@ -47,7 +47,9 @@ export default function GasManagementForm() {
       const result = payedPrice / pricePerLiter;
       setValue("oil_volume", Number(result.toFixed(2)));
       if (result < 1) {
-        setStatus("Цена на нефть не должна быть выше уплаченной суммы.");
+        setStatus("Цена на масла не должна быть выше уплаченной суммы.");
+      }else {
+        setStatus("")
       }
     } else {
       setValue("oil_volume", 0);
