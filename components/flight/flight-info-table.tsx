@@ -158,6 +158,7 @@ export default function FlightTable() {
               <TableCell className="px-5">
                 <span className="line-clamp-1 overflow-hidden">
                   {finance.comment}
+                  {finance?.reason && "/" + finance.reason}
                 </span>
               </TableCell>
               <TableCell className="px-5 flex gap-1 items-center">

@@ -50,7 +50,7 @@ const EndFlight: React.FC<EndFlightProps> = ({ id, driver, balance, car, expense
   } = methods 
 
   useEffect(() => {
-    setValue("balance", expenses);
+    setValue("balance", balance);
     setValue("endKm", car?.distance_travelled);
   }, [setValue, balance, car?.distance_travelled, expenses]);
 
@@ -103,7 +103,7 @@ const EndFlight: React.FC<EndFlightProps> = ({ id, driver, balance, car, expense
     updateMutation({ id, endKm: data?.endKm, arrival_date: arrival_date });
     changeMutation({
       id: driver?.id as string,
-      balance_usz: Number(driver?.balance_uzs) + Number(data?.balance),
+      balance_usz: (Number(driver?.balance_uzs) + expenses) - balance
     });
     updateCarMutation({
       id: car?.id as string,
@@ -113,10 +113,10 @@ const EndFlight: React.FC<EndFlightProps> = ({ id, driver, balance, car, expense
       action: "OUTCOME",
       kind: "PAY_SALARY",
       car: "",
-      flight: "",
+      flight: id,
       amount_uzs: data?.balance_uzs,
       employee: driver?.id,
-      comment: `${driver?.full_name} заплатил за полет ${data?.balance_uzs} ${data?.balance_type}`
+      comment: `${driver?.full_name} заплатил за рейс ${data?.balance_uzs} ${data?.balance_type}`
     };
     createMutation(formData);
 

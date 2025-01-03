@@ -9,6 +9,7 @@ export interface IFinance {
   car?: string;
   balance?: string;
   comment?: string;
+  reason?: string;
   created_at?: string;
   leasing_balance?: number;
   total_leasing_paid?: number;

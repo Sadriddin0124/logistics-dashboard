@@ -167,21 +167,21 @@ export function ExpenseStats({ start, end, setStart, setEnd }: Props) {
             title="Расходы на сотрудников"
             value={salaries?.results[0]?.outcome_sum?.toFixed(2) || 0}
             icon={TrendingDownIcon}
-            url="/flight/info/?action=OUTCOME"
+            url="/flight/info/?action=OUTCOME&kind=PAY_SALARY"
             name="финансовая информация"
           />
           <StatCard
             title="Проче расходы"
             value={other_expenses?.results[0]?.outcome_sum?.toFixed(2) || 0}
             icon={TrendingDownIcon}
-            url="/flight/info/?action=OUTCOME&kind"
+            url="/flight/info/?action=OUTCOME&kind=OTHER"
             name="финансовая информация"
           />
           <StatCard
             title="Лизинговый баланс"
             value={data?.leasing_balance?.toFixed(2) || 0}
             icon={TrendingDownIcon}
-            url="/flight/info/?action=OUTCOME"
+            // url="/flight/info/?action=OUTCOME"
             name="финансовая информация"
           />
           <StatCard
