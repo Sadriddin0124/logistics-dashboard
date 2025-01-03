@@ -71,7 +71,8 @@ export default function FlightInfoForm() {
     queryFn: () => fetchFlight(id as string),
     enabled: !!id,
   });
-
+  
+  
   // Map options
   useEffect(() => {
     if (employeeList) {
@@ -82,8 +83,6 @@ export default function FlightInfoForm() {
       setDriverOptions(driverOption as Option[]);
       const driver = employeeList?.find((item) => item?.id === flight?.driver);
       setDriver(driver as IEmployee);
-      const car = cars?.find((item) => item?.id === flight?.car?.id);
-      setCar(car as ICars);
       const driverDefault = driverOption.find(
         (driver) => driver.value === flight?.driver
       );
@@ -102,8 +101,11 @@ export default function FlightInfoForm() {
       }
       const carDefault = carOption.find((car) => car.value === carId);
       setSelectedCar(carDefault as Option);
+      const carItem = cars?.find(item=> item?.id === carId)
+      setCar(carItem as ICars);
     }
-  }, [employeeList, cars, flight]);
+    console.log(car);
+  }, [employeeList, cars, flight, car]);
 
   // Reset form on flight data change
   useEffect(() => {
@@ -369,7 +371,7 @@ export default function FlightInfoForm() {
             id={id as string}
             balance={flight?.flight_balance as number}
             driver={driver as IEmployee}
-            // car={}
+            car={car as ICars}
           />
         )}
       </div>

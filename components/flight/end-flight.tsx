@@ -10,12 +10,13 @@ import { useForm, Controller } from "react-hook-form";
 import { Input } from "../ui/input";
 import { IEmployee } from "@/lib/types/employee.types";
 import { updateEmployeeBalance } from "@/lib/actions/employees.action";
+import { ICars } from "@/lib/types/cars.types";
 
 interface EndFlightProps {
   id: string;
   driver: IEmployee
   balance: number;
-
+  car: ICars
 }
 
 interface EndFlightForm {
@@ -23,7 +24,7 @@ interface EndFlightForm {
   balance: number;
 }
 
-const EndFlight: React.FC<EndFlightProps> = ({ id, driver, balance }) => {
+const EndFlight: React.FC<EndFlightProps> = ({ id, driver, balance, car }) => {
   const [open, setOpen] = React.useState(false);
   const { push } = useRouter();
 
@@ -42,7 +43,8 @@ const EndFlight: React.FC<EndFlightProps> = ({ id, driver, balance }) => {
 
   useEffect(()=> {
    setValue("balance", balance)
-  },[setValue, balance])
+   setValue("endKm", car?.distance_travelled)
+  },[setValue, balance, car?.distance_travelled])
 
   const { mutate: updateMutation } = useMutation({
     mutationFn: updateFlight,
