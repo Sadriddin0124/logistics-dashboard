@@ -46,7 +46,7 @@ const Repairing = () => {
       component: <LeasingForm />,
     },
     {
-      id: "DIESEL",
+      id: "SALARKA",
       component: <DieselExpense />,
     },
   ];
@@ -64,7 +64,7 @@ const Repairing = () => {
               <SelectItem value="FLIGHT">Рейс</SelectItem>
               <SelectItem value="OTHER">Общий</SelectItem>
               <SelectItem value="LEASING">Лизинг</SelectItem>
-              <SelectItem value="DIESEL">Дизель</SelectItem>
+              <SelectItem value="SALARKA">Солярка</SelectItem>
             </SelectContent>
           </Select>
         </div>

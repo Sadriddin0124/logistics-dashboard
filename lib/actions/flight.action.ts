@@ -32,7 +32,7 @@ export const fetchOrderedFlights = async (page: number) => {
 };
 
 export const fetchFlightExpense = async (id: string, page: number) => {
-  const response = await $api.get(`/flight/history/${id}?page=${page}`);
+  const response = await $api.get(`/flight/finance/${id}?page=${page}`);
   return response.data;
 };
 
@@ -60,6 +60,11 @@ export const updateFlight = async (data: {id: string, endKm: number}) => {
   const response = await $api.patch(`/flight/${data?.id}/`, {end_km: data?.endKm, status: "INACTIVE" });
   return response.data;
 };
+
+// export const updateFlightBalance = async (data: {id: string, flight_balance: number}) => {
+//   const response = await $api.patch(`/flight/${data?.id}/`, {flight_balance: data?.flight_balance});
+//   return response.data;
+// };
 
 export const updateFlightData = async (data: IFlightCreate) => {
   const response = await $api.patch(`/flight/${data?.id}/`, data);

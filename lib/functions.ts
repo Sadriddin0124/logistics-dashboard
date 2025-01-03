@@ -61,5 +61,5 @@ export const downloadExcelFile = async (link: string, name: string) => {
 // };
 
 export const fuelChange = (fuel: string) => {
-  return fuel === "GAS" ? "Газ" : "Дизель"
+  return fuel === "GAS" ? "Газ" : "Солярка"
 }

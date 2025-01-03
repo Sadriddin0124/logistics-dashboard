@@ -292,7 +292,7 @@ export default function VehicleForm() {
         ) : (
           <div className="space-y-2 bg-white p-8 rounded-2xl">
             <h2 className="text-lg font-semibold">
-              Дата получения топлива (Дизель)
+              Дата получения топлива (Солярка)
             </h2>
             <FuelLog />
           </div>

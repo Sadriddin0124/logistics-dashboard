@@ -90,6 +90,8 @@ export default function Expenses() {
         return "Общий";
       case "LEASING":
         return "Лизинг";
+      case "SALARKA":
+        return "Солярка";
       default:
     }
   };
@@ -138,7 +140,7 @@ export default function Expenses() {
         <h2>Расходы и Приходы</h2>
       </div>
       <div className="grid grid-cols-5 items-end gap-4 my-4">
-        <div>
+        <div className="space-y-2">
           <label>Дата начала</label>
           <Input
             type="date"
@@ -146,7 +148,7 @@ export default function Expenses() {
             className="max-w-[500px]"
           />
         </div>
-        <div>
+        <div className="space-y-2">
           <label>Дата окончания</label>
           <Input
             type="date"
@@ -154,7 +156,7 @@ export default function Expenses() {
             className="max-w-[500px]"
           />
         </div>
-        <div>
+        <div className="space-y-2">
           <label>Тип расхода</label>
           <Select onValueChange={handleSelect} defaultValue=".">
             <SelectTrigger>
@@ -170,7 +172,7 @@ export default function Expenses() {
             </SelectContent>
           </Select>
         </div>
-        <div>
+        <div className="space-y-2">
           <label>Расход или Приход</label>
           <Select onValueChange={(value)=>setAction(value === "." ? "" : value)}>
             <SelectTrigger>

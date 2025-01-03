@@ -44,11 +44,11 @@ const Breadcrumb = () => {
     },
     {
       key: "diesel",
-      value: "Дизель",
+      value: "Солярка",
     },
     {
       key: "diesel-fill",
-      value: "Дизельный впрыск",
+      value: "Солярканый впрыск",
     },
     {
       key: "settings",

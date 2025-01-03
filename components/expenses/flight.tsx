@@ -72,6 +72,17 @@ export default function FlightForm() {
     },
   });
 
+    // const { mutate: updateMutation } = useMutation({
+    //   mutationFn: updateFlightBalance,
+    //   onSuccess: () => {
+    //     queryClient.invalidateQueries({ queryKey: ["all_flights"] });
+    //     reset();
+    //   },
+    //   onError: () => {
+    //     toast.error("Ошибка при завершении рейса!");
+    //   },
+    // });
+
   const onSubmit = (data: SalaryFormData) => {
     const formData = {
       ...data,

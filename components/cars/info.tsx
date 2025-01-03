@@ -41,7 +41,7 @@ export default function VehicleInfoCard({ car }: { car: ICars }) {
           <Car className="h-6 w-6 text-primary" />
           <div>
             <p className="text-sm font-medium">Тип топлива машины</p>
-            <p className="text-xl font-medium">{car?.fuel_type === "GAS" ? "Газ" : "Дизель"}</p>
+            <p className="text-xl font-medium">{car?.fuel_type === "GAS" ? "Газ" : "Солярка"}</p>
           </div>
         </div>
         <Separator className="col-span-2" />

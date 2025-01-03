@@ -36,14 +36,14 @@ export function CarCard({
               size={"sm"}
               onClick={() => downloadExcelFile(`/gas/gaz-info/?type=another&car_id=${item?.id}`)}
             >
-              {item?.fuel_type === "GAS" ? "Газ" : "Дизель"} Translation: "Download" = "Загрузить"
+              {item?.fuel_type === "GAS" ? "Газ" : "Солярка"} Translation: "Download" = "Загрузить"
             </Button> */}
             <Button
               variant={"ghost"}
               size={"sm"}
               onClick={() => downloadExcelFile(`/gas/gaz-info/?type=another&car_id=${item?.id}`, "информация о добыче газа")}
             >
-              {item?.fuel_type === "GAS" ? "Газ" : "Дизель"} {/* Translation: "Download" = "Загрузить" */}
+              {item?.fuel_type === "GAS" ? "Газ" : "Солярка"} {/* Translation: "Download" = "Загрузить" */}
             </Button>
             </div>
         </div>
