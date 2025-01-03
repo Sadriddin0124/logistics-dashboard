@@ -68,12 +68,11 @@ const EndFlight: React.FC<EndFlightProps> = ({ id, driver, balance }) => {
       toast.error("Ошибка при завершении рейса!");
     },
   });
-  console.log(balance, driver?.balance_uzs);
   
 
   const onSubmit = (data: EndFlightForm) => {
     updateMutation({ id, endKm: data?.endKm });
-    changeMutation({ id: driver?.id as string, balance_usz: Number(data?.balance) + Number(driver?.balance_uzs) });
+    changeMutation({ id: driver?.id as string, balance_usz: Number(data?.balance) - Number(driver?.balance_uzs) });
   };
 
   return (

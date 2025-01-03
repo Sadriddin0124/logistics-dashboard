@@ -43,12 +43,14 @@ export default function FlightInfoForm() {
   const [image, setImage] = useState<ImageType>({ id: "", file: "" });
   const region = watch("region");
   const flight_type = watch("flight_type");
+  const status = watch("status");
 
   const [driverOptions, setDriverOptions] = useState<Option[]>([]);
   const [selectedDriver, setSelectedDriver] = useState<Option | null>(null);
   const [carOptions, setCarOptions] = useState<Option[]>([]);
   const [selectedCar, setSelectedCar] = useState<Option | null>(null);
   const [driver, setDriver] = useState<IEmployee | null>(null);
+  const [car, setCar] = useState<ICars | null>(null);
   const { id } = useRouter()?.query;
 
   // Fetch Data
@@ -80,6 +82,8 @@ export default function FlightInfoForm() {
       setDriverOptions(driverOption as Option[]);
       const driver = employeeList?.find((item) => item?.id === flight?.driver);
       setDriver(driver as IEmployee);
+      const car = cars?.find((item) => item?.id === flight?.car?.id);
+      setCar(car as ICars);
       const driverDefault = driverOption.find(
         (driver) => driver.value === flight?.driver
       );
@@ -349,22 +353,23 @@ export default function FlightInfoForm() {
               <FileUploader image={image} setImage={setImage} type=".xlsx" />
             </div>
           )}
-          <div className="w-full flex justify-end gap-6">
+         {status?.toLowerCase() !== "inactive" && <div className="w-full flex justify-end gap-6">
             <Button
               type="submit"
               className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded-md"
             >
               Сохранить
             </Button>
-          </div>
+          </div>}
         </form>
       </FormProvider>
       <div className="w-full flex justify-end gap-6 mt-3">
-        {flight && (
+        {status?.toLowerCase() !== "inactive" && (
           <EndFlight
             id={id as string}
-            balance={flight?.flight_balance}
+            balance={flight?.flight_balance as number}
             driver={driver as IEmployee}
+            // car={}
           />
         )}
       </div>
