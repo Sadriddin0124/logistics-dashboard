@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Option } from "@/pages/warehouse/diesel";
 import { IEmployee } from "@/lib/types/employee.types";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { fetchEmployeesAll } from "@/lib/actions/employees.action";
+import { fetchEmployeesAll, updateEmployeeBalance } from "@/lib/actions/employees.action";
 import Select, { SingleValue } from "react-select";
 import { Input } from "../ui/input";
 import { createFinance } from "@/lib/actions/finance.action";
@@ -42,7 +42,7 @@ export default function Salary() {
   } = methods;
   const [driverOptions, setDriverOptions] = useState<Option[]>([]);
   const [selectedDriver, setSelectedDriver] = useState<Option | null>(null);
-  const [balance, setBalance] = useState<string>("");
+  const [balance, setBalance] = useState<number>(0);
   const { id } = useRouter()?.query
   const { data: employeeList } = useQuery<IEmployee[]>({
     queryKey: ["employees-all"],
@@ -52,7 +52,7 @@ export default function Salary() {
     const balance = employeeList?.find(
       (item) => item?.id === selectedDriver?.value
     );
-    setBalance(balance?.balance_uzs as string || "0");
+    setBalance(Number(balance?.balance_uzs) || 0);
   }, [employeeList, selectedDriver, setBalance]);
   useEffect(() => {
     const driverOption = employeeList?.map((driver) => {
@@ -77,6 +77,17 @@ export default function Salary() {
       toast.error("Ошибка сохранения!");
     },
   });
+  const { mutate: changeMutation } = useMutation({
+    mutationFn: updateEmployeeBalance,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["flights"] });
+      reset();
+    },
+    onError: () => {
+      toast.error("Ошибка при завершении рейса!");
+    },
+  });
+  
 
   const onSubmit = (data: SalaryFormData) => {
     const formData = {
@@ -87,9 +98,8 @@ export default function Salary() {
       car: "",
       flight: "",
     };
-    console.log(data);
-    
     createMutation(formData);
+    changeMutation({ id: selectedDriver?.value as string, balance_usz: balance - data?.amount_uzs });
   };
 
   const handleSelectDriver = (newValue: SingleValue<Option>) => {

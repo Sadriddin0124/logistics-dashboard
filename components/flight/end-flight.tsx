@@ -74,7 +74,7 @@ const EndFlight: React.FC<EndFlightProps> = ({ id, driver, balance, car }) => {
 
   const onSubmit = (data: EndFlightForm) => {
     updateMutation({ id, endKm: data?.endKm });
-    changeMutation({ id: driver?.id as string, balance_usz: Number(data?.balance) - Number(driver?.balance_uzs) });
+    changeMutation({ id: driver?.id as string, balance_usz: Number(driver?.balance_uzs) - Number(data?.balance) });
   };
 
   return (
