@@ -97,6 +97,7 @@ export default function Salary() {
       kind: id as string,
       car: "",
       flight: "",
+      comment: data?.bonus ? `Бонус / ${data?.comment}` : data?.comment
     };
     createMutation(formData);
     changeMutation({ id: selectedDriver?.value as string, balance_usz: data?.bonus ? balance + data?.amount_uzs : balance - data?.amount_uzs });

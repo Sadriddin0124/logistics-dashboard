@@ -420,11 +420,12 @@ export default function FlightInfoForm() {
         {status?.toLowerCase() !== "inactive" && (
           <EndFlight
             id={id as string}
-            balance={Number(flight?.flight_expenses_uzs) - ((flight?.other_expenses_uzs ?? 0) * travelPeriod)}
+            balance={Number(flight?.flight_expenses_uzs)}
             driver={driver as IEmployee}
             car={car as ICars}
             arrival_date={arrival_date as string}
-            expenses={(flight?.driver_expenses_uzs ?? 0) + ((flight?.other_expenses_uzs ?? 0) * travelPeriod)}
+            expenses_cook={((flight?.other_expenses_uzs ?? 0) * travelPeriod)}
+            expense={flight?.driver_expenses_uzs as number}
           />
         )}
       </div>

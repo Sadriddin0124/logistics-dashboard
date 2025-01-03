@@ -20,7 +20,8 @@ interface EndFlightProps {
   driver: IEmployee;
   balance: number;
   car: ICars;
-  expenses: number
+  expense: number
+  expenses_cook: number
   arrival_date: string
 }
 
@@ -31,7 +32,7 @@ interface EndFlightForm {
   balance_type: string;
 }
 
-const EndFlight: React.FC<EndFlightProps> = ({ id, driver, balance, car, expenses, arrival_date}) => {
+const EndFlight: React.FC<EndFlightProps> = ({ id, driver, balance, car, expense, arrival_date, expenses_cook}) => {
   const [open, setOpen] = React.useState(false);
   const { push } = useRouter();
 
@@ -52,7 +53,7 @@ const EndFlight: React.FC<EndFlightProps> = ({ id, driver, balance, car, expense
   useEffect(() => {
     setValue("balance", balance);
     setValue("endKm", car?.distance_travelled);
-  }, [setValue, balance, car?.distance_travelled, expenses]);
+  }, [setValue, balance, car?.distance_travelled, expense]);
 
   const { mutate: updateMutation } = useMutation({
     mutationFn: updateFlight,
@@ -81,7 +82,7 @@ const EndFlight: React.FC<EndFlightProps> = ({ id, driver, balance, car, expense
     const { mutate: updateCarMutation } = useMutation({
       mutationFn: updateCarDistance,
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["gas_stations"] });
+        queryClient.invalidateQueries({ queryKey: ["flight-one"] });
       },
       onError: () => {
         toast.error("Ошибка сохранения!");
@@ -98,12 +99,13 @@ const EndFlight: React.FC<EndFlightProps> = ({ id, driver, balance, car, expense
       toast.error("Ошибка сохранения!");
     },
   });
+console.log(expenses_cook);
 
   const onSubmit = (data: EndFlightForm) => {
     updateMutation({ id, endKm: data?.endKm, arrival_date: arrival_date });
     changeMutation({
       id: driver?.id as string,
-      balance_usz: (Number(driver?.balance_uzs) + expenses) - balance
+      balance_usz: (Number(driver?.balance_uzs) + expense + expenses_cook) 
     });
     updateCarMutation({
       id: car?.id as string,
@@ -118,7 +120,27 @@ const EndFlight: React.FC<EndFlightProps> = ({ id, driver, balance, car, expense
       employee: driver?.id,
       comment: `${driver?.full_name} заплатил за рейс ${data?.balance_uzs} ${data?.balance_type}`
     };
-    createMutation(formData);
+    const formData2 = {
+      action: "OUTCOME",
+      kind: "PAY_SALARY",
+      car: "",
+      flight: id,
+      amount_uzs: expenses_cook,
+      employee: driver?.id,
+      comment: `Расход на питание ${expenses_cook}`
+    };
+    const formData3 = {
+      action: "OUTCOME",
+      kind: "PAY_SALARY",
+      car: "",
+      flight: id,
+      amount_uzs: expense,
+      employee: driver?.id,
+      comment: `Расходы водителя ${expense}`
+    };
+      createMutation(formData);
+      createMutation(formData2);
+      createMutation(formData3);
 
   };
 

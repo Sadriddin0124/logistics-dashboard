@@ -18,7 +18,7 @@ import { queryClient } from "../ui-items/ReactQueryProvider";
 import { toast } from "react-toastify";
 import { createFlight } from "@/lib/actions/flight.action";
 import { Option } from "@/pages/warehouse/diesel";
-import { fetchCarNoPage } from "@/lib/actions/cars.action";
+import { fetchCarNoPage, updateCarDistance } from "@/lib/actions/cars.action";
 import { ICars } from "@/lib/types/cars.types";
 import Select, { SingleValue } from "react-select";
 import { IRegion } from "@/lib/types/regions.types";
@@ -111,6 +111,15 @@ export default function FlightForm() {
       toast.error("Ошибка сохранения!");
     },
   });
+      const { mutate: updateCarMutation } = useMutation({
+        mutationFn: updateCarDistance,
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ["flight-one"] });
+        },
+        onError: () => {
+          toast.error("Ошибка сохранения!");
+        },
+      });
   const onSubmit = (data: IFlightData) => {
     createMutation({
       ...data,
@@ -128,6 +137,7 @@ export default function FlightForm() {
       arrival_date: data?.arrival_date || null,
       // upload: image?.id
     });
+    updateCarMutation({id: selectedCar?.value as string, distance_travelled: data?.start_km})
   };
 
   const handleSelectChange = (value: string, name: string) => {
