@@ -147,7 +147,8 @@ const CurrencyInputWithSelect: React.FC<CurrencyInputWithSelectProps> = ({
           onBlur={(e: ChangeEvent<HTMLInputElement>) => {
             const rawValue = e.target.value;
             const parsedValue = parseAndValidateNumber(rawValue);
-
+            console.log(parsedValue);
+            
             // Format the input value with commas after the user finishes typing
             if (parsedValue !== null) {
               const formattedValue = formatNumberWithCommas(parsedValue);

@@ -132,10 +132,10 @@ export default function VehicleForm() {
     } as ICars);
   };
 
-  const handleDelete = (value: string) => {
+  const handleDelete = (value: number) => {
     deleteMutation({
       id: id as string,
-      sell_price: Number(removeCommas(value)),
+      sell_price: value,
     });
   };
   return (

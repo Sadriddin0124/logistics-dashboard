@@ -14,9 +14,9 @@ import { ICars } from "@/lib/types/cars.types";
 
 interface EndFlightProps {
   id: string;
-  driver: IEmployee
+  driver: IEmployee;
   balance: number;
-  car: ICars
+  car: ICars;
 }
 
 interface EndFlightForm {
@@ -41,10 +41,10 @@ const EndFlight: React.FC<EndFlightProps> = ({ id, driver, balance, car }) => {
     },
   });
 
-  useEffect(()=> {
-   setValue("balance", balance)
-   setValue("endKm", car?.distance_travelled)
-  },[setValue, balance, car?.distance_travelled])
+  useEffect(() => {
+    setValue("balance", balance);
+    setValue("endKm", car?.distance_travelled);
+  }, [setValue, balance, car?.distance_travelled]);
 
   const { mutate: updateMutation } = useMutation({
     mutationFn: updateFlight,
@@ -70,11 +70,13 @@ const EndFlight: React.FC<EndFlightProps> = ({ id, driver, balance, car }) => {
       toast.error("Ошибка при завершении рейса!");
     },
   });
-  
 
   const onSubmit = (data: EndFlightForm) => {
     updateMutation({ id, endKm: data?.endKm });
-    changeMutation({ id: driver?.id as string, balance_usz: Number(driver?.balance_uzs) - Number(data?.balance) });
+    changeMutation({
+      id: driver?.id as string,
+      balance_usz: Number(driver?.balance_uzs) - Number(data?.balance),
+    });
   };
 
   return (
@@ -85,22 +87,29 @@ const EndFlight: React.FC<EndFlightProps> = ({ id, driver, balance, car }) => {
         </Button>
       </DialogTrigger>
       <DialogContent className="space-y-4 p-6">
-        <h3 className="text-lg font-medium">Вы уверены, что хотите завершить рейс?</h3>
+        <h3 className="text-lg font-medium">
+          Вы уверены, что хотите завершить рейс?
+        </h3>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium">Введите текущий пробег*</label>
+            <label className="text-sm font-medium">
+              Введите текущий пробег*
+            </label>
             <Controller
               name="endKm"
               control={control}
-              rules={{ required: "Текущий пробег обязателен" }}
+              rules={{
+                required: "Текущий пробег обязателен",
+                validate: (value) =>
+                  value < car?.distance_travelled
+                    ? `Расстояние должно быть больше ${car?.distance_travelled}`
+                    : true,
+              }}
               render={({ field }) => (
-                <Input
-                  type="number"
-                  placeholder="Текущий пробег"
-                  {...field}
-                />
+                <Input type="number" placeholder="Текущий пробег" {...field} />
               )}
             />
+
             {errors.endKm && (
               <p className="text-red-500 text-sm">{errors.endKm.message}</p>
             )}
@@ -112,11 +121,7 @@ const EndFlight: React.FC<EndFlightProps> = ({ id, driver, balance, car }) => {
               control={control}
               rules={{ required: "Баланс обязателен" }}
               render={({ field }) => (
-                <Input
-                  type="number"
-                  placeholder="Баланс"
-                  {...field}
-                />
+                <Input type="number" placeholder="Баланс" {...field} />
               )}
             />
             {errors.balance && (

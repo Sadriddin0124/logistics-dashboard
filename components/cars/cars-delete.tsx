@@ -17,7 +17,7 @@ import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import CurrencyInputWithSelect from "../ui-items/currencySelect";
 
 interface DeleteAlertDialogProps {
-  onDelete: (value: string) => void; // The function to delete an item using its id
+  onDelete: (value: number) => void; // The function to delete an item using its id
   title?: string; // Optional title for the confirmation dialog
   description?: string;
 }
@@ -27,13 +27,15 @@ export function DeleteCars({
   title = "Введите цену, чтобы отключить машину?", // Default title
   description = "Это действие невозможно отменить. Это приведет к безвозвратному удалению элемента и его удалению с наших серверов.", // Default description
 }: DeleteAlertDialogProps) {
-  const methods = useForm<{ id: string, value_uzs: string }>();
+  const methods = useForm<{ id: string, value_uzs: number }>();
   const {
     handleSubmit,
     formState: { errors },
   } = methods;
-  const handleDelete: SubmitHandler<{ value_uzs: string; }> = (data) => {
+  const handleDelete: SubmitHandler<{ value_uzs: number; }> = (data) => {
     onDelete(data?.value_uzs)
+    console.log(data);
+    
   }
   return (
     <AlertDialog>

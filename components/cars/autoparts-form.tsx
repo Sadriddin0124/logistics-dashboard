@@ -31,7 +31,7 @@ interface FormValues {
   id_detail: string;
   in_sklad: boolean;
   price_uzs: number;
-  price?: string;
+  price?: string ;
 }
 
 export function AutoPartsForm() {
@@ -110,10 +110,13 @@ export function AutoPartsForm() {
     const formData = data.parts.map((item) => ({
       ...item,
       price: Number(removeCommas(item?.price as string)),
+      price_uzs: Number(removeCommas(item?.price as string)),
       car: id as string,
     }));
+    console.log(formData);
+    
     createMutation(formData);
-    setSkeletonStatus(true)
+    // setSkeletonStatus(true)
   };
 
   const watchedFields = watch("parts");
@@ -135,7 +138,7 @@ export function AutoPartsForm() {
       remove(index);
     }
   };
-  console.log(fields);
+  // console.log(fields);
   const { mutate: deleteMutation } = useMutation({
     mutationFn: deleteAutoDetail,
     onSuccess: () => {

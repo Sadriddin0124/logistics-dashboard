@@ -35,6 +35,7 @@ export default function FlightForm() {
   const [selectedDriver, setSelectedDriver] = useState<Option | null>(null);
   const [carOptions, setCarOptions] = useState<Option[]>([]);
   const [selectedCar, setSelectedCar] = useState<Option | null>(null);
+  const [distance, setDistance] = useState<number>(0);
   const methods = useForm<IFlightData>({
     defaultValues: {
       price_uzs: "",
@@ -79,9 +80,11 @@ export default function FlightForm() {
         value: car?.id,
       };
     });
+    const distance = cars?.find(item=> item?.id === selectedCar?.value)?.distance_travelled
+    setDistance(distance as number)
     setCarOptions(carOption as Option[]);
     setDriverOptions(driverOption as Option[]);
-  }, [cars, employeeList, flight_type]);
+  }, [cars, employeeList, flight_type, selectedCar?.value]);
   useEffect(() => {
     if (flight_type === "IN_UZB") {
       setValue("region", "");
@@ -324,6 +327,10 @@ export default function FlightForm() {
               {...register("start_km", {
                 required: "Введите текущий пробег",
                 valueAsNumber: true,
+                validate: (value) =>
+                  value < distance
+                    ? `Расстояние должно быть больше ${distance}`
+                    : true,
               })}
             />
             {errors?.start_km && (

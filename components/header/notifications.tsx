@@ -76,7 +76,7 @@ export default function NotificationsPopover() {
           <CardHeader className="border-b px-4 py-3">
             <CardTitle className="text-base">Уведомления</CardTitle>
           </CardHeader>
-          <CardContent className="px-2 py-2">
+          <CardContent className="px-2 py-2 max-h-[80vh] overflow-y-auto">
             {notification?.map((notification) =>
               !notification.is_read ? (
                 <div

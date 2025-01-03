@@ -79,6 +79,7 @@ export function EmployeeExpensesTable() {
             {/* <TableHead>Администратор</TableHead> */}
             <TableHead>Сумма</TableHead>
             <TableHead>Дата</TableHead>
+            <TableHead>Комментарий</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -89,6 +90,7 @@ export function EmployeeExpensesTable() {
                 {flight.amount_uzs} $
               </TableCell>
               <TableCell>{formatDate(flight?.created_at as string, "/")}</TableCell>
+              <TableCell>{flight?.comment}</TableCell>
             </TableRow>
           ))}
         </TableBody>

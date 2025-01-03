@@ -71,8 +71,7 @@ export default function FlightInfoForm() {
     queryFn: () => fetchFlight(id as string),
     enabled: !!id,
   });
-  
-  
+
   // Map options
   useEffect(() => {
     if (employeeList) {
@@ -101,10 +100,9 @@ export default function FlightInfoForm() {
       }
       const carDefault = carOption.find((car) => car.value === carId);
       setSelectedCar(carDefault as Option);
-      const carItem = cars?.find(item=> item?.id === carId)
+      const carItem = cars?.find((item) => item?.id === carId);
       setCar(carItem as ICars);
     }
-    console.log(car);
   }, [employeeList, cars, flight, car]);
 
   // Reset form on flight data change
@@ -115,9 +113,12 @@ export default function FlightInfoForm() {
         id: flight?.upload?.id || "",
         file: flight?.upload?.file || "",
       });
-      setValue("region", typeof flight?.region === "object" && "id" in flight.region
-        ? (flight?.region?.id as string)
-        : "")
+      setValue(
+        "region",
+        typeof flight?.region === "object" && "id" in flight.region
+          ? (flight?.region?.id as string)
+          : ""
+      );
     }
   }, [flight, reset, setValue]);
 
@@ -195,6 +196,9 @@ export default function FlightInfoForm() {
             <div className="space-y-2">
               <label className="text-sm font-medium">Выберите регион*</label>
               <Selector
+                disabled={
+                  flight?.status?.toLowerCase() === "inactive" ? true : false
+                }
                 value={flight?.flight_type || ""}
                 onValueChange={(value) =>
                   handleSelectChange(value, "flight_type")
@@ -218,6 +222,9 @@ export default function FlightInfoForm() {
                 Выберите автомобиль*
               </label>
               <Select
+                isDisabled={
+                  flight?.status?.toLowerCase() === "inactive" ? true : false
+                }
                 options={carOptions}
                 value={selectedCar}
                 onChange={handleSelectCar}
@@ -230,6 +237,9 @@ export default function FlightInfoForm() {
             <div className="space-y-2">
               <label className="text-sm font-medium">Выберите область*</label>
               <Selector
+                disabled={
+                  flight?.status?.toLowerCase() === "inactive" ? true : false
+                }
                 onValueChange={(value) => handleSelectChange(value, "region")}
               >
                 <SelectTrigger>
@@ -251,6 +261,9 @@ export default function FlightInfoForm() {
             <div className="space-y-2">
               <label className="text-sm font-medium">Выберите водителя*</label>
               <Select
+                isDisabled={
+                  flight?.status?.toLowerCase() === "inactive" ? true : false
+                }
                 {...register("driver", {
                   required: "Это значение является обязательным",
                 })}
@@ -269,6 +282,9 @@ export default function FlightInfoForm() {
             <div className="space-y-2">
               <label className="text-sm font-medium">Маршрут*</label>
               <Selector
+                disabled={
+                  flight?.status?.toLowerCase() === "inactive" ? true : false
+                }
                 value={flight?.route || ""}
                 onValueChange={(value) => handleSelectChange(value, "route")}
               >
@@ -287,7 +303,7 @@ export default function FlightInfoForm() {
               <label className="text-sm font-medium">
                 Введите стоимость рейса*
               </label>
-              <CurrencyInputWithSelect name="price" />
+              <CurrencyInputWithSelect disabled name="price" />
             </div>
 
             {/* Departure Date */}
@@ -297,6 +313,9 @@ export default function FlightInfoForm() {
               </label>
               <Input
                 type="date"
+                disabled={
+                  flight?.status?.toLowerCase() === "inactive" ? true : false
+                }
                 placeholder="Введите дату"
                 {...register("departure_date")}
               />
@@ -305,7 +324,7 @@ export default function FlightInfoForm() {
             {/* Spending */}
             <div className="space-y-2">
               <label className="text-sm font-medium">Расходы водителя*</label>
-              <CurrencyInputWithSelect name="driver_expenses" />
+              <CurrencyInputWithSelect disabled name="driver_expenses" />
             </div>
 
             {/* Arrival Date */}
@@ -315,6 +334,9 @@ export default function FlightInfoForm() {
               </label>
               <Input
                 type="date"
+                disabled={
+                  flight?.status?.toLowerCase() === "inactive" ? true : false
+                }
                 placeholder="Введите дату"
                 {...register("arrival_date")}
               />
@@ -322,12 +344,12 @@ export default function FlightInfoForm() {
             {flight_type === "OUT" && (
               <div className="space-y-2">
                 <label className="text-sm font-medium">Расход на питание</label>
-                <CurrencyInputWithSelect name="other_expenses" />
+                <CurrencyInputWithSelect disabled name="other_expenses" />
               </div>
             )}
-            <div className="space-y-2">
+            <div className="space-y-2 hidden">
               <label className="text-sm font-medium">Расходы на Рейс*</label>
-              <CurrencyInputWithSelect name="flight_expenses" />
+              <CurrencyInputWithSelect disabled name="flight_expenses" />
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Баланс Рейса</label>
@@ -355,14 +377,16 @@ export default function FlightInfoForm() {
               <FileUploader image={image} setImage={setImage} type=".xlsx" />
             </div>
           )}
-         {status?.toLowerCase() !== "inactive" && <div className="w-full flex justify-end gap-6">
-            <Button
-              type="submit"
-              className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded-md"
-            >
-              Сохранить
-            </Button>
-          </div>}
+          {status?.toLowerCase() !== "inactive" && (
+            <div className="w-full flex justify-end gap-6">
+              <Button
+                type="submit"
+                className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded-md"
+              >
+                Сохранить
+              </Button>
+            </div>
+          )}
         </form>
       </FormProvider>
       <div className="w-full flex justify-end gap-6 mt-3">
