@@ -99,7 +99,7 @@ export default function Salary() {
       flight: "",
     };
     createMutation(formData);
-    changeMutation({ id: selectedDriver?.value as string, balance_usz: balance - data?.amount_uzs });
+    changeMutation({ id: selectedDriver?.value as string, balance_usz: data?.bonus ? balance + data?.amount_uzs : balance - data?.amount_uzs });
   };
 
   const handleSelectDriver = (newValue: SingleValue<Option>) => {

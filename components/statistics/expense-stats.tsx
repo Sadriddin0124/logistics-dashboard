@@ -174,7 +174,7 @@ export function ExpenseStats({ start, end, setStart, setEnd }: Props) {
             title="Проче расходы"
             value={other_expenses?.results[0]?.outcome_sum?.toFixed(2) || 0}
             icon={TrendingDownIcon}
-            url="/flight/info/?action=OUTCOME"
+            url="/flight/info/?action=OUTCOME&kind"
             name="финансовая информация"
           />
           <StatCard

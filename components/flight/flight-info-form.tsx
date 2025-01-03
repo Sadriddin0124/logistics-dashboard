@@ -29,6 +29,26 @@ import EndFlight from "./end-flight";
 import CurrencyInputWithSelect from "../ui-items/currencySelect";
 import { removeCommas } from "@/lib/utils";
 
+function calculateDaysBetweenDates(start: string, end: string): number {
+  // Parse the dates into Date objects
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+
+  // Validate the dates
+  if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+    throw new Error("Invalid date format. Use 'YYYY-MM-DD'.");
+  }
+
+  // Calculate the difference in time (milliseconds)
+  const diffInMs = endDate.getTime() - startDate.getTime();
+
+  // Convert the difference from milliseconds to days
+  const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+
+  return diffInDays;
+}
+
+
 export default function FlightInfoForm() {
   const methods = useForm<IFlightFormEdit>();
   const {
@@ -44,6 +64,8 @@ export default function FlightInfoForm() {
   const region = watch("region");
   const flight_type = watch("flight_type");
   const status = watch("status");
+  const departure_date = watch("departure_date");
+  const arrival_date = watch("arrival_date");
 
   const [driverOptions, setDriverOptions] = useState<Option[]>([]);
   const [selectedDriver, setSelectedDriver] = useState<Option | null>(null);
@@ -51,6 +73,7 @@ export default function FlightInfoForm() {
   const [selectedCar, setSelectedCar] = useState<Option | null>(null);
   const [driver, setDriver] = useState<IEmployee | null>(null);
   const [car, setCar] = useState<ICars | null>(null);
+  const [travelPeriod, setTravelPeriod] = useState<number>(0)
   const { id } = useRouter()?.query;
 
   // Fetch Data
@@ -103,8 +126,12 @@ export default function FlightInfoForm() {
       const carItem = cars?.find((item) => item?.id === carId);
       setCar(carItem as ICars);
     }
-  }, [employeeList, cars, flight, car]);
-
+    if (arrival_date) {
+      setTravelPeriod(calculateDaysBetweenDates(departure_date, arrival_date as string))
+    }
+  }, [employeeList, cars, flight, car, arrival_date, departure_date]);
+  console.log(travelPeriod);
+  
   // Reset form on flight data change
   useEffect(() => {
     if (flight) {
@@ -396,6 +423,8 @@ export default function FlightInfoForm() {
             balance={flight?.flight_balance as number}
             driver={driver as IEmployee}
             car={car as ICars}
+            arrival_date={arrival_date as string}
+            expenses={(flight?.driver_expenses_uzs ?? 0) + ((flight?.other_expenses_uzs ?? 0) * travelPeriod)}
           />
         )}
       </div>

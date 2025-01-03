@@ -100,6 +100,7 @@ export interface IFlightFormEdit {
   flight_expenses_uzs?: string;
   flight_expenses: number | string;
   other_expenses: number | string;
+  other_expenses_uzs?: number;
   start_km: number;
   end_km?: number;
 }

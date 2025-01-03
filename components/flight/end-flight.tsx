@@ -6,45 +6,53 @@ import { useMutation } from "@tanstack/react-query";
 import { Button } from "../ui/button";
 import React, { useEffect } from "react";
 import { useRouter } from "next/router";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, FormProvider } from "react-hook-form";
 import { Input } from "../ui/input";
 import { IEmployee } from "@/lib/types/employee.types";
 import { updateEmployeeBalance } from "@/lib/actions/employees.action";
 import { ICars } from "@/lib/types/cars.types";
+import { updateCarDistance } from "@/lib/actions/cars.action";
+import { createFinance } from "@/lib/actions/finance.action";
+import CurrencyInputWithSelect from "../ui-items/currencySelect";
 
 interface EndFlightProps {
   id: string;
   driver: IEmployee;
   balance: number;
   car: ICars;
+  expenses: number
+  arrival_date: string
 }
 
 interface EndFlightForm {
   endKm: number;
   balance: number;
+  balance_uzs: number;
+  balance_type: string;
 }
 
-const EndFlight: React.FC<EndFlightProps> = ({ id, driver, balance, car }) => {
+const EndFlight: React.FC<EndFlightProps> = ({ id, driver, balance, car, expenses, arrival_date}) => {
   const [open, setOpen] = React.useState(false);
   const { push } = useRouter();
 
+  const methods = useForm<EndFlightForm>({
+    defaultValues: {
+      endKm: 0,
+      balance: 0,
+    },
+  });
   const {
     control,
     handleSubmit,
     reset,
     setValue,
     formState: { errors, isSubmitting },
-  } = useForm<EndFlightForm>({
-    defaultValues: {
-      endKm: 0,
-      balance: 0,
-    },
-  });
+  } = methods 
 
   useEffect(() => {
-    setValue("balance", balance);
+    setValue("balance", expenses);
     setValue("endKm", car?.distance_travelled);
-  }, [setValue, balance, car?.distance_travelled]);
+  }, [setValue, balance, car?.distance_travelled, expenses]);
 
   const { mutate: updateMutation } = useMutation({
     mutationFn: updateFlight,
@@ -70,13 +78,48 @@ const EndFlight: React.FC<EndFlightProps> = ({ id, driver, balance, car }) => {
       toast.error("Ошибка при завершении рейса!");
     },
   });
+    const { mutate: updateCarMutation } = useMutation({
+      mutationFn: updateCarDistance,
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["gas_stations"] });
+      },
+      onError: () => {
+        toast.error("Ошибка сохранения!");
+      },
+    });
+ const { mutate: createMutation } = useMutation({
+    mutationFn: createFinance,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["finance"] });
+      toast.success(" Сохранено успешно!");
+      reset();
+    },
+    onError: () => {
+      toast.error("Ошибка сохранения!");
+    },
+  });
 
   const onSubmit = (data: EndFlightForm) => {
-    updateMutation({ id, endKm: data?.endKm });
+    updateMutation({ id, endKm: data?.endKm, arrival_date: arrival_date });
     changeMutation({
       id: driver?.id as string,
-      balance_usz: Number(driver?.balance_uzs) - Number(data?.balance),
+      balance_usz: Number(driver?.balance_uzs) + Number(data?.balance),
     });
+    updateCarMutation({
+      id: car?.id as string,
+      distance_travelled: data?.endKm,
+    });
+    const formData = {
+      action: "OUTCOME",
+      kind: "PAY_SALARY",
+      car: "",
+      flight: "",
+      amount_uzs: data?.balance_uzs,
+      employee: driver?.id,
+      comment: `${driver?.full_name} заплатил за полет ${data?.balance_uzs} ${data?.balance_type}`
+    };
+    createMutation(formData);
+
   };
 
   return (
@@ -90,6 +133,7 @@ const EndFlight: React.FC<EndFlightProps> = ({ id, driver, balance, car }) => {
         <h3 className="text-lg font-medium">
           Вы уверены, что хотите завершить рейс?
         </h3>
+        <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
             <label className="text-sm font-medium">
@@ -116,14 +160,7 @@ const EndFlight: React.FC<EndFlightProps> = ({ id, driver, balance, car }) => {
           </div>
           <div className="space-y-2">
             <label className="text-sm font-medium">Баланс*</label>
-            <Controller
-              name="balance"
-              control={control}
-              rules={{ required: "Баланс обязателен" }}
-              render={({ field }) => (
-                <Input type="number" placeholder="Баланс" {...field} />
-              )}
-            />
+              <CurrencyInputWithSelect name="balance" />
             {errors.balance && (
               <p className="text-red-500 text-sm">{errors.balance.message}</p>
             )}
@@ -143,6 +180,7 @@ const EndFlight: React.FC<EndFlightProps> = ({ id, driver, balance, car }) => {
             </Button>
           </div>
         </form>
+        </FormProvider>
       </DialogContent>
     </Dialog>
   );
