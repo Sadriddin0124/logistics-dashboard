@@ -194,6 +194,8 @@ export function ExpenseStats({ start, end, setStart, setEnd }: Props) {
             title="Газ"
             value={`${gasVolume?.toFixed(2) || 0} м3`}
             icon={AwardIcon}
+            title1="Покупка газа"
+            title2="Продажа газа"
             url="/gas/gaz-info/?type=purchase"
             url2="/gas/gaz-info/?type=sale"
             name="информация о добыче газа"
@@ -203,6 +205,8 @@ export function ExpenseStats({ start, end, setStart, setEnd }: Props) {
             title="Масло"
             value={`${oilVolume?.toFixed(2) || 0} л`}
             icon={AwardIcon}
+            title1="Покупка масло"
+            title2="Продажа масло"
             url="/oil/oil-info/?type=purchase"
             url2="/oil/oil-info/?type=recycle"
             name="о производстве масла"
@@ -212,6 +216,8 @@ export function ExpenseStats({ start, end, setStart, setEnd }: Props) {
             title="Солярка"
             value={`${diesel_volume?.toFixed(2) || 0} л`}
             icon={AwardIcon}
+            title1="Покупка солярка"
+            title2="Продажа солярка"
             url="/oil/oil-info/?type=purchase"
             url2="/oil/oil-info/?type=recycle"
             name="о производстве саларки"

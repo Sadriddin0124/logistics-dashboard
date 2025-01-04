@@ -13,6 +13,7 @@ import {
   DollarSign,
   Menu,
   Package,
+  Pencil,
   Settings,
   Users,
 } from "lucide-react";
@@ -136,6 +137,8 @@ export const AppSidebar: React.FC<SideBarProps> = ({
   subItemStatus,
 }) => {
   const [activeSubItem, setActiveSubItem] = useState<MenuItem[]>([]);
+  const { currencyStatus, setCurrencyStatus } = useStringContext();
+  const [editStatus, setEditStatus] = useState(true)
   const pathname = usePathname();
   const { push } = useRouter();
   const { data: exchange } = useQuery<ExchangeRate[]>({
@@ -159,7 +162,10 @@ export const AppSidebar: React.FC<SideBarProps> = ({
     localStorage.removeItem("accessToken");
     push("/login");
   };
-  const { currencyStatus, setCurrencyStatus } = useStringContext();
+
+  const handleReload = () => {
+    window.location.reload()
+  }
   return (
     <aside className="fixed top-0 left-0 h-full z-50">
       <Sidebar
@@ -212,22 +218,24 @@ export const AppSidebar: React.FC<SideBarProps> = ({
               );
             })}
             <div className="h-full flex flex-col items-end justify-end p-6 gap-2">
+              {editStatus && <Button size={"icon"} variant={"ghost"} onClick={()=>setEditStatus(prev=> !prev)}><Pencil/></Button>}
               <div className="flex items-center gap-3 justify-between w-full p-2 py-3 rounded-md border border-gray-300 text-sm">
                 <span>{currencyStatus ? "Ручной ввод" : "Автоматический расчет"}</span>
                 <Switch
+                disabled={editStatus}
                   checked={currencyStatus}
                   onCheckedChange={() => {
                     localStorage.setItem(
                       "currencyStatus",
                       (!currencyStatus).toString()
                     );
-                    window.location.reload()
+                    // window.location.reload()
                     setCurrencyStatus(!currencyStatus);
                   }}
                 />
               </div>
               {currencyStatus ? (
-                <CustomCurrency />
+                <CustomCurrency status={editStatus}/>
               ) : (
                 EXCHANGE_RATE?.map((rate, index) => (
                   <CurrencyStatus
@@ -238,6 +246,14 @@ export const AppSidebar: React.FC<SideBarProps> = ({
                   />
                 ))
               )}
+              {!editStatus && <div className="flex justify-center w-full">
+                <Button
+                  onClick={handleReload}
+                  className="w-full bg-[#4880FF] text-white hover:bg-blue-600"
+                >
+                  Сохранить
+                </Button>
+              </div>}
               <div className="flex justify-center w-full">
                 <Button
                   onClick={logOut}

@@ -80,7 +80,7 @@ export default function Salary() {
   const { mutate: changeMutation } = useMutation({
     mutationFn: updateEmployeeBalance,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["flights"] });
+      queryClient.invalidateQueries({ queryKey: ["employees-all"] });
       reset();
     },
     onError: () => {

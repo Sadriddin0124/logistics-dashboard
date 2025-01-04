@@ -26,12 +26,16 @@ export const StringProvider = ({ children }: { children: ReactNode }) => {
     const ruble = localStorage.getItem("ruble") || "";
     const tenge = localStorage.getItem("tenge") || "";
     const currencyStatus = localStorage.getItem("currencyStatus") === "true";
-  
+    console.log(currencyStatus);
+    
     setDollar(dollar);
     setTenge(tenge);
     setRuble(ruble);
     setCurrencyStatus(currencyStatus);
   }, []);
+  useEffect(() => {
+    console.log("currencyStatus changed:", currencyStatus);
+  }, [currencyStatus]);
   
   return (
     <StringContext.Provider value={{ value, setSelectedCurrency, ruble, setRuble, dollar, setDollar, tenge, setTenge, currencyStatus, setCurrencyStatus }}>

@@ -18,7 +18,7 @@ import {
   updateEmployee,
 } from "@/lib/actions/employees.action";
 import { useRouter } from "next/router";
-import { IEmployee } from "@/lib/types/employee.types";
+import { IEmployeeGet } from "@/lib/types/employee.types";
 import { queryClient } from "../ui-items/ReactQueryProvider";
 import { toast } from "react-toastify";
 import { DeleteAlertDialog } from "../ui-items/delete-dialog";
@@ -26,20 +26,21 @@ import { EmployeeFlightTable } from "./employee.flight";
 import { EmployeeExpensesTable } from "./employe-expenses";
 import { FileType } from "@/lib/types/general.types";
 import { FileUploader } from "../ui-items/FileUploader";
+import { API_URL } from "@/pages/api/api";
 
-interface FormValues {
-  full_name: string;
-  license_photo: string;
-  passport_photo: string;
-  phone: string;
-  flight_type: string;
-  balance_uzs: string;
-  bonus?: boolean 
-}
+// interface FormValues {
+//   full_name: string;
+//   license_photo: string;
+//   passport_photo: string;
+//   phone: string;
+//   flight_type: string;
+//   balance_uzs: string;
+//   bonus?: boolean 
+// }
 
-export function areObjectsEqual(obj1: IEmployee, obj2: IEmployee): boolean {
+export function areObjectsEqual(obj1: IEmployeeGet, obj2: IEmployeeGet): boolean {
   for (const key in obj1) {
-    if (obj1[key as keyof IEmployee] !== obj2[key as keyof IEmployee]) {
+    if (obj1[key as keyof IEmployeeGet] !== obj2[key as keyof IEmployeeGet]) {
       return false;
     }
   }
@@ -50,7 +51,7 @@ export default function EmployeesInfoForm() {
   const router = useRouter();
   const { id } = router?.query;
 
-  const { data: employee } = useQuery<IEmployee>({
+  const { data: employee } = useQuery<IEmployeeGet>({
     queryKey: ["employee"],
     queryFn: () => fetchEmployee(id as string),
   });
@@ -62,7 +63,7 @@ export default function EmployeesInfoForm() {
     getValues,
     setValue,
     formState: { errors },
-  } = useForm<FormValues>({
+  } = useForm<IEmployeeGet>({
     defaultValues: {
       flight_type: employee?.flight_type,
     },
@@ -75,16 +76,19 @@ export default function EmployeesInfoForm() {
   React.useEffect(() => {}, [setValue, passport, license]);
 
   useEffect(() => {
-    setValue("license_photo", license?.id as string);
-    setValue("passport_photo", passport?.id as string);
+    setValue("full_name", employee?.full_name as string);
+    setValue("phone", employee?.phone as string);
     if (employee) {
       reset(employee);
     }
   }, [employee, reset, passport, license, setValue]);
   useEffect(() => {
+    setLicense({id: employee?.license_photo?.id as string, file: `${API_URL}${employee?.license_photo?.file}` as string})
+    setPassport({id: employee?.passport_photo?.id as string, file: `${API_URL}${employee?.passport_photo?.file}` as string})
+    
     const subscription = watch((_, { name, type }) => {
       const currentValues = getValues();
-      const hasChanged = !areObjectsEqual(employee as IEmployee, currentValues);
+      const hasChanged = !areObjectsEqual(employee as IEmployeeGet, currentValues);
       setIsChanged(hasChanged);
       if (name) {
         console.log(`${name} changed (${type})`);
@@ -92,6 +96,7 @@ export default function EmployeesInfoForm() {
     });
     return () => subscription.unsubscribe();
   }, [employee, watch, getValues, isChanged]);
+  console.log(license);
   const { mutate: updateMutation } = useMutation({
     mutationFn: updateEmployee,
     onSuccess: () => {
@@ -103,8 +108,14 @@ export default function EmployeesInfoForm() {
       toast.error("Ошибка сохранения!");
     },
   });
-  const onSubmit = (data: FormValues) => {
-    updateMutation({ ...data, id: id as string });
+  const onSubmit = (data: IEmployeeGet) => {
+    updateMutation({
+      full_name: data?.full_name,
+      phone: data?.phone,
+      flight_type: data?.flight_type,
+      license_photo: license?.id,
+      passport_photo: passport?.id,
+      id: id as string });
   };
   const { mutate: deleteMutation } = useMutation({
     mutationFn: deleteEmployee,

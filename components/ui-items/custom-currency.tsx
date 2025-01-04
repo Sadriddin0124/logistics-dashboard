@@ -2,7 +2,7 @@ import React from "react";
 import { Input } from "../ui/input";
 import { useStringContext } from "./CurrencyProvider";
 
-const CustomCurrency: React.FC = () => {
+const CustomCurrency: React.FC<{status: boolean}> = ({status}) => {
   const {
     dollar,
     setDollar,
@@ -33,6 +33,7 @@ const CustomCurrency: React.FC = () => {
       <div className="flex items-center space-x-2 rounded-md border border-gray-300 w-full p-2">
         <span className="font-medium">USD</span>
         <Input
+        disabled={status}
           className="font-medium"
           value={dollar || ""} // Ensure a fallback to avoid uncontrolled input
           type="number"
@@ -45,6 +46,7 @@ const CustomCurrency: React.FC = () => {
       <div className="flex items-center space-x-2 rounded-md border border-gray-300 w-full p-2">
         <span className="font-medium">RUB</span>
         <Input
+        disabled={status}
           className="font-medium"
           value={ruble || ""} // Ensure a fallback to avoid uncontrolled input
           type="number"
@@ -57,6 +59,7 @@ const CustomCurrency: React.FC = () => {
       <div className="flex items-center space-x-2 rounded-md border border-gray-300 w-full p-2">
         <span className="font-medium">KZT</span>
         <Input
+        disabled={status}
           className="font-medium"
           value={tenge || ""} // Ensure a fallback to avoid uncontrolled input
           type="number"

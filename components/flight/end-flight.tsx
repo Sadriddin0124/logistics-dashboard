@@ -147,7 +147,7 @@ console.log(expenses_cook);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded-md">
+        <Button disabled={arrival_date ? false : true} className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded-md">
           Завершить рейс
         </Button>
       </DialogTrigger>

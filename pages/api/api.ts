@@ -1,6 +1,6 @@
 import axios, { CreateAxiosDefaults } from "axios";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+export const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const options: CreateAxiosDefaults = {
   baseURL: API_URL,

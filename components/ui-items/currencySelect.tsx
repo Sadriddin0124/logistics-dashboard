@@ -15,13 +15,11 @@ interface CurrencyInputWithSelectProps {
 
 // Utility functions
 const formatNumberWithCommas = (value: string | number): string => {
+  if (value === 0 || value === "0") return "0"; // Explicitly handle zero
   if (!value) return "";
+
   const [integerPart, decimalPart] = value.toString().split(".");
-
-  // Add commas to the integer part
   const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
-  // Return the formatted number with decimals (if any)
   return decimalPart !== undefined
     ? `${formattedInteger}.${decimalPart}`
     : formattedInteger;
@@ -30,6 +28,8 @@ const formatNumberWithCommas = (value: string | number): string => {
 const parseAndValidateNumber = (value: string | number): number | null => {
   const sanitizedValue =
     typeof value === "string" ? parseFloat(value.replace(/,/g, "")) : value;
+
+  // Explicitly allow 0 as valid
   return !isNaN(sanitizedValue) && sanitizedValue >= 0 ? sanitizedValue : null;
 };
 
@@ -107,9 +107,6 @@ const CurrencyInputWithSelect: React.FC<CurrencyInputWithSelectProps> = ({
     tenge,
     watch,
   ]);
-  
-  
-
   return (
     <div className="flex gap-2 items-start">
       <div className="flex flex-col gap-2 w-full relative">
@@ -147,15 +144,18 @@ const CurrencyInputWithSelect: React.FC<CurrencyInputWithSelectProps> = ({
           onBlur={(e: ChangeEvent<HTMLInputElement>) => {
             const rawValue = e.target.value;
             const parsedValue = parseAndValidateNumber(rawValue);
-            console.log(parsedValue);
-            
-            // Format the input value with commas after the user finishes typing
+          
             if (parsedValue !== null) {
               const formattedValue = formatNumberWithCommas(parsedValue);
               e.target.value = formattedValue;
               setValue(name, formattedValue, { shouldValidate: true });
+            } else {
+              // If the value is invalid (e.g., empty), reset it to 0
+              e.target.value = "0";
+              setValue(name, "0", { shouldValidate: true });
             }
           }}
+          
         />
 
         {errors[name] && (

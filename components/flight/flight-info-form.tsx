@@ -28,6 +28,7 @@ import { useRouter } from "next/router";
 import EndFlight from "./end-flight";
 import CurrencyInputWithSelect from "../ui-items/currencySelect";
 import { removeCommas } from "@/lib/utils";
+import { API_URL } from "@/pages/api/api";
 
 function calculateDaysBetweenDates(start: string, end: string): number {
   // Parse the dates into Date objects
@@ -138,7 +139,7 @@ export default function FlightInfoForm() {
       reset(flight);
       setImage({
         id: flight?.upload?.id || "",
-        file: flight?.upload?.file || "",
+        file: `${API_URL}${flight?.upload?.file}`,
       });
       setValue(
         "region",
@@ -167,8 +168,6 @@ export default function FlightInfoForm() {
     if (typeof flight?.region === "object" && "id" in flight.region) {
       regionId = flight.region.id;
     }
-    console.log(data);
-
     createMutation({
       ...data,
       id: id as string,
