@@ -108,6 +108,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
           {message}
         </p>
       )}
+      <div className={image?.file && image?.id ? "" : "hidden"}>
       {image?.file &&
       ["png", "jpg", "webp"].includes(
         image?.file.split(".").pop() as string
@@ -146,6 +147,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
       ) : (
         ""
       )}
+      </div>
     </div>
   );
 };

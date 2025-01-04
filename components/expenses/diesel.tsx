@@ -40,9 +40,10 @@ export default function DieselExpense() {
   } = methods;
   const [flightOptions, setFlightOptions] = useState<Option[]>([]);
   const [selectedFlight, setSelectedFlight] = useState<Option | null>(null);
-  const [carOptions, setCarOptions] = useState<Option[]>([]);
-  const [selectedCar, setSelectedCar] = useState<Option | null>(null);
-  const { id } = useRouter()?.query
+  const [carFuelType, setCarFuelType] = useState<string>("");
+  // const [carOptions, setCarOptions] = useState<Option[]>([]);
+  // const [selectedCar, setSelectedCar] = useState<Option | null>(null);
+  const { id } = useRouter()?.query;
   const { data: cars } = useQuery<ICars[]>({
     queryKey: ["cars"],
     queryFn: fetchCarNoPage,
@@ -71,13 +72,13 @@ export default function DieselExpense() {
         };
       });
     setFlightOptions(flightOption as Option[]);
-    const carOption = cars
-      ?.filter((item) => item?.type_of_payment === "LEASING" && item?.fuel_type === "DIESEL")
-      ?.map((car) => ({
-        label: `${car?.name} ${car?.number}`,
-        value: car?.id,
-      }));
-    setCarOptions(carOption as Option[]);
+    // const carOption = cars
+    //   ?.filter((item) => item?.type_of_payment === "LEASING" && item?.fuel_type === "DIESEL")
+    //   ?.map((car) => ({
+    //     label: `${car?.name} ${car?.number}`,
+    //     value: car?.id,
+    //   }));
+    // setCarOptions(carOption as Option[]);
   }, [flights, cars]);
 
   // const { mutate: createMutation } = useMutation({
@@ -92,30 +93,30 @@ export default function DieselExpense() {
   //     toast.error("Ошибка сохранения!");
   //   },
   // });
-   const { mutate: createFinanceMutation } = useMutation({
-      mutationFn: createFinance,
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["finance"] });
-        toast.success("Данные успешно добавлены!");
-        methods.reset();
-        setSelectedCar(null);
-      },
-      onError: () => {
-        toast.error("Ошибка при добавлении данных!");
-      },
-    });
-  
-    const onSubmit = (data: FormValues) => {
-      const formData = {
-        ...data,
-        car: data?.car,
-        action: "OUTCOME",
-        amount: Number(removeCommas(data?.amount as string)),
-        employee: "",
-        kind: id as string,
-      };
-      createFinanceMutation(formData);
+  const { mutate: createFinanceMutation } = useMutation({
+    mutationFn: createFinance,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["finance"] });
+      toast.success("Данные успешно добавлены!");
+      methods.reset();
+      // setSelectedCar(null);
+    },
+    onError: () => {
+      toast.error("Ошибка при добавлении данных!");
+    },
+  });
+
+  const onSubmit = (data: FormValues) => {
+    const formData = {
+      ...data,
+      car: data?.car,
+      action: "OUTCOME",
+      amount: Number(removeCommas(data?.amount as string)),
+      employee: "",
+      kind: id as string,
     };
+    createFinanceMutation(formData);
+  };
 
   // const onSubmit = (data: IFinanceDiesel) => {
   //     console.log(data);
@@ -129,12 +130,27 @@ export default function DieselExpense() {
   const handleSelectFlight = (newValue: SingleValue<Option>) => {
     setSelectedFlight(newValue);
     setValue("flight", newValue?.value as string);
+    const car = flights?.find((flight) => flight?.id === newValue?.value)?.car;
+    let carId: string | undefined;
+    if (typeof car === "object" && "id" in car) {
+      carId = car.id;
+    }
+    let fuel_type: string | undefined;
+    if (typeof car === "object" && "id" in car) {
+      fuel_type = car.fuel_type;
+    }
+    if (fuel_type === "GAS") {
+      setCarFuelType("Автомобиль этого рейса не работает на дизеле.");
+    } else {
+      setValue("car", carId as string);
+      setCarFuelType("");
+    }
   };
 
-  const handleSelectCar = (newValue: SingleValue<Option>) => {
-    setSelectedCar(newValue);
-    setValue("car", newValue?.value as string);
-  };
+  // const handleSelectCar = (newValue: SingleValue<Option>) => {
+  //   setSelectedCar(newValue);
+  //   setValue("car", newValue?.value as string);
+  // };
   return (
     <div>
       <FormProvider {...methods}>
@@ -145,7 +161,7 @@ export default function DieselExpense() {
           <h2 className="text-2xl font-semibold">Отправление в рейс</h2>
           <div className="grid grid-cols-1 gap-4 mt-4">
             <div className=" grid grid-cols-2 gap-4">
-              <div className="space-y-2">
+              {/* <div className="space-y-2">
                 <label className="text-sm font-medium">
                   Выберите автомобиль*
                 </label>
@@ -159,7 +175,7 @@ export default function DieselExpense() {
                 {errors.car && (
                   <p className="text-red-500">{errors.car?.message}</p>
                 )}
-              </div>
+              </div> */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">
                   Введите сумму расхода.*
@@ -179,25 +195,33 @@ export default function DieselExpense() {
                   placeholder="Выберите..."
                   noOptionsMessage={() => "Не найдено"}
                 />
-                {errors?.flight && (
+                {errors?.flight ? (
                   <p className="text-red-500">{errors?.flight?.message}</p>
+                ) : carFuelType ? (
+                  <p className="text-red-500">{carFuelType}</p>
+                ) : (
+                  ""
                 )}
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium">
-                Введите количество Солярканого топлива*
+                  Введите количество Солярканого топлива*
                 </label>
-                <Input {...register("volume", {required: "Обязательно указывается количество Солярканого топлива.", valueAsNumber: true})} />
+                <Input
+                  {...register("volume", {
+                    required:
+                      "Обязательно указывается количество Солярканого топлива.",
+                    valueAsNumber: true,
+                  })}
+                />
               </div>
               {errors?.volume && (
-                  <p className="text-red-500">{errors?.volume?.message}</p>
-                )}
+                <p className="text-red-500">{errors?.volume?.message}</p>
+              )}
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">
-                Комментарий
-              </label>
+              <label className="text-sm font-medium">Комментарий</label>
               <Textarea
                 placeholder="Напишите комментарий..."
                 className="min-h-[120px] resize-none"

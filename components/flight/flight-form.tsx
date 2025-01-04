@@ -349,8 +349,8 @@ export default function FlightForm() {
           </div>
           {flight_type === "OUT" && (
             <div className="space-y-2">
-              <label className="text-sm font-medium">Расход на питание</label>
-              <CurrencyInputWithSelect name="other_expenses" />
+                <label className="text-sm font-medium">Расход на питание (за день)</label>
+                <CurrencyInputWithSelect name="other_expenses" />
             </div>
           )}
         </div>

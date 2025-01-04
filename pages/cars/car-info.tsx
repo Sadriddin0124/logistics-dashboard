@@ -111,7 +111,7 @@ export default function VehicleForm() {
       toast.success(" Успешно создано!");
     },
     onError: () => {
-      toast.error("ni yangilashda xatolik!");
+      toast.error("Ошибка сохранения");
     },
   });
   const { mutate: deleteMutation } = useMutation({
@@ -122,7 +122,7 @@ export default function VehicleForm() {
       push("/cars");
     },
     onError: () => {
-      toast.error("ni yangilashda xatolik!");
+      toast.error("Ошибка сохранения");
     },
   });
   const onSubmit: SubmitHandler<ICars> = (data) => {
@@ -135,7 +135,7 @@ export default function VehicleForm() {
   const handleDelete = (value: number) => {
     deleteMutation({
       id: id as string,
-      sell_price: value,
+      sell_price: value.toString(),
     });
   };
   return (

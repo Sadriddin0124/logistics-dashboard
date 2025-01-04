@@ -54,6 +54,7 @@ export default function OrderFlightFormInfo() {
       setValue("car_number", ordered?.car_number as string);
       setValue("cargo_info", ordered?.cargo_info as string);
       setValue("driver_expenses_uzs", ordered?.driver_expenses_uzs as string);
+      setValue("driver_expenses", ordered?.driver_expenses_uzs as string);
       setValue("price_uzs", ordered?.price_uzs as string);
     }
   }, [ordered, setValue]);
@@ -130,7 +131,7 @@ export default function OrderFlightFormInfo() {
               <p className="text-red-500">{errors?.driver_name?.message}</p>
             )}
           </div>
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <label className="text-sm font-medium">
               Введите стоимость рейса*
             </label>
@@ -138,7 +139,7 @@ export default function OrderFlightFormInfo() {
             {errors?.price_uzs && (
               <p className="text-red-500">{errors?.price_uzs?.message}</p>
             )}
-          </div>
+          </div> */}
 
           <div className="space-y-2">
             <label className="text-sm font-medium">

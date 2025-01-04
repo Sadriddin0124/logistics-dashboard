@@ -78,7 +78,7 @@ import { IFinanceResponse } from "@/lib/types/finance.types";
 
 export default function FlightTable() {
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const { id } = useRouter()?.query
+  const { id } = useRouter()?.query;
   const { data: flights } = useQuery<IFinanceResponse>({
     queryKey: ["flights-expenses", id, currentPage],
     queryFn: () => fetchFlightExpense(id as string, currentPage),
@@ -125,16 +125,19 @@ export default function FlightTable() {
   const buttons = getPaginationButtons();
   const handleChange = (value: string) => {
     switch (value) {
-      case 'PAY_SALARY':
-        return 'Оплата'
-      case 'FIX_CAR':
-        return 'Ремонт автомобиля'
-      case 'FLIGHT':
-        return 'Рейс'
-      case 'OTHER':
-        return 'Общий'
+      case "PAY_SALARY":
+        return "Оплата";
+      case "FIX_CAR":
+        return "Ремонт автомобиля";
+      case "FLIGHT":
+        return "Рейс";
+      case "OTHER":
+        return "Общий";
+      case "SALARKA":
+        return "Солярка";
       default:
-    }}
+    }
+  };
   return (
     <div className="w-full container mx-auto bg-white rounded-2xl min-h-screen p-8">
       <h2 className="mb-4 text-2xl font-medium">История расходов</h2>
@@ -151,9 +154,17 @@ export default function FlightTable() {
         <TableBody>
           {flights?.results?.map((finance, index) => (
             <TableRow key={index} className="border-b border-gray-200">
-              <TableCell className="px-5">{finance.action?.toLowerCase() === "outcome" ? "Расход" : "Приход"}</TableCell>
-              <TableCell className="px-5">{handleChange(finance?.kind as string)}</TableCell>
-              <TableCell className="px-5">{Number(finance.amount_uzs).toFixed(2)} $</TableCell>
+              <TableCell className="px-5">
+                {finance.action?.toLowerCase() === "outcome"
+                  ? "Расход"
+                  : "Приход"}
+              </TableCell>
+              <TableCell className="px-5">
+                {handleChange(finance?.kind as string)}
+              </TableCell>
+              <TableCell className="px-5">
+                {Number(finance.amount_uzs).toFixed(2)} $
+              </TableCell>
               {/* <TableCell className="px-5">{finance?.driver_expenses} $</TableCell> */}
               <TableCell className="px-5">
                 <span className="line-clamp-1 overflow-hidden">

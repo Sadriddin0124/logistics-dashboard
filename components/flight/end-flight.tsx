@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
 import { updateFlight } from "@/lib/actions/flight.action";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "../ui/button";
-import React, { useEffect } from "react";
+import React, { Dispatch, SetStateAction, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useForm, Controller, FormProvider } from "react-hook-form";
 import { Input } from "../ui/input";
@@ -23,6 +23,7 @@ interface EndFlightProps {
   expense: number
   expenses_cook: number
   arrival_date: string
+  setArrivalStatus: Dispatch<SetStateAction<string>>
 }
 
 interface EndFlightForm {
@@ -32,7 +33,7 @@ interface EndFlightForm {
   balance_type: string;
 }
 
-const EndFlight: React.FC<EndFlightProps> = ({ id, driver, balance, car, expense, arrival_date, expenses_cook}) => {
+const EndFlight: React.FC<EndFlightProps> = ({ id, driver, balance, car, expense, arrival_date, expenses_cook, setArrivalStatus }) => {
   const [open, setOpen] = React.useState(false);
   const { push } = useRouter();
 
@@ -144,13 +145,19 @@ console.log(expenses_cook);
 
   };
 
+  const handleOpen = () => {
+    if (arrival_date) {
+      setOpen(true)
+      setArrivalStatus("")
+    }else {
+      setArrivalStatus("Введите дату прибытия")
+    }
+  }
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button disabled={arrival_date ? false : true} className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded-md">
+        <Button onClick={handleOpen} className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded-md">
           Завершить рейс
         </Button>
-      </DialogTrigger>
       <DialogContent className="space-y-4 p-6">
         <h3 className="text-lg font-medium">
           Вы уверены, что хотите завершить рейс?

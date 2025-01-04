@@ -49,7 +49,6 @@ function calculateDaysBetweenDates(start: string, end: string): number {
   return diffInDays;
 }
 
-
 export default function FlightInfoForm() {
   const methods = useForm<IFlightFormEdit>();
   const {
@@ -74,7 +73,8 @@ export default function FlightInfoForm() {
   const [selectedCar, setSelectedCar] = useState<Option | null>(null);
   const [driver, setDriver] = useState<IEmployee | null>(null);
   const [car, setCar] = useState<ICars | null>(null);
-  const [travelPeriod, setTravelPeriod] = useState<number>(0)
+  const [travelPeriod, setTravelPeriod] = useState<number>(0);
+  const [arrivalStatus, setArrivalStatus] = useState<string>("");
   const { id } = useRouter()?.query;
 
   // Fetch Data
@@ -128,11 +128,13 @@ export default function FlightInfoForm() {
       setCar(carItem as ICars);
     }
     if (arrival_date) {
-      setTravelPeriod(calculateDaysBetweenDates(departure_date, arrival_date as string))
+      setTravelPeriod(
+        calculateDaysBetweenDates(departure_date, arrival_date as string)
+      );
     }
   }, [employeeList, cars, flight, car, arrival_date, departure_date]);
   console.log(travelPeriod);
-  
+
   // Reset form on flight data change
   useEffect(() => {
     if (flight) {
@@ -222,9 +224,7 @@ export default function FlightInfoForm() {
             <div className="space-y-2">
               <label className="text-sm font-medium">Выберите регион*</label>
               <Selector
-                disabled={
-                  flight?.status?.toLowerCase() === "inactive" ? true : false
-                }
+                disabled
                 value={flight?.flight_type || ""}
                 onValueChange={(value) =>
                   handleSelectChange(value, "flight_type")
@@ -248,9 +248,7 @@ export default function FlightInfoForm() {
                 Выберите автомобиль*
               </label>
               <Select
-                isDisabled={
-                  flight?.status?.toLowerCase() === "inactive" ? true : false
-                }
+                isDisabled
                 options={carOptions}
                 value={selectedCar}
                 onChange={handleSelectCar}
@@ -263,8 +261,11 @@ export default function FlightInfoForm() {
             <div className="space-y-2">
               <label className="text-sm font-medium">Выберите область*</label>
               <Selector
-                disabled={
-                  flight?.status?.toLowerCase() === "inactive" ? true : false
+                disabled={flight?.status?.toLowerCase() === "inactive"}
+                value={
+                  typeof flight?.region === "object" && "id" in flight.region
+                    ? flight.region.id
+                    : undefined // Ensure the value matches the region ID or is undefined
                 }
                 onValueChange={(value) => handleSelectChange(value, "region")}
               >
@@ -287,9 +288,7 @@ export default function FlightInfoForm() {
             <div className="space-y-2">
               <label className="text-sm font-medium">Выберите водителя*</label>
               <Select
-                isDisabled={
-                  flight?.status?.toLowerCase() === "inactive" ? true : false
-                }
+                isDisabled
                 {...register("driver", {
                   required: "Это значение является обязательным",
                 })}
@@ -366,10 +365,13 @@ export default function FlightInfoForm() {
                 placeholder="Введите дату"
                 {...register("arrival_date")}
               />
+              {arrivalStatus && <p className="text-red-500 text-sm">{arrivalStatus}</p>}
             </div>
             {flight_type === "OUT" && (
               <div className="space-y-2">
-                <label className="text-sm font-medium">Расход на питание</label>
+                <label className="text-sm font-medium">
+                  Расход на питание (за день)
+                </label>
                 <CurrencyInputWithSelect disabled name="other_expenses" />
               </div>
             )}
@@ -423,8 +425,9 @@ export default function FlightInfoForm() {
             driver={driver as IEmployee}
             car={car as ICars}
             arrival_date={arrival_date as string}
-            expenses_cook={((flight?.other_expenses_uzs ?? 0) * travelPeriod)}
+            expenses_cook={(flight?.other_expenses_uzs ?? 0) * travelPeriod}
             expense={flight?.driver_expenses_uzs as number}
+            setArrivalStatus={setArrivalStatus}
           />
         )}
       </div>

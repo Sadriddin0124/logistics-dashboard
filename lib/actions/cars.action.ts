@@ -21,7 +21,7 @@ export const createCar = async (data: ICars) => {
   return response.data;
 };
 
-export const sellCar = async (data: { id: string; sell_price: number }) => {
+export const sellCar = async (data: { id: string; sell_price: string }) => {
   const response = await $api.post(`/cars/delete/${data?.id}`, {
     sell_price: data?.sell_price,
   });
