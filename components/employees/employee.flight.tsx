@@ -75,8 +75,10 @@ export function EmployeeFlightTable() {
       <Table>
         <TableHeader className="font-bold">
           <TableRow className="border-b border-b-gray-200">
+            <TableHead> </TableHead>
             <TableHead>Автомобиль</TableHead>
             <TableHead>Цена</TableHead>
+            <TableHead >Статус</TableHead>
             <TableHead>Дата отправления</TableHead>
             <TableHead>Дата приезда</TableHead>
             <TableHead>Груз</TableHead>
@@ -87,11 +89,12 @@ export function EmployeeFlightTable() {
             <TableRow key={i} className="border-b-gray-300 border-b">
               <TableCell>{i + 1}</TableCell>
               <TableCell>{flight?.car?.name}</TableCell>
-              <TableCell>{formatDate(flight?.departure_date as string, "/")}</TableCell>
-              <TableCell>{formatDate(flight?.arrival_date as string, "/")}</TableCell>
               <TableCell>
                  {Number(flight.price_uzs).toFixed(2)} $
               </TableCell>
+              <TableCell className="px-5">{flight?.status?.toLowerCase() === "active" ? "Активный" : "Завершенный"}</TableCell>
+              <TableCell>{formatDate(flight?.departure_date as string, "/")}</TableCell>
+              <TableCell>{formatDate(flight?.arrival_date as string, "/")}</TableCell>
               <TableCell>
                 <p className="line-clamp-1 overflow-hidden">
                   {flight.cargo_info}

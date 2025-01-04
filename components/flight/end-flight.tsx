@@ -90,6 +90,7 @@ const EndFlight: React.FC<EndFlightProps> = ({
     mutationFn: updateCarDistance,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["flight-one"] });
+      toast.success(" Сохранено успешно!");
     },
     onError: () => {
       toast.error("Ошибка сохранения!");
@@ -99,7 +100,6 @@ const EndFlight: React.FC<EndFlightProps> = ({
     mutationFn: createFinance,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["finance"] });
-      toast.success(" Сохранено успешно!");
       reset();
     },
     onError: () => {
