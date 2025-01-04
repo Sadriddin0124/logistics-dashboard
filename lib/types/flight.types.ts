@@ -35,9 +35,10 @@ export interface IFlightCreate {
   other_expenses_uzs?: string | number;
   other_expenses?: string | number;
   flight_expenses?: string | number;
-  flight_expenses_uzs?: string;
+  flight_expenses_uzs?: number;
   start_km: number;
   end_km?: number;
+  flight_balance?: number;
 }
 export interface IFlightData {
   id?: string;
@@ -59,6 +60,7 @@ export interface IFlightData {
   car_number?: string;
   other_expenses: number | string;
   flight_expenses: number | string;
+  flight_expenses_uzs: number;
   driver_expenses: number | string;
   start_km: number;
   end_km?: number;
@@ -97,7 +99,7 @@ export interface IFlightFormEdit {
   route: string; // Required
   status?: string;
   flight_balance: number;
-  flight_expenses_uzs?: string;
+  flight_expenses_uzs?: number;
   flight_expenses: number | string;
   other_expenses: number | string;
   other_expenses_uzs?: number;

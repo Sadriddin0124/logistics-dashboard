@@ -71,10 +71,8 @@ const EndFlight: React.FC<EndFlightProps> = ({ id, driver, balance, car, expense
   const { mutate: changeMutation } = useMutation({
     mutationFn: updateEmployeeBalance,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["flights"] });
-      setOpen(false);
+      queryClient.invalidateQueries({ queryKey: ["employees-all"] });
       reset();
-      push("/flight");
     },
     onError: () => {
       toast.error("Ошибка при завершении рейса!");
@@ -100,13 +98,16 @@ const EndFlight: React.FC<EndFlightProps> = ({ id, driver, balance, car, expense
       toast.error("Ошибка сохранения!");
     },
   });
-console.log(expenses_cook);
-
+console.log(Number(driver?.balance_uzs) + expense + expenses_cook);
+  console.log(expense);
+  console.log(expenses_cook);
+  
   const onSubmit = (data: EndFlightForm) => {
-    updateMutation({ id, endKm: data?.endKm, arrival_date: arrival_date });
+    updateMutation({ id, endKm: data?.endKm, arrival_date: arrival_date, flight_balance: data?.balance_uzs });
     changeMutation({
       id: driver?.id as string,
-      balance_usz: (Number(driver?.balance_uzs) + expense + expenses_cook) 
+      balance_usz: (Number(driver?.balance_uzs) + expense + expenses_cook),
+      // balance: (Number(driver?.balance_uzs) + expense + expenses_cook) 
     });
     updateCarMutation({
       id: car?.id as string,

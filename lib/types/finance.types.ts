@@ -22,8 +22,8 @@ export interface IFinanceDiesel {
   price_uzs: string;
   price: string | number;
   price_type: string;
-  km: string;
-  km_car: string;
+  km?: string;
+  km_car?: string;
 }
 
 export type IFinanceResponse = PaginationResponse<IFinance>;

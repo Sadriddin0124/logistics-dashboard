@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Option } from "@/pages/warehouse/diesel";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Select, { SingleValue } from "react-select";
-import { createFinance } from "@/lib/actions/finance.action";
+import { createFinance, createFinanceDiesel } from "@/lib/actions/finance.action";
 import { queryClient } from "../ui-items/ReactQueryProvider";
 import { toast } from "react-toastify";
 import { fetchAllFlights } from "@/lib/actions/flight.action";
@@ -19,6 +19,7 @@ import { Textarea } from "../ui/textarea";
 
 interface FormValues {
   action: string;
+  amount_type: string;
   amount_uzs: string;
   amount: string;
   kind: string;
@@ -81,18 +82,17 @@ export default function DieselExpense() {
     // setCarOptions(carOption as Option[]);
   }, [flights, cars]);
 
-  // const { mutate: createMutation } = useMutation({
-  //   mutationFn: createFinanceDiesel,
-  //   onSuccess: () => {
-  //     reset();
-  //     setSelectedFlight(null);
-  //     queryClient.invalidateQueries({ queryKey: ["finance"] });
-  //     toast.success(" Сохранено успешно!");
-  //   },
-  //   onError: () => {
-  //     toast.error("Ошибка сохранения!");
-  //   },
-  // });
+  const { mutate: createMutation } = useMutation({
+    mutationFn: createFinanceDiesel,
+    onSuccess: () => {
+      methods.reset();
+      setSelectedFlight(null);
+      queryClient.invalidateQueries({ queryKey: ["finance"] });
+    },
+    onError: () => {
+      toast.error("Ошибка сохранения!");
+    },
+  });
   const { mutate: createFinanceMutation } = useMutation({
     mutationFn: createFinance,
     onSuccess: () => {
@@ -115,6 +115,15 @@ export default function DieselExpense() {
       employee: "",
       kind: id as string,
     };
+    const formData2 = {
+      car: data?.car,
+      flight: data?.flight,
+      price: Number(removeCommas(data?.amount as string)),
+      price_uzs: data?.amount_uzs,
+      price_type: data?.amount_type,
+      volume: data?.volume
+    };
+    createMutation(formData2)
     createFinanceMutation(formData);
   };
 
@@ -176,33 +185,7 @@ export default function DieselExpense() {
                   <p className="text-red-500">{errors.car?.message}</p>
                 )}
               </div> */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  Введите сумму расхода.*
-                </label>
-                <CurrencyInputWithSelect name="amount" />
-              </div>
-            </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Выберите рейс*</label>
-                <Select
-                  {...register("flight", { required: "Выберите рейс" })}
-                  options={flightOptions}
-                  value={selectedFlight}
-                  onChange={handleSelectFlight}
-                  placeholder="Выберите..."
-                  noOptionsMessage={() => "Не найдено"}
-                />
-                {errors?.flight ? (
-                  <p className="text-red-500">{errors?.flight?.message}</p>
-                ) : carFuelType ? (
-                  <p className="text-red-500">{carFuelType}</p>
-                ) : (
-                  ""
-                )}
-              </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium">
                   Введите количество Солярканого топлива*
@@ -214,13 +197,40 @@ export default function DieselExpense() {
                     valueAsNumber: true,
                   })}
                 />
-              </div>
               {errors?.volume && (
                 <p className="text-red-500">{errors?.volume?.message}</p>
               )}
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Выберите рейс*</label>
+              <Select
+                {...register("flight", { required: "Выберите рейс" })}
+                options={flightOptions}
+                value={selectedFlight}
+                onChange={handleSelectFlight}
+                placeholder="Выберите..."
+                noOptionsMessage={() => "Не найдено"}
+              />
+              {errors?.flight ? (
+                <p className="text-red-500">{errors?.flight?.message}</p>
+              ) : carFuelType ? (
+                <p className="text-red-500">{carFuelType}</p>
+              ) : (
+                ""
+              )}
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">
+                Введите сумму расхода.*
+              </label>
+              <CurrencyInputWithSelect name="amount" />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 col-span-2">
               <label className="text-sm font-medium">Комментарий</label>
               <Textarea
                 placeholder="Напишите комментарий..."
@@ -228,7 +238,7 @@ export default function DieselExpense() {
                 {...register("comment")}
               />
             </div>
-            <div className="w-full justify-end flex">
+            <div className="w-full justify-end flex col-span-2">
               <Button
                 type="submit"
                 className="bg-[#4880FF] text-white hover:bg-blue-600 w-[300px] rounded-md"

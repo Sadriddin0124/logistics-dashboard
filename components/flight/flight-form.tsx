@@ -134,6 +134,7 @@ export default function FlightForm() {
       price: Number(removeCommas(data?.price_uzs?.toString())),
       flight_expenses: Number(removeCommas(data?.flight_expenses?.toString())),
       other_expenses: Number(removeCommas(data?.other_expenses?.toString())),
+      flight_balance: data?.flight_expenses_uzs,
       arrival_date: data?.arrival_date || null,
       // upload: image?.id
     });

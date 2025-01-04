@@ -34,7 +34,7 @@ export const updateEmployee = async (data: IEmployee) => {
   const response = await $api.put(`/employees/update/${data?.id}/`, data);
   return response.data;
 };
-export const updateEmployeeBalance = async (data: {id: string, balance_usz: number}) => {
+export const updateEmployeeBalance = async (data: {id: string, balance_usz: number,}) => {
   const response = await $api.patch(`/employees/update/${data?.id}/`, {balance_uzs: data?.balance_usz});
   return response.data;
 };

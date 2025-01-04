@@ -56,8 +56,8 @@ export const updateOrderedStatus = async (id: string) => {
   return response.data;
 };
 
-export const updateFlight = async (data: {id: string, endKm: number, arrival_date: string}) => {
-  const response = await $api.patch(`/flight/${data?.id}/`, {end_km: data?.endKm, status: "INACTIVE", arrival_date: data?.arrival_date });
+export const updateFlight = async (data: {id: string, endKm: number, arrival_date: string, flight_balance: number}) => {
+  const response = await $api.patch(`/flight/${data?.id}/`, {end_km: data?.endKm, status: "INACTIVE", arrival_date: data?.arrival_date, flight_balance: data?.flight_balance });
   return response.data;
 };
 

@@ -167,6 +167,7 @@ const CurrencyInputWithSelect: React.FC<CurrencyInputWithSelectProps> = ({
 
       <div className="flex flex-col gap-2">
         <select
+        disabled={disabled}
           id="currency-select"
           className="border rounded-md p-2"
           value={selectedCurrency}
