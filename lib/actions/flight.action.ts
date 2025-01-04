@@ -1,5 +1,5 @@
 import { $api } from "@/pages/api/api";
-import { IFlightCreate } from "../types/flight.types";
+import { IFlightCreate, IFlightData } from "../types/flight.types";
 
 export const fetchFlight = async (id: string) => {
   const response = await $api.get(`/flight/${id}/`);
@@ -58,6 +58,11 @@ export const updateOrderedStatus = async (id: string) => {
 
 export const updateFlight = async (data: {id: string, endKm: number, arrival_date: string, flight_balance: number}) => {
   const response = await $api.patch(`/flight/${data?.id}/`, {end_km: data?.endKm, status: "INACTIVE", arrival_date: data?.arrival_date, flight_balance: data?.flight_balance });
+  return response.data;
+};
+
+export const closeFlight = async (data: IFlightData) => {
+  const response = await $api.put(`/flight/${data?.id}/`, data);
   return response.data;
 };
 
