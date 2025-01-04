@@ -30,7 +30,7 @@ const CustomCurrency: React.FC<{status: boolean}> = ({status}) => {
   return (
     <div className="flex flex-col gap-2">
       {/* USD Input */}
-      <div className="flex items-center space-x-2 rounded-md border border-gray-300 w-full p-2">
+      <div className="flex items-center space-x-2 rounded-md border border-gray-300 w-full px-2 py-[2px]">
         <span className="font-medium">USD</span>
         <Input
         disabled={status}
@@ -43,7 +43,7 @@ const CustomCurrency: React.FC<{status: boolean}> = ({status}) => {
       </div>
 
       {/* RUB Input */}
-      <div className="flex items-center space-x-2 rounded-md border border-gray-300 w-full p-2">
+      <div className="flex items-center space-x-2 rounded-md border border-gray-300 w-full px-2 py-[2px]">
         <span className="font-medium">RUB</span>
         <Input
         disabled={status}
@@ -56,7 +56,7 @@ const CustomCurrency: React.FC<{status: boolean}> = ({status}) => {
       </div>
 
       {/* KZT Input */}
-      <div className="flex items-center space-x-2 rounded-md border border-gray-300 w-full p-2">
+      <div className="flex items-center space-x-2 rounded-md border border-gray-300 w-full px-2 py-[2px]">
         <span className="font-medium">KZT</span>
         <Input
         disabled={status}
