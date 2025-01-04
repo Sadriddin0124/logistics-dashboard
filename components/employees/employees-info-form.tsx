@@ -173,7 +173,7 @@ export default function EmployeesInfoForm() {
             name="flight_type"
             control={control}
             render={({ field }) => (
-              <Select value={field?.value} onValueChange={field.onChange}>
+              <Select value={field?.value} onValueChange={field.onChange} disabled>
                 <SelectTrigger>
                   <SelectValue placeholder="Выберите..." />
                 </SelectTrigger>

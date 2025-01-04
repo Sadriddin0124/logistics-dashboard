@@ -90,6 +90,7 @@ export default function FlightForm() {
       car: "",
       employee: "",
       kind: id as string,
+      comment: data?.comment + "/" + ""
     };
     createMutation(formData);
     reset();
