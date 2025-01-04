@@ -39,6 +39,7 @@ export interface IFlightCreate {
   start_km: number;
   end_km?: number;
   flight_balance?: number;
+  flight_balance_uzs?: number;
 }
 export interface IFlightData {
   id?: string;

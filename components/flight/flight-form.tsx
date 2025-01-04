@@ -136,6 +136,7 @@ export default function FlightForm() {
       flight_expenses: Number(removeCommas(data?.flight_expenses?.toString())),
       other_expenses: Number(removeCommas(data?.other_expenses?.toString())),
       flight_balance: data?.flight_expenses_uzs,
+      flight_balance_uzs: data?.flight_expenses_uzs,
       arrival_date: data?.arrival_date || null,
     });
     updateCarMutation({
