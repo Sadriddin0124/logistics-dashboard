@@ -123,7 +123,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
           />
           <Download
             className="absolute right-2 bottom-2 text-white group-hover:z-[2] z-[-1] text-[24px] cursor-pointer"
-            onClick={() => downloadImage(image?.file, "Image")}
+            onClick={() => downloadImage(image?.file, decodeURIComponent(image?.file?.split("/")[5]))}
           />
           <Image
             width={1000}

@@ -96,7 +96,6 @@ export default function EmployeesInfoForm() {
     });
     return () => subscription.unsubscribe();
   }, [employee, watch, getValues, isChanged]);
-  console.log(license);
   const { mutate: updateMutation } = useMutation({
     mutationFn: updateEmployee,
     onSuccess: () => {

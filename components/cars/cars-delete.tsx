@@ -34,7 +34,6 @@ export function DeleteCars({
   } = methods;
   const handleDelete: SubmitHandler<{ value_uzs: number; }> = (data) => {
     onDelete(data?.value_uzs)
-    console.log(data);
     
   }
   return (

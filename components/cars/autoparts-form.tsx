@@ -112,7 +112,6 @@ export function AutoPartsForm() {
       price_uzs: Number(removeCommas(item?.price as string)),
       car: id as string,
     }));
-    console.log(formData);
     methods.reset();
     
     createMutation(formData);
