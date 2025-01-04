@@ -16,6 +16,7 @@ import { Input } from "../ui/input";
 import { removeCommas } from "@/lib/utils";
 // import { useRouter } from "next/router";
 import { Textarea } from "../ui/textarea";
+import { formatDate } from "@/lib/functions";
 
 interface FormValues {
   action: string;
@@ -68,7 +69,7 @@ export default function DieselExpense() {
           modelName = flight.car.models?.name;
         }
         return {
-          label: `${regionName} ${carName} ${modelName}`,
+          label: `${regionName} ${carName} ${modelName}  ${formatDate(flight?.created_at as string, "/")}`,
           value: flight?.id,
         };
       });

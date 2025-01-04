@@ -91,6 +91,7 @@ export interface IFlightForm {
   cargo_info?: string | null; // Nullable
   route: string; // Required
   status?: string;
+  created_at?: string;
 }
 export interface IFlightFormEdit {
   id?: string;
@@ -108,6 +109,7 @@ export interface IFlightFormEdit {
   cargo_info?: string | null; // Nullable
   route: string; // Required
   status?: string;
+  created_at?: string;
   flight_balance: number;
   flight_balance_uzs: number;
   flight_expenses_uzs?: number;

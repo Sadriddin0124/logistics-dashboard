@@ -22,6 +22,7 @@ export interface IGasStation {
   amount?: number;
   created_at?: string;
   updated_at?: string;
+  km?: number;
   station?: IGasStation
 }
 

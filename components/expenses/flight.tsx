@@ -12,9 +12,10 @@ import { removeCommas } from "@/lib/utils";
 import { SalaryFormData } from "./salary";
 import { useRouter } from "next/router";
 import { fetchAllFlights } from "@/lib/actions/flight.action";
-import { IFlightFormEdit } from "@/lib/types/flight.types";
+import { IFlightForm, IFlightFormEdit } from "@/lib/types/flight.types";
 import { Input } from "../ui/input";
 import CurrencyInputWithSelect from "../ui-items/currencySelect";
+import { formatDate } from "@/lib/functions";
 
 export default function FlightForm() {
   const methods = useForm<SalaryFormData>();
@@ -26,6 +27,7 @@ export default function FlightForm() {
   } = methods;
   const [flightOptions, setFlightOptions] = useState<Option[]>([]);
   const [selectedFlight, setSelectedFlight] = useState<Option | null>(null);
+  const [flight, setFlight] = useState<IFlightForm | null>(null);
   const [balance, setBalance] = useState(0);
   const { id } = useRouter()?.query;
 
@@ -48,14 +50,14 @@ export default function FlightForm() {
           modelName = flight.car.models?.name;
         }
         return {
-          label: `${regionName} ${carName} ${modelName}`,
+          label: `${regionName} ${carName} ${modelName} ${formatDate(flight?.created_at as string, "/")}`,
           value: flight?.id,
         };
       });
     setFlightOptions(carOption as Option[]);
     const balance = flights?.find(
       (item) => selectedFlight?.value === item?.id
-    )?.flight_balance;
+    )?.flight_balance_uzs;
     setBalance(balance as number);
   }, [flights, selectedFlight?.value]);
 
@@ -90,7 +92,7 @@ export default function FlightForm() {
       car: "",
       employee: "",
       kind: id as string,
-      comment: data?.comment + "/" + ""
+      comment: data?.comment + ` / ${flight?.car?.name} ${flight?.car?.number} ${formatDate(flight?.created_at as string, "/")}`
     };
     createMutation(formData);
     reset();
@@ -99,6 +101,8 @@ export default function FlightForm() {
   const handleSelectFlight = (newValue: SingleValue<Option>) => {
     setSelectedFlight(newValue);
     setValue("flight", newValue?.value as string);
+    const flight = flights?.find(item=> item?.id === newValue?.value)
+    setFlight(flight as IFlightForm)
   };
   return (
     <div>

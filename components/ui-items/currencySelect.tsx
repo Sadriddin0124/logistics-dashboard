@@ -11,6 +11,7 @@ interface CurrencyInputWithSelectProps {
   name: string;
   required?: boolean;
   disabled?: boolean;
+  type?: string
 }
 
 // Utility functions
@@ -37,6 +38,7 @@ const CurrencyInputWithSelect: React.FC<CurrencyInputWithSelectProps> = ({
   name,
   required,
   disabled,
+  type
 }) => {
   const { data: exchangeRates } = useQuery<ExchangeRate[]>({
     queryKey: ["exchangeRates"],
@@ -49,7 +51,7 @@ const CurrencyInputWithSelect: React.FC<CurrencyInputWithSelectProps> = ({
     setValue,
     formState: { errors },
   } = useFormContext();
-  const [selectedCurrency, setSelectedCurrency] = useState("USD");
+  const [selectedCurrency, setSelectedCurrency] = useState(type || "USD");
   
   const inputValue = watch(name);
   
@@ -62,51 +64,59 @@ const CurrencyInputWithSelect: React.FC<CurrencyInputWithSelectProps> = ({
     {}
   );
   
-  useEffect(() => {
-    
-    if (!exchangeRatesMap || !inputValue) return;
-  
-    const parsedInput = parseAndValidateNumber(inputValue);
-    if (parsedInput !== null) {
-      const usdRate = currencyStatus
-        ? Number(dollar)
-        : exchangeRatesMap["USD"] ?? 1;
-      const rubRate = currencyStatus
-        ? Number(ruble)
-        : exchangeRatesMap["RUB"] ?? 1;
-      const kztRate = currencyStatus
-        ? Number(tenge)
-        : exchangeRatesMap["KZT"] ?? 1;
-  
-      const convertedValue =
-        selectedCurrency === "USD"
-          ? parsedInput
-          : selectedCurrency === "RUB"
-          ? parsedInput * (rubRate / usdRate)
-          : selectedCurrency === "KZT"
-          ? parsedInput * (kztRate / usdRate)
-          : parsedInput / usdRate;
-  
-      if (watch(`${name}_uzs`) !== convertedValue) {
-        setValue(`${name}_uzs`, convertedValue, { shouldValidate: true });
-      }
-  
-      if (watch(`${name}_type`) !== selectedCurrency) {
-        setValue(`${name}_type`, selectedCurrency, { shouldValidate: true });
-      }
+// Separate useEffect for initializing selectedCurrency
+useEffect(() => {
+  if (type) {
+    setSelectedCurrency(type); // Set default value only when type changes
+  }
+}, [type]); // Runs only when `type` changes
+
+// Main useEffect for calculations
+useEffect(() => {
+  if (!exchangeRatesMap || !inputValue) return;
+
+  const parsedInput = parseAndValidateNumber(inputValue);
+  if (parsedInput !== null) {
+    const usdRate = currencyStatus
+      ? Number(dollar)
+      : exchangeRatesMap["USD"] ?? 1;
+    const rubRate = currencyStatus
+      ? Number(ruble)
+      : exchangeRatesMap["RUB"] ?? 1;
+    const kztRate = currencyStatus
+      ? Number(tenge)
+      : exchangeRatesMap["KZT"] ?? 1;
+
+    const convertedValue =
+      selectedCurrency === "USD"
+        ? parsedInput
+        : selectedCurrency === "RUB"
+        ? parsedInput * (rubRate / usdRate)
+        : selectedCurrency === "KZT"
+        ? parsedInput * (kztRate / usdRate)
+        : parsedInput / usdRate;
+
+    if (watch(`${name}_uzs`) !== convertedValue) {
+      setValue(`${name}_uzs`, convertedValue, { shouldValidate: true });
     }
-  }, [
-    inputValue,
-    selectedCurrency,
-    exchangeRatesMap,
-    setValue,
-    name,
-    currencyStatus, // currencyStatus dependency
-    dollar,
-    ruble,
-    tenge,
-    watch,
-  ]);
+
+    if (watch(`${name}_type`) !== selectedCurrency) {
+      setValue(`${name}_type`, selectedCurrency, { shouldValidate: true });
+    }
+  }
+}, [
+  inputValue,
+  selectedCurrency,
+  exchangeRatesMap,
+  setValue,
+  name,
+  currencyStatus,
+  dollar,
+  ruble,
+  tenge,
+  watch,
+]);
+
   return (
     <div className="flex gap-2 items-start">
       <div className="flex flex-col gap-2 w-full relative">

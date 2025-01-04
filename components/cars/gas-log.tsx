@@ -76,14 +76,16 @@ export function GasLog() {
           <TableRow className="border-b-gray-300 border-b">
             <TableHead className="font-bold">Заправки</TableHead>
             <TableHead className="font-bold">Количество</TableHead>
+            <TableHead className="font-bold">Пройденный путь</TableHead>
             <TableHead className="font-bold">Дата</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {purchased?.results.map((entry, i) => (
+          {purchased?.results?.map((entry, i) => (
             <TableRow key={i} className="border-b-gray-300 border-b">
               <TableCell>{entry.station?.name}</TableCell>
               <TableCell>{entry?.amount}</TableCell>
+              <TableCell>{entry?.km} км</TableCell>
               <TableCell>{formatDate(entry?.created_at as string, "/")}</TableCell>
             </TableRow>
           ))}

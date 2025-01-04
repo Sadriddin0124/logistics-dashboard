@@ -8,7 +8,6 @@ import React, { Dispatch, SetStateAction, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useForm, Controller, FormProvider } from "react-hook-form";
 import { Input } from "../ui/input";
-import { IEmployee } from "@/lib/types/employee.types";
 import { ICars } from "@/lib/types/cars.types";
 import { updateCarDistance } from "@/lib/actions/cars.action";
 import CurrencyInputWithSelect from "../ui-items/currencySelect";
@@ -16,13 +15,11 @@ import { removeCommas } from "@/lib/utils";
 
 interface EndFlightProps {
   id: string;
-  driver: IEmployee;
   balance: number;
   car: ICars;
-  expense: number;
-  expenses_cook: number;
   arrival_date: string;
   setArrivalStatus: Dispatch<SetStateAction<string>>;
+  flight_type: string;
 }
 
 interface EndFlightForm {
@@ -39,7 +36,7 @@ const EndFlight: React.FC<EndFlightProps> = ({
   car,
   // expense,
   arrival_date,
-  // expenses_cook,
+  flight_type,
   setArrivalStatus,
 }) => {
   const [open, setOpen] = React.useState(false);
@@ -58,8 +55,10 @@ const EndFlight: React.FC<EndFlightProps> = ({
     formState: { errors, isSubmitting },
   } = methods;
 
+  console.log(flight_type);
+
   useEffect(() => {
-    setValue("balance", balance?.toString());
+    setValue("balance", balance?.toString() || "0");
     setValue("endKm", car?.distance_travelled);
   }, [setValue, car?.distance_travelled, balance]);
 
@@ -104,7 +103,7 @@ const EndFlight: React.FC<EndFlightProps> = ({
       flight_balance_uzs: Number(removeCommas(data?.balance)),
       arrival_date: arrival_date,
     };
-    updateMutation(formData);
+    updateMutation(formData)
     updateCarMutation({
       id: car?.id as string,
       distance_travelled: data?.endKm,
@@ -149,9 +148,11 @@ const EndFlight: React.FC<EndFlightProps> = ({
   };
 
   const handleOpen = () => {
-    if (arrival_date) {
+    if (arrival_date && flight_type === "OUT") {
       setOpen(true);
       setArrivalStatus("");
+    } else if (!arrival_date && flight_type === "IN_UZB") {
+      setOpen(true);
     } else {
       setArrivalStatus("Введите дату прибытия");
     }
@@ -170,39 +171,43 @@ const EndFlight: React.FC<EndFlightProps> = ({
         </h3>
         <FormProvider {...methods}>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">
-                Введите текущий пробег*
-              </label>
-              <Controller
-                name="endKm"
-                control={control}
-                rules={{
-                  required: "Текущий пробег обязателен",
-                  validate: (value) =>
-                    value < car?.distance_travelled
-                      ? `Расстояние должно быть больше ${car?.distance_travelled}`
-                      : true,
-                }}
-                render={({ field }) => (
-                  <Input
-                    type="number"
-                    placeholder="Текущий пробег"
-                    {...field}
-                  />
-                )}
-              />
+            <div className={flight_type === "OUT" ? "space-y-4" : "hidden"}>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                  Введите текущий пробег*
+                </label>
+                <Controller
+                  name="endKm"
+                  control={control}
+                  rules={{
+                    required: "Текущий пробег обязателен",
+                    validate: (value) =>
+                      value < car?.distance_travelled
+                        ? `Расстояние должно быть больше ${car?.distance_travelled}`
+                        : true,
+                  }}
+                  render={({ field }) => (
+                    <Input
+                      type="number"
+                      placeholder="Текущий пробег"
+                      {...field}
+                    />
+                  )}
+                />
 
-              {errors.endKm && (
-                <p className="text-red-500 text-sm">{errors.endKm.message}</p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Баланс*</label>
-              <CurrencyInputWithSelect name="balance" />
-              {errors.balance && (
-                <p className="text-red-500 text-sm">{errors.balance.message}</p>
-              )}
+                {errors.endKm && (
+                  <p className="text-red-500 text-sm">{errors.endKm.message}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Баланс*</label>
+                <CurrencyInputWithSelect name="balance" />
+                {errors.balance && (
+                  <p className="text-red-500 text-sm">
+                    {errors.balance.message}
+                  </p>
+                )}
+              </div>
             </div>
             <div className="flex justify-end gap-4">
               <DialogTrigger asChild>

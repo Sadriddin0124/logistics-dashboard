@@ -21,21 +21,25 @@ import { downloadExcelFile, formatDate } from "@/lib/functions";
 export default function FlightTable({
   active,
   setActive,
+  flightType,
+  status
 }: {
   active: string;
   setActive: Dispatch<SetStateAction<string>>;
+  status: string
+  flightType: string
 }) {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const { data: flights } = useQuery<FlightPaginatedResponse2>({
-    queryKey: ["flights", currentPage],
-    queryFn: () => fetchFlights(currentPage),
+    queryKey: ["flights", currentPage, flightType, status],
+    queryFn: () => fetchFlights(currentPage, flightType, status),
   });
   useEffect(() => {
     queryClient.prefetchQuery({
-      queryKey: ["flights", currentPage + 1],
-      queryFn: () => fetchFlights(currentPage + 1),
+      queryKey: ["flights", currentPage + 1, flightType, status],
+      queryFn: () => fetchFlights(currentPage + 1, flightType, status),
     });
-  }, [currentPage]);
+  }, [currentPage, flightType, status]);
 
   const itemsPerPage = 30;
   const indexOfLastOrder = currentPage * itemsPerPage;

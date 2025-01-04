@@ -72,7 +72,7 @@ export default function EmployeesTable() {
             <TableHead className="font-bold">П/Н</TableHead>
             <TableHead className="font-bold">Имя сотрудника</TableHead>
             <TableHead className="font-bold">Номер телефона.</TableHead>
-            <TableHead className="font-bold">Есть ли бонус?</TableHead>
+            <TableHead className="font-bold">Баланс</TableHead>
             <TableHead className="font-bold w-[50px]"></TableHead>
           </TableRow>
         </TableHeader>
@@ -82,7 +82,7 @@ export default function EmployeesTable() {
               <TableCell>{index + 1}</TableCell>
               <TableCell>{employee?.full_name}</TableCell>
               <TableCell>{employee?.phone}</TableCell>
-              <TableCell>{employee?.bonus ? "Да" : " Нет"}</TableCell>
+              <TableCell>{employee?.balance_uzs} $</TableCell>
               <TableCell>
                 <Link href={`/employees/employee-info?id=${employee?.id}`}>
                   <Button variant="ghost" size="icon" className="h-8 w-8">

@@ -1,7 +1,7 @@
 "use client";
 
 import { Dispatch, SetStateAction, useEffect } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, FormProvider, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,6 +18,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import CurrencyInputWithSelect from "../ui-items/currencySelect";
+import { removeCommas } from "@/lib/utils";
 
 export default function CreateCityModal({
   isOpen,
@@ -30,13 +32,14 @@ export default function CreateCityModal({
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
 }) {
+  const methods = useForm<IRegion>();
   const {
     register,
     handleSubmit,
     control,
     formState: { errors },
     reset,
-  } = useForm<IRegion>();
+  } = methods;
   useEffect(() => {
     if (editItem) {
       reset(editItem);
@@ -65,9 +68,47 @@ export default function CreateCityModal({
   const onSubmit = (data: IRegion) => {
     if (editItem) {
       console.log(data);
-      updateMutation(data);
+      updateMutation({
+        ...data,
+        been_driver_expenses:
+        typeof data?.been_driver_expenses === "string"
+          ? Number(removeCommas(data?.been_driver_expenses as string))
+          : data?.been_driver_expenses,
+        gone_driver_expenses:
+        typeof data?.gone_driver_expenses === "string"
+          ? Number(removeCommas(data?.gone_driver_expenses as string))
+          : data?.gone_driver_expenses,
+        been_flight_price:
+        typeof data?.been_flight_price === "string"
+          ? Number(removeCommas(data?.been_flight_price as string))
+          : data?.been_driver_expenses,
+        gone_flight_price:
+        typeof data?.gone_flight_price === "string"
+          ? Number(removeCommas(data?.gone_flight_price as string))
+          : data?.gone_flight_price,
+        route: "BEEN_TO"
+      });
     } else {
-      createMutation(data);
+      createMutation({
+        ...data,
+        been_driver_expenses:
+        typeof data?.been_driver_expenses === "string"
+          ? Number(removeCommas(data?.been_driver_expenses as string))
+          : data?.been_driver_expenses,
+        gone_driver_expenses:
+        typeof data?.gone_driver_expenses === "string"
+          ? Number(removeCommas(data?.gone_driver_expenses as string))
+          : data?.gone_driver_expenses,
+        been_flight_price:
+        typeof data?.been_flight_price === "string"
+          ? Number(removeCommas(data?.been_flight_price as string))
+          : data?.been_driver_expenses,
+        gone_flight_price:
+        typeof data?.gone_flight_price === "string"
+          ? Number(removeCommas(data?.gone_flight_price as string))
+          : data?.gone_flight_price,
+        route: "BEEN_TO"
+      });
     }
     setEditItem(null);
     setIsOpen(false);
@@ -96,52 +137,130 @@ export default function CreateCityModal({
             Добавить регион
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div>
-              <Label htmlFor="name">Имя</Label>
-              <Input
-                id="name"
-                {...register("name", { required: "Name is required" })}
-              />
-              {errors.name && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.name.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="flight_type">Тип области</Label>
-              <Controller
-                name="flight_type"
-                control={control}
-                rules={{ required: "Поле обязательно для заполнения." }}
-                render={({ field }) => (
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Выберите..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="OUT">
-                        За территории Узбекистана
-                      </SelectItem>
-                      <SelectItem value="IN_UZB">
-                        На территории Узбекистана
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
-              />{" "}
-            </div>
-
-            <Button
-              type="submit"
-              className="bg-[#4880FF] text-white hover:bg-blue-600"
+        <DialogContent className="sm:max-w-[600px]">
+          <FormProvider {...methods}>
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="flex flex-col justify-start gap-4"
             >
-              Сохранять
-            </Button>
-          </form>
+              {/* <div>
+                <Label htmlFor="flight_type">Маршрут*</Label>
+                <Controller
+                  name="route"
+                  control={control}
+                  rules={{ required: "Поле обязательно для заполнения." }}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Выберите..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={"GONE_TO"}>Туда</SelectItem>
+                        <SelectItem value={"BEEN_TO"}>
+                          Туда и обратно
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />{" "}
+              </div> */}
+              <div>
+                <Label htmlFor="name">Имя</Label>
+                <Input
+                  id="name"
+                  {...register("name", { required: "Name is required" })}
+                />
+                {errors.name && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.name.message}
+                  </p>
+                )}
+              </div>
+                <div>
+                  <div>
+                    <Label htmlFor="name">Расходы водителя (Туда и обратно)</Label>
+                    <CurrencyInputWithSelect
+                      name="been_driver_expenses"
+                      type={editItem?.been_driver_expenses_type}
+                    />
+                    {errors.been_driver_expenses && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.been_driver_expenses.message}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <Label htmlFor="name">Стоимость рейса (Туда и обратно)</Label>
+                    <CurrencyInputWithSelect
+                      name="been_flight_price"
+                      type={editItem?.been_flight_price_type}
+                    />
+                    {errors.been_flight_price && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.been_flight_price.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <div>
+                    <Label htmlFor="name">Расходы водителя (Туда)</Label>
+                    <CurrencyInputWithSelect
+                      name="gone_driver_expenses"
+                      type={editItem?.gone_driver_expenses_type}
+                    />
+                    {errors.gone_driver_expenses && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.gone_driver_expenses.message}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <Label htmlFor="name">Стоимость рейса (Туда)</Label>
+                    <CurrencyInputWithSelect
+                      name="gone_flight_price"
+                      type={editItem?.gone_flight_price_type}
+                    />
+                    {errors.gone_flight_price && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.gone_flight_price.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+              <div>
+                <Label htmlFor="flight_type">Тип области</Label>
+                <Controller
+                  name="flight_type"
+                  control={control}
+                  rules={{ required: "Поле обязательно для заполнения." }}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Выберите..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="OUT">
+                          За территории Узбекистана
+                        </SelectItem>
+                        <SelectItem value="IN_UZB">
+                          На территории Узбекистана
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />{" "}
+              </div>
+
+              <Button
+                type="submit"
+                className="bg-[#4880FF] text-white hover:bg-blue-600 self-end"
+              >
+                Сохранять
+              </Button>
+            </form>
+          </FormProvider>
         </DialogContent>
       </Dialog>
     </div>

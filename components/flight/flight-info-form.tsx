@@ -61,7 +61,6 @@ export default function FlightInfoForm() {
   } = methods;
 
   const [image, setImage] = useState<ImageType>({ id: "", file: "" });
-  const region = watch("region");
   const flight_type = watch("flight_type");
   const status = watch("status");
   const departure_date = watch("departure_date");
@@ -71,7 +70,6 @@ export default function FlightInfoForm() {
   const [selectedDriver, setSelectedDriver] = useState<Option | null>(null);
   const [carOptions, setCarOptions] = useState<Option[]>([]);
   const [selectedCar, setSelectedCar] = useState<Option | null>(null);
-  const [driver, setDriver] = useState<IEmployee | null>(null);
   const [car, setCar] = useState<ICars | null>(null);
   const [travelPeriod, setTravelPeriod] = useState<number>(0);
   const [arrivalStatus, setArrivalStatus] = useState<string>("");
@@ -104,8 +102,6 @@ export default function FlightInfoForm() {
         value: driver.id,
       }));
       setDriverOptions(driverOption as Option[]);
-      const driver = employeeList?.find((item) => item?.id === flight?.driver);
-      setDriver(driver as IEmployee);
       const driverDefault = driverOption.find(
         (driver) => driver.value === flight?.driver
       );
@@ -318,8 +314,8 @@ export default function FlightInfoForm() {
                   <SelectValue placeholder="Выберите..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={"GONE_TO"}>Иду</SelectItem>
-                  <SelectItem value={"BEEN_TO"}>Прихожу</SelectItem>
+                <SelectItem value={"GONE_TO"}>Туда</SelectItem>
+                <SelectItem value={"BEEN_TO"}>Туда и обратно</SelectItem>
                 </SelectContent>
               </Selector>
             </div>
@@ -354,7 +350,7 @@ export default function FlightInfoForm() {
             </div>
 
             {/* Arrival Date */}
-            <div className="space-y-2">
+            {flight_type === "OUT" && <div className="space-y-2">
               <label className="text-sm font-medium">
                 Введите дату прибытия*
               </label>
@@ -367,7 +363,7 @@ export default function FlightInfoForm() {
                 {...register("arrival_date")}
               />
               {arrivalStatus && <p className="text-red-500 text-sm">{arrivalStatus}</p>}
-            </div>
+            </div>}
             {flight_type === "OUT" && (
               <div className="space-y-2">
                 <label className="text-sm font-medium">
@@ -380,14 +376,14 @@ export default function FlightInfoForm() {
               <label className="text-sm font-medium">Расходы на Рейс*</label>
               <CurrencyInputWithSelect disabled name="flight_expenses" />
             </div>
-            <div className="space-y-2">
+            {flight_type === "OUT" && <div className="space-y-2">
               <label className="text-sm font-medium">Баланс Рейса</label>
               <Input
                 value={flight?.flight_balance_uzs}
                 className="bg-muted"
                 readOnly
               />
-            </div>
+            </div>}
           </div>
 
           {/* Cargo Information */}
@@ -401,12 +397,12 @@ export default function FlightInfoForm() {
         </div> */}
 
           {/* Expenses */}
-          {region !== "IN_UZB" && (
+          {flight_type === "OUT" && (
             <div className="grid grid-cols-2 gap-6">
               <FileUploader image={image} setImage={setImage} type=".xlsx" />
             </div>
           )}
-          {status?.toLowerCase() !== "inactive" && (
+          {status?.toLowerCase() !== "inactive" && flight_type === "OUT" && (
             <div className="w-full flex justify-end gap-6">
               <Button
                 type="submit"
@@ -423,12 +419,10 @@ export default function FlightInfoForm() {
           <EndFlight
             id={id as string}
             balance={Number(flight?.flight_balance_uzs)}
-            driver={driver as IEmployee}
             car={car as ICars}
             arrival_date={arrival_date as string}
-            expenses_cook={(flight?.other_expenses_uzs ?? 0) * travelPeriod}
-            expense={flight?.driver_expenses_uzs as number}
             setArrivalStatus={setArrivalStatus}
+            flight_type={flight_type}
           />
         )}
       </div>
