@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { ImageType } from "@/lib/types/file.types";
 import { FileUploader } from "../ui-items/FileUploader";
-import { IFlightData, IFlightFormEdit } from "@/lib/types/flight.types";
+import { IFlightFormEdit } from "@/lib/types/flight.types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient } from "../ui-items/ReactQueryProvider";
 import { toast } from "react-toastify";
@@ -200,12 +200,6 @@ export default function FlightInfoForm() {
     });
   };
 
-  const flightData = {
-    ...flight,
-    car: car?.id,
-    upload: image?.id,
-    region: region
-  }
 
   // Handlers for select components
   const handleSelectChange = (value: string, name: string) => {
@@ -427,7 +421,6 @@ export default function FlightInfoForm() {
       <div className="w-full flex justify-end gap-6 mt-3">
         {status?.toLowerCase() !== "inactive" && (
           <EndFlight
-          flight={flightData as IFlightData}
             id={id as string}
             balance={Number(flight?.flight_expenses_uzs)}
             driver={driver as IEmployee}

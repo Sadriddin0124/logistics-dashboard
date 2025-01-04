@@ -12,11 +12,9 @@ import { IEmployee } from "@/lib/types/employee.types";
 import { ICars } from "@/lib/types/cars.types";
 import { updateCarDistance } from "@/lib/actions/cars.action";
 import CurrencyInputWithSelect from "../ui-items/currencySelect";
-import { IFlightData } from "@/lib/types/flight.types";
-import { createFinance } from "@/lib/actions/finance.action";
+import { removeCommas } from "@/lib/utils";
 
 interface EndFlightProps {
-  flight: IFlightData
   id: string;
   driver: IEmployee;
   balance: number;
@@ -29,21 +27,20 @@ interface EndFlightProps {
 
 interface EndFlightForm {
   endKm: number;
-  balance: number;
+  balance: string;
   balance_uzs: number;
   balance_type: string;
 }
 
 const EndFlight: React.FC<EndFlightProps> = ({
   id,
-  driver,
-  // balance,
+  // driver,
+  balance,
   car,
-  expense,
+  // expense,
   arrival_date,
-  expenses_cook,
+  // expenses_cook,
   setArrivalStatus,
-  flight
 }) => {
   const [open, setOpen] = React.useState(false);
   const { push } = useRouter();
@@ -51,7 +48,6 @@ const EndFlight: React.FC<EndFlightProps> = ({
   const methods = useForm<EndFlightForm>({
     defaultValues: {
       endKm: 0,
-      balance: 0,
     },
   });
   const {
@@ -63,9 +59,9 @@ const EndFlight: React.FC<EndFlightProps> = ({
   } = methods;
 
   useEffect(() => {
-    setValue("balance", flight?.flight_balance);
+    setValue("balance", balance?.toString());
     setValue("endKm", car?.distance_travelled);
-  }, [setValue, car?.distance_travelled, flight?.flight_balance]);
+  }, [setValue, car?.distance_travelled, balance]);
 
   const { mutate: updateMutation } = useMutation({
     mutationFn: closeFlight,
@@ -79,15 +75,7 @@ const EndFlight: React.FC<EndFlightProps> = ({
       toast.error("Ошибка при завершении рейса!");
     },
   });
-  // const { mutate: changeMutation } = useMutation({
-  //   mutationFn: updateEmployeeBalance,
-  //   onSuccess: () => {
-  //     queryClient.invalidateQueries({ queryKey: ["employees-all"] });
-  //   },
-  //   onError: () => {
-  //     toast.error("Ошибка при завершении рейса!");
-  //   },
-  // });
+
   const { mutate: updateCarMutation } = useMutation({
     mutationFn: updateCarDistance,
     onSuccess: () => {
@@ -98,65 +86,65 @@ const EndFlight: React.FC<EndFlightProps> = ({
       toast.error("Ошибка сохранения!");
     },
   });
-  const { mutate: createMutation } = useMutation({
-    mutationFn: createFinance,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["finance"] });
-      reset();
-    },
-    onError: () => {
-      toast.error("Ошибка сохранения!");
-    },
-  });
+  // const { mutate: createMutation } = useMutation({
+  //   mutationFn: createFinance,
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ["finance"] });
+  //     reset();
+  //   },
+  //   onError: () => {
+  //     toast.error("Ошибка сохранения!");
+  //   },
+  // });
 
   const onSubmit = (data: EndFlightForm) => {
-    updateMutation({
-      ...flight,
-      flight_balance: data?.balance_uzs,
-      status: "INACTIVE",
-      arrival_date: arrival_date
-    });
-    // changeMutation({
-    //   id: driver?.id as string,
-    //   balance_usz: Number(driver?.balance_uzs) + expense + expenses_cook,
-    //   // balance: (Number(driver?.balance_uzs) + expense + expenses_cook)
-    // });
+    const formData = {
+      id,
+      distance_travelled: data?.endKm,
+      flight_balance_uzs: Number(removeCommas(data?.balance)),
+      arrival_date: arrival_date,
+    };
+    updateMutation(formData);
     updateCarMutation({
       id: car?.id as string,
       distance_travelled: data?.endKm,
     });
-    const formData = {
-      action: "OUTCOME",
-      kind: "PAY_SALARY",
-      car: "",
-      flight: id,
-      amount_uzs: data?.balance_uzs,
-      employee: driver?.id,
-      comment: `${driver?.full_name} заплатил за рейс ${data?.balance_uzs} ${data?.balance_type}`,
-    };
-    const formData2 = {
-      action: "OUTCOME",
-      kind: "PAY_SALARY",
-      car: "",
-      flight: id,
-      amount_uzs: expenses_cook,
-      employee: driver?.id,
-      comment: `Расход на питание ${expenses_cook}`,
-    };
-    const formData3 = {
-      action: "OUTCOME",
-      kind: "PAY_SALARY",
-      car: "",
-      flight: id,
-      amount_uzs: expense,
-      employee: driver?.id,
-      comment: `Расходы водителя ${expense}`,
-    };
-    setTimeout(() => {
-      createMutation(formData);
-      createMutation(formData2);
-      createMutation(formData3);
-    }, 1000);
+    // const Finances = [
+    //   {
+    //     action: "OUTCOME",
+    //     kind: "PAY_SALARY",
+    //     car: "",
+    //     flight: id,
+    //     amount_uzs: data?.balance_uzs,
+    //     employee: driver?.id,
+    //     comment: `${driver?.full_name} заплатил за рейс ${data?.balance_uzs} ${data?.balance_type}`,
+    //   },
+    //   {
+    //     action: "OUTCOME",
+    //     kind: "PAY_SALARY",
+    //     car: "",
+    //     flight: id,
+    //     amount_uzs: expenses_cook,
+    //     employee: driver?.id,
+    //     comment: `Расход на питание ${expenses_cook}`,
+    //   },
+    //   {
+    //     action: "OUTCOME",
+    //     kind: "PAY_SALARY",
+    //     car: "",
+    //     flight: id,
+    //     amount_uzs: expense,
+    //     employee: driver?.id,
+    //     comment: `Расходы водителя ${expense}`,
+    //   },
+    // ];
+    // // setTimeout(() => {
+    // //   Finances?.forEach((item) => {
+    // //     createMutation(item);
+    // //   });
+    // //   // createMutation(formData2);
+    // //   // createMutation(formData3);
+    // // }, 1000);
     reset();
   };
 

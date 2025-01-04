@@ -1,5 +1,5 @@
 import { $api } from "@/pages/api/api";
-import { IFlightCreate, IFlightData } from "../types/flight.types";
+import { CloseFlight, IFlightCreate } from "../types/flight.types";
 
 export const fetchFlight = async (id: string) => {
   const response = await $api.get(`/flight/${id}/`);
@@ -61,7 +61,7 @@ export const updateFlight = async (data: {id: string, endKm: number, arrival_dat
   return response.data;
 };
 
-export const closeFlight = async (data: IFlightData) => {
+export const closeFlight = async (data: CloseFlight) => {
   const response = await $api.put(`/flight/close/${data?.id}`, data);
   return response.data;
 };

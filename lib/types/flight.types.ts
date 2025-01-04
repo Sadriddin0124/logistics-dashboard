@@ -66,6 +66,14 @@ export interface IFlightData {
   start_km: number;
   end_km?: number;
 }
+ 
+export interface CloseFlight {
+  id?: string
+  distance_travelled: number,
+  arrival_date: string,
+  flight_balance_uzs: number
+}
+
 export interface IFlightForm {
   id?: string;
   region: IRegion; // UUID
