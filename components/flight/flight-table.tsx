@@ -107,12 +107,12 @@ export default function FlightTable({
           {flights?.results.map((flight, index) => (
             <TableRow key={index} className="border-b border-gray-200">
               <TableCell className="px-5 w-[100px]">{index + 1}</TableCell>
-              <TableCell className="px-5">{flight?.car?.name} {flight?.car?.models?.name} {flight?.car?.number}</TableCell>
-              <TableCell className="px-5">{flight?.region?.name}</TableCell>
-              <TableCell className="px-5">{flight?.status.toLowerCase() === "active" ? "Активный" : "Завершенный"}</TableCell>
-              <TableCell className="px-5">{formatDate(flight?.created_at as string, "/")}</TableCell>
-              <TableCell className="px-5">{Number(flight?.price_uzs).toFixed(2)} $</TableCell>
-              <TableCell className="px-5">
+              <TableCell>{flight?.car?.name} {flight?.car?.models?.name} {flight?.car?.number}</TableCell>
+              <TableCell>{flight?.region?.name}</TableCell>
+              <TableCell>{flight?.status.toLowerCase() === "active" ? "Активный" : "Завершенный"}</TableCell>
+              <TableCell>{formatDate(flight?.created_at as string, "/")}</TableCell>
+              <TableCell>{Number(flight?.price_uzs).toFixed(2)} $</TableCell>
+              <TableCell className="px-5 text-end">
                 <Link href={`/flight/flight-info?id=${flight?.id}`}>
                   <Button variant="ghost" size="icon" className="h-8 w-8">
                     <Pencil className="h-4 w-4" />
