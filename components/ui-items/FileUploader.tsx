@@ -2,11 +2,12 @@
 
 import { Dispatch, SetStateAction, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Upload, X } from "lucide-react";
+import { Download, Upload, X } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { uploadImage } from "@/lib/actions";
 import { ImageType } from "@/lib/types/file.types";
 import Image from "next/image";
+import { downloadImage } from "@/lib/functions";
 
 interface FileUploaderProps {
   setImage: Dispatch<SetStateAction<ImageType>>;
@@ -57,7 +58,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
         router.refresh();
       }
     } catch (error) {
-      setMessage("An error occurred while uploading the file.");
+      setMessage("При загрузке файла произошла ошибка.");
       console.log(error);
     } finally {
       clearInterval(interval);
@@ -119,6 +120,10 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
           <X
             className="absolute right-2 top-2 text-red-500 group-hover:z-[2] z-[-1] text-[24px] cursor-pointer"
             onClick={() => setImage({ id: "", file: "" })}
+          />
+          <Download
+            className="absolute right-2 bottom-2 text-white group-hover:z-[2] z-[-1] text-[24px] cursor-pointer"
+            onClick={() => downloadImage(image?.file, "Image")}
           />
           <Image
             width={1000}

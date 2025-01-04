@@ -62,6 +62,7 @@ export interface IFlightData {
   flight_expenses: number | string;
   flight_expenses_uzs: number;
   driver_expenses: number | string;
+  flight_balance: number;
   start_km: number;
   end_km?: number;
 }

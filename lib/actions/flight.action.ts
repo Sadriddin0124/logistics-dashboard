@@ -62,13 +62,13 @@ export const updateFlight = async (data: {id: string, endKm: number, arrival_dat
 };
 
 export const closeFlight = async (data: IFlightData) => {
-  const response = await $api.put(`/flight/${data?.id}/`, data);
+  const response = await $api.put(`/flight/close/${data?.id}`, data);
   return response.data;
 };
 
-// export const updateFlightBalance = async (data: {id: string, flight_balance: number}) => {
-//   const response = await $api.patch(`/flight/${data?.id}/`, {flight_balance: data?.flight_balance});
-//   return response.data;
+// export const updateFlightB $api.patch(`/flight/${data?.id}/`, {flight_balance: data?.flight_balance});
+//   return responsealance = async (data: {id: string, flight_balance: number}) => {
+//   const response = await.data;
 // };
 
 export const updateFlightData = async (data: IFlightCreate) => {

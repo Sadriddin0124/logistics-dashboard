@@ -36,9 +36,9 @@ interface EndFlightForm {
 const EndFlight: React.FC<EndFlightProps> = ({
   // id,
   // driver,
-  balance,
+  // balance,
   car,
-  expense,
+  // expense,
   arrival_date,
   // expenses_cook,
   setArrivalStatus,
@@ -62,9 +62,9 @@ const EndFlight: React.FC<EndFlightProps> = ({
   } = methods;
 
   useEffect(() => {
-    setValue("balance", balance);
+    setValue("balance", flight?.flight_balance);
     setValue("endKm", car?.distance_travelled);
-  }, [setValue, balance, car?.distance_travelled, expense]);
+  }, [setValue, car?.distance_travelled, flight?.flight_balance]);
 
   const { mutate: updateMutation } = useMutation({
     mutationFn: closeFlight,
@@ -111,7 +111,9 @@ const EndFlight: React.FC<EndFlightProps> = ({
   const onSubmit = (data: EndFlightForm) => {
     updateMutation({
       ...flight,
-      status: "INACTIVE"
+      flight_balance: data?.balance_uzs,
+      status: "INACTIVE",
+      arrival_date: arrival_date
     });
     // changeMutation({
     //   id: driver?.id as string,
@@ -152,7 +154,9 @@ const EndFlight: React.FC<EndFlightProps> = ({
     // createMutation(formData);
     // createMutation(formData2);
     // createMutation(formData3);
-    reset();
+    // reset();
+    console.log(flight);
+    
   };
 
   const handleOpen = () => {

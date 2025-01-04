@@ -25,6 +25,8 @@ export const formatNumberAsPrice = (value: string) => {
 export const formatDate = (value: string, symbol: string) => {
   const dateMaker = new Date(value);
   const day = dateMaker.getDay();
+  console.log(day);
+  
   const date = dateMaker.getDate();
   const year = dateMaker.getFullYear();
   return `${date}${symbol}${day}${symbol}${year}`;
@@ -44,6 +46,28 @@ export const downloadExcelFile = async (link: string, name: string) => {
     const a = document.createElement("a");
     a.href = url;
     a.download = `${name}.xlsx`; // Specify the file name you want to save
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (err) {
+    console.error("Error downloading the file:", err);
+  }
+};
+
+export const downloadImage = async (link: string, name: string) => {
+  try {
+    const response = await $api.get(link, {
+      responseType: "blob", // Set response type to blob to handle binary data
+      headers: {
+        "Content-Type": "Multipart/Formdata",
+      },
+    });
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    // Create a temporary link element and trigger download
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${name}.jpg`; // Specify the file name you want to save
     document.body.appendChild(a);
     a.click();
     a.remove();
