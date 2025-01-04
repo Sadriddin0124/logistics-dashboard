@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Option } from "@/pages/warehouse/diesel";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Select, { SingleValue } from "react-select";
-import { createFinance, createFinanceDiesel } from "@/lib/actions/finance.action";
+import { createFinanceDiesel } from "@/lib/actions/finance.action";
 import { queryClient } from "../ui-items/ReactQueryProvider";
 import { toast } from "react-toastify";
 import { fetchAllFlights } from "@/lib/actions/flight.action";
@@ -14,7 +14,7 @@ import { fetchCarNoPage } from "@/lib/actions/cars.action";
 import { ICars } from "@/lib/types/cars.types";
 import { Input } from "../ui/input";
 import { removeCommas } from "@/lib/utils";
-import { useRouter } from "next/router";
+// import { useRouter } from "next/router";
 import { Textarea } from "../ui/textarea";
 
 interface FormValues {
@@ -44,7 +44,7 @@ export default function DieselExpense() {
   const [carFuelType, setCarFuelType] = useState<string>("");
   // const [carOptions, setCarOptions] = useState<Option[]>([]);
   // const [selectedCar, setSelectedCar] = useState<Option | null>(null);
-  const { id } = useRouter()?.query;
+  // const { id } = useRouter()?.query;
   const { data: cars } = useQuery<ICars[]>({
     queryKey: ["cars"],
     queryFn: fetchCarNoPage,
@@ -87,33 +87,34 @@ export default function DieselExpense() {
     onSuccess: () => {
       setSelectedFlight(null);
       queryClient.invalidateQueries({ queryKey: ["finance"] });
+            toast.success("Данные успешно добавлены!");
     },
     onError: () => {
       toast.error("Ошибка сохранения!");
     },
   });
-  const { mutate: createFinanceMutation } = useMutation({
-    mutationFn: createFinance,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["finance"] });
-      toast.success("Данные успешно добавлены!");
-      methods.reset();
-      // setSelectedCar(null);
-    },
-    onError: () => {
-      toast.error("Ошибка при добавлении данных!");
-    },
-  });
+  // const { mutate: createFinanceMutation } = useMutation({
+  //   mutationFn: createFinance,
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ["finance"] });
+  //     toast.success("Данные успешно добавлены!");
+  //     methods.reset();
+  //     // setSelectedCar(null);
+  //   },
+  //   onError: () => {
+  //     toast.error("Ошибка при добавлении данных!");
+  //   },
+  // });
 
   const onSubmit = (data: FormValues) => {
-    const formData = {
-      ...data,
-      car: data?.car,
-      action: "OUTCOME",
-      amount: Number(removeCommas(data?.amount as string)),
-      employee: "",
-      kind: id as string,
-    };
+    // const formData = {
+    //   ...data,
+    //   car: data?.car,
+    //   action: "OUTCOME",
+    //   amount: Number(removeCommas(data?.amount as string)),
+    //   employee: "",
+    //   kind: id as string,
+    // };
     const formData2 = {
       car: data?.car,
       flight: data?.flight,
@@ -123,7 +124,7 @@ export default function DieselExpense() {
       volume: data?.volume
     };
     createMutation(formData2)
-    createFinanceMutation(formData);
+    // createFinanceMutation(formData);
     methods.reset();
   };
 

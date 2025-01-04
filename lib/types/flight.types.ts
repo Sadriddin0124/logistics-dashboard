@@ -108,6 +108,7 @@ export interface IFlightFormEdit {
   route: string; // Required
   status?: string;
   flight_balance: number;
+  flight_balance_uzs: number;
   flight_expenses_uzs?: number;
   flight_expenses: number | string;
   other_expenses: number | string;

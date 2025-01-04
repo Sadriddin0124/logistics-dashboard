@@ -383,7 +383,7 @@ export default function FlightInfoForm() {
             <div className="space-y-2">
               <label className="text-sm font-medium">Баланс Рейса</label>
               <Input
-                value={flight?.flight_balance}
+                value={flight?.flight_balance_uzs}
                 className="bg-muted"
                 readOnly
               />
@@ -422,7 +422,7 @@ export default function FlightInfoForm() {
         {status?.toLowerCase() !== "inactive" && (
           <EndFlight
             id={id as string}
-            balance={Number(flight?.flight_expenses_uzs)}
+            balance={Number(flight?.flight_balance_uzs)}
             driver={driver as IEmployee}
             car={car as ICars}
             arrival_date={arrival_date as string}
