@@ -42,7 +42,6 @@ export default function FlightForm() {
       queryClient.invalidateQueries({ queryKey: ["recycled"] });
       toast.success(" Сохранено успешно!");
       push(`/flight`);
-      reset()
     },
     onError: () => {
       toast.error("Ошибка сохранения!");
@@ -56,6 +55,7 @@ export default function FlightForm() {
       departure_date: data?.arrival_date || "2024-12-26",
       // upload: image?.id
     });
+    reset()
   };
 
   const handleSelectChange = (value: string, name: string) => {

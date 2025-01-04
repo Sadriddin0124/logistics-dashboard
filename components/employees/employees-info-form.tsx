@@ -101,7 +101,6 @@ export default function EmployeesInfoForm() {
     mutationFn: updateEmployee,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["employee"] });
-      reset();
       toast.success(" Сохранено успешно!");
     },
     onError: () => {
@@ -116,6 +115,7 @@ export default function EmployeesInfoForm() {
       license_photo: license?.id,
       passport_photo: passport?.id,
       id: id as string });
+      reset();
   };
   const { mutate: deleteMutation } = useMutation({
     mutationFn: deleteEmployee,

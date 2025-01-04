@@ -36,7 +36,7 @@ export default function OtherExpenseForm() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["finance"] });
       toast.success(" Сохранено успешно!");
-      reset()
+      
     },
     onError: () => {
       toast.error("Ошибка сохранения!");
@@ -55,6 +55,7 @@ export default function OtherExpenseForm() {
       employee: "",
     };
     createMutation(formData);
+    reset()
   };
 
   return (

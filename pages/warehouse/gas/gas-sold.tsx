@@ -88,7 +88,6 @@ export default function GasSold() {
       push(`/warehouse/gas/`);
       setSelectedStation(null);
       toast.success("Сохранено успешно!");
-      reset();
     },
     onError: () => {
       toast.error("Ошибка сохранения!");
@@ -115,6 +114,7 @@ export default function GasSold() {
       id: selectedCar?.value as string,
       distance_travelled: data?.next_gas_distance,
     });
+    reset();
   };
 
   const handleSelectStation = (newValue: SingleValue<Option>) => {

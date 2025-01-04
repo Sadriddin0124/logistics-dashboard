@@ -81,7 +81,6 @@ export default function OilExchange() {
       push(`/warehouse/oil/`);
       setSelectedOil(null);
       toast.success("Сохранено успешно!");
-      reset();
     },
     onError: () => {
       toast.error("Ошибка сохранения!");
@@ -107,6 +106,7 @@ export default function OilExchange() {
       distance_travelled: data?.oil_recycle_distance,
       next_oil_recycle_distance: data?.next_oil_recycle_distance,
     });
+    reset();
   };
 
   const handleSelectOil = (newValue: SingleValue<Option>) => {

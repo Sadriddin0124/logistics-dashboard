@@ -113,7 +113,6 @@ export default function GasManagementForm() {
         queryKey: ["another-stations", currentPage],
       });
       toast.success(" Сохранено успешно!");
-      reset();
       setSelectedCar(null);
     },
     onError: () => {
@@ -142,6 +141,7 @@ export default function GasManagementForm() {
       id: selectedCar?.value as string,
       distance_travelled: data?.next_gas_distance as number,
     });
+    reset();
   };
   const handleSelectCar = (newVale: SingleValue<Option>) => {
     setSelectedCar(newVale);

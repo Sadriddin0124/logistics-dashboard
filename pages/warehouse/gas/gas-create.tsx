@@ -69,7 +69,6 @@ export default function GasManagementForm() {
         id: data.id,
         gasData: addGasData as IGasCreate,
       });
-      reset()      
       toast.success("Сохранено успешно!");
     },
     onError: () => {
@@ -87,6 +86,7 @@ export default function GasManagementForm() {
       ...formData,
     } as IGasStation);
     createMutation({ ...formData, name: data?.name });    
+    reset()      
   };
 
   return (

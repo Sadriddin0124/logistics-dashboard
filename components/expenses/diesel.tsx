@@ -85,7 +85,6 @@ export default function DieselExpense() {
   const { mutate: createMutation } = useMutation({
     mutationFn: createFinanceDiesel,
     onSuccess: () => {
-      methods.reset();
       setSelectedFlight(null);
       queryClient.invalidateQueries({ queryKey: ["finance"] });
     },
@@ -125,6 +124,7 @@ export default function DieselExpense() {
     };
     createMutation(formData2)
     createFinanceMutation(formData);
+    methods.reset();
   };
 
   // const onSubmit = (data: IFinanceDiesel) => {

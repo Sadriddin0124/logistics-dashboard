@@ -96,7 +96,6 @@ export function AutoPartsForm() {
     mutationFn: createAutoDetail,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["car_details"] });
-      methods.reset();
       setTimeout(() => {
         setSkeletonStatus(false)
       }, 1000);
@@ -105,7 +104,7 @@ export function AutoPartsForm() {
       toast.error("Ошибка при сохранении!");
     },
   });
-
+  
   const onSubmit = (data: { parts: FormValues[] }) => {
     const formData = data.parts.map((item) => ({
       ...item,
@@ -114,6 +113,7 @@ export function AutoPartsForm() {
       car: id as string,
     }));
     console.log(formData);
+    methods.reset();
     
     createMutation(formData);
     // setSkeletonStatus(true)

@@ -80,7 +80,6 @@ export default function RepairingForm() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["finance"] });
       toast.success("Данные успешно добавлены!");
-      methods.reset();
       setSelectedCar(null);
     },
     onError: () => {
@@ -118,11 +117,10 @@ export default function RepairingForm() {
       price: Number(removeCommas(item?.price)),
       car: data?.car as string,
     }));
-    console.log(formData);
-    console.log(formData2);
 
     createMutation(formData2);
     createFinanceMutation(formData);
+    methods.reset();
   };
   return (
     <FormProvider {...methods}>

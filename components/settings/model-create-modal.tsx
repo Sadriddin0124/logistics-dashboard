@@ -31,7 +31,6 @@ export default function CreateModel({isOpen, setIsOpen, editItem, setEditItem}: 
       mutationFn: createModel,
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["models"] });
-        reset();
         toast.success(" Сохранено успешно!");
       },
       onError: () => {

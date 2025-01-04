@@ -56,7 +56,6 @@ export default function DieselFill() {
       queryClient.invalidateQueries({ queryKey: ["diesel"] });
       queryClient.invalidateQueries({ queryKey: ["diesel_sale"] });
       setSelectedCar(null);
-      reset();
       toast.success("Сохранено успешно!");
     },
     onError: () => {
@@ -66,6 +65,7 @@ export default function DieselFill() {
 
   const onSubmit = (data: IDieselSale) => {
     createMutation(data);
+    reset();
   };
 
   const handleSelectCar = (newValue: SingleValue<Option>) => {

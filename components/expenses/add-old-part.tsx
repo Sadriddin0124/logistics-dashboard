@@ -55,7 +55,6 @@ export function OldPartsForm() {
     mutationFn: createAutoDetail,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["car_details"] });
-      methods.reset();
       toast.success("Утилизация завершена успешно!");
     },
     onError: () => {
@@ -70,8 +69,7 @@ export function OldPartsForm() {
       price: Number(removeCommas(item?.price as string)),
       car: id as string,
     }));
-    console.log(data?.parts);
-
+    methods.reset();
     createMutation(formData);
   };
 

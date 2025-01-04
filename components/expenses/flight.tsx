@@ -62,7 +62,6 @@ export default function FlightForm() {
   const { mutate: createMutation } = useMutation({
     mutationFn: createFinance,
     onSuccess: () => {
-      reset();
       setSelectedFlight(null);
       queryClient.invalidateQueries({ queryKey: ["finance"] });
       toast.success(" Сохранено успешно!");
@@ -93,6 +92,7 @@ export default function FlightForm() {
       kind: id as string,
     };
     createMutation(formData);
+    reset();
   };
 
   const handleSelectFlight = (newValue: SingleValue<Option>) => {

@@ -67,7 +67,6 @@ export default function LeasingForm() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["finance"] });
       toast.success("Данные успешно добавлены!");
-      methods.reset();
       setSelectedCar(null);
     },
     onError: () => {
@@ -99,6 +98,7 @@ export default function LeasingForm() {
     createFinanceMutation(formData);
     const item = {id: selectedCar?.value as string, leasing_payed_amount: data?.amount_uzs + carAmount}
     updateMutation(item)
+    methods.reset();
   };
 
 

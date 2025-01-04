@@ -82,7 +82,6 @@ export default function VehicleForm() {
       queryClient.invalidateQueries({ queryKey: ["cars"] });
       push(`/cars/car-info?id=${data?.id}`);
       toast.success(" Сохранено успешно!");
-      reset()
     },
     onError: () => {
       toast.error("Ошибка сохранения!");

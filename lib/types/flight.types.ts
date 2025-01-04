@@ -143,6 +143,7 @@ export interface IFlightType2 {
   driver_expenses_usd?: string | null; // Expenses allocated to the driver (nullable)
   upload?: string | null; // UUID (nullable)
   cargo_info?: string | null; // Nullable
+  created_at?: string | null; // Nullable
 }
 
 export interface IOrderedFlight {

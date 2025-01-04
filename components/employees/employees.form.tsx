@@ -48,7 +48,6 @@ export default function EmployeesInfoForm() {
       push(`/employees`);
       queryClient.invalidateQueries({ queryKey: ["employees"] });
       toast.success(" Сохранено успешно!");
-      reset();
     },
     onError: () => {
       toast.error("Ошибка сохранения!");
@@ -56,6 +55,7 @@ export default function EmployeesInfoForm() {
   });
   const onSubmit = (data: IEmployee) => {
     createMutation({ ...data, phone: formatPhoneNumber(data?.phone) });
+    reset();
   };
   return (
     <div className="container mx-auto space-y-8 mt-8 ">

@@ -51,7 +51,6 @@ export default function GasManagementForm() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["gas_stations"] });
       push(`/warehouse/oil/oil-info?id=${oilId}`);
-      reset();
     },
     onError: () => {
       toast.error("Ошибка сохранения!");
@@ -88,6 +87,7 @@ export default function GasManagementForm() {
       oil_volume: data?.oil_volume,
       ...formData,
     });
+    reset();
   };
 
   return (

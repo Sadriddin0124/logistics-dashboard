@@ -51,7 +51,6 @@ export default function GasManagementForm() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["station"] });
       queryClient.invalidateQueries({ queryKey: ["purchased"] });
-      reset();
       toast.success("Сохранено успешно!");
     },
     onError: () => {
@@ -65,7 +64,9 @@ export default function GasManagementForm() {
       payed_price_uzs: Number(removeCommas(data?.payed_price_uzs?.toString())),
     };
     updateMutation({ id: id as string, gasData: formData });
+    reset();
   };
+  
   const { mutate: deleteMutation } = useMutation({
     mutationFn: deleteStation,
    onSuccess: () => {

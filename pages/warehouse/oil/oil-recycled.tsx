@@ -40,7 +40,6 @@ export default function GasManagementForm() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["quantity"] });
       queryClient.invalidateQueries({ queryKey: ["oil_utilized"] });
-      reset()
       toast.success(" Сохранено успешно!");
     },
     onError: () => {
@@ -53,6 +52,7 @@ export default function GasManagementForm() {
       price_uzs: Number(removeCommas(data?.price_uzs?.toString())),
       price: Number(removeCommas(data?.price?.toString())),
     });
+    reset()
   };
   const oil_volume = quantity?.results?.[0]?.remaining_oil_quantity;
 

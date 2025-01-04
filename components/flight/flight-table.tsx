@@ -16,7 +16,7 @@ import { fetchFlights } from "@/lib/actions/flight.action";
 import { useQuery } from "@tanstack/react-query";
 import { queryClient } from "../ui-items/ReactQueryProvider";
 import { FlightPaginatedResponse2 } from "@/lib/types/flight.types";
-import { downloadExcelFile } from "@/lib/functions";
+import { downloadExcelFile, formatDate } from "@/lib/functions";
 
 export default function FlightTable({
   active,
@@ -79,6 +79,7 @@ export default function FlightTable({
             <TableHead className="font-bold">Автомобили</TableHead>
             <TableHead className="font-bold">Область</TableHead>
             <TableHead className="font-bold">Статус</TableHead>
+            <TableHead className="font-bold">Дата создания</TableHead>
             <TableHead className="font-bold">Цена рейса</TableHead>
             <TableHead className="font-bold w-[50px]">
               <div className="flex items-center">
@@ -105,10 +106,11 @@ export default function FlightTable({
         <TableBody>
           {flights?.results.map((flight, index) => (
             <TableRow key={index} className="border-b border-gray-200">
-              <TableCell className="px-5">{index + 1}</TableCell>
+              <TableCell className="px-5 w-[100px]">{index + 1}</TableCell>
               <TableCell className="px-5">{flight?.car?.name} {flight?.car?.models?.name} {flight?.car?.number}</TableCell>
               <TableCell className="px-5">{flight?.region?.name}</TableCell>
               <TableCell className="px-5">{flight?.status.toLowerCase() === "active" ? "Активный" : "Завершенный"}</TableCell>
+              <TableCell className="px-5">{formatDate(flight?.created_at as string, "/")}</TableCell>
               <TableCell className="px-5">{Number(flight?.price_uzs).toFixed(2)} $</TableCell>
               <TableCell className="px-5">
                 <Link href={`/flight/flight-info?id=${flight?.id}`}>

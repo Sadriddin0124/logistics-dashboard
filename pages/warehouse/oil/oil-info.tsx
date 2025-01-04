@@ -63,7 +63,6 @@ export default function GasManagementForm() {
       queryClient.invalidateQueries({ queryKey: ["oil"] });
       queryClient.invalidateQueries({ queryKey: ["oil_purchases"] });
       toast.success(" Сохранено успешно!");
-      reset();
     },
     onError: () => {
       toast.error("Ошибка сохранения!");
@@ -83,6 +82,7 @@ export default function GasManagementForm() {
       id: id as string,
       oilData: formData as IOilType,
     });
+    reset();
   };
   const { mutate: deleteMutation } = useMutation({
     mutationFn: deleteOil,

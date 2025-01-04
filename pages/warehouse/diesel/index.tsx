@@ -97,7 +97,6 @@ export default function GasManagementForm() {
     mutationFn: createDiesel,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["diesel"] });
-      reset();
       toast.success(" Сохранено успешно!");
     },
     onError: () => {
@@ -110,6 +109,7 @@ export default function GasManagementForm() {
       ...data,
       price: Number(removeCommas(data?.price as string)),
     });
+    reset();
   };
   const handleSelectCar = (newValue: SingleValue<Option>) => {
     setSelectedCar(newValue);

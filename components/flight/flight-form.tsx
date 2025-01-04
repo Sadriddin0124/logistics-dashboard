@@ -80,8 +80,10 @@ export default function FlightForm() {
         value: car?.id,
       };
     });
-    const distance = cars?.find(item=> item?.id === selectedCar?.value)?.distance_travelled
-    setDistance(distance as number)
+    const distance = cars?.find(
+      (item) => item?.id === selectedCar?.value
+    )?.distance_travelled;
+    setDistance(distance as number);
     setCarOptions(carOption as Option[]);
     setDriverOptions(driverOption as Option[]);
   }, [cars, employeeList, flight_type, selectedCar?.value]);
@@ -105,21 +107,20 @@ export default function FlightForm() {
       queryClient.invalidateQueries({ queryKey: ["recycled"] });
       toast.success(" Сохранено успешно!");
       push(`/flight`);
-      reset();
     },
     onError: () => {
       toast.error("Ошибка сохранения!");
     },
   });
-      const { mutate: updateCarMutation } = useMutation({
-        mutationFn: updateCarDistance,
-        onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: ["flight-one"] });
-        },
-        onError: () => {
-          toast.error("Ошибка сохранения!");
-        },
-      });
+  const { mutate: updateCarMutation } = useMutation({
+    mutationFn: updateCarDistance,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["flight-one"] });
+    },
+    onError: () => {
+      toast.error("Ошибка сохранения!");
+    },
+  });
   const onSubmit = (data: IFlightData) => {
     createMutation({
       ...data,
@@ -136,9 +137,12 @@ export default function FlightForm() {
       other_expenses: Number(removeCommas(data?.other_expenses?.toString())),
       flight_balance: data?.flight_expenses_uzs,
       arrival_date: data?.arrival_date || null,
-      // upload: image?.id
     });
-    updateCarMutation({id: selectedCar?.value as string, distance_travelled: data?.start_km})
+    updateCarMutation({
+      id: selectedCar?.value as string,
+      distance_travelled: data?.start_km,
+    });
+    reset();
   };
 
   const handleSelectChange = (value: string, name: string) => {
@@ -350,8 +354,10 @@ export default function FlightForm() {
           </div>
           {flight_type === "OUT" && (
             <div className="space-y-2">
-                <label className="text-sm font-medium">Расход на питание (за день)</label>
-                <CurrencyInputWithSelect name="other_expenses" />
+              <label className="text-sm font-medium">
+                Расход на питание (за день)
+              </label>
+              <CurrencyInputWithSelect name="other_expenses" />
             </div>
           )}
         </div>

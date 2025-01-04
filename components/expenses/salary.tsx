@@ -70,7 +70,6 @@ export default function Salary() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["finance"] });
       toast.success(" Сохранено успешно!");
-      reset();
       setSelectedDriver(null)
     },
     onError: () => {
@@ -101,6 +100,7 @@ export default function Salary() {
     };
     createMutation(formData);
     changeMutation({ id: selectedDriver?.value as string, balance_usz: data?.bonus ? balance : balance - data?.amount_uzs });
+    reset();
   };
 
   const handleSelectDriver = (newValue: SingleValue<Option>) => {
