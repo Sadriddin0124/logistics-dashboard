@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Option } from "@/pages/warehouse/diesel";
 import { IEmployee } from "@/lib/types/employee.types";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { fetchEmployeesAll, } from "@/lib/actions/employees.action";
+import { fetchEmployeesAll } from "@/lib/actions/employees.action";
 import Select, { SingleValue } from "react-select";
 import { Input } from "../ui/input";
 import { createFinance } from "@/lib/actions/finance.action";
@@ -19,7 +19,6 @@ import CurrencyInputWithSelect from "../ui-items/currencySelect";
 export interface SalaryFormData {
   action: string;
   amount_uzs: number;
-  amount_type: string;
   amount: string | number;
   kind: string;
   flight: string;
@@ -90,19 +89,17 @@ export default function Salary() {
   
 
   const onSubmit = (data: SalaryFormData) => {
+    
     const formData = {
-      employee: data?.employee,
+      ...data,
       action: "OUTCOME",
-      amount: !data?.bonus ? Number(removeCommas(data?.amount as string)) : 0,
-      amount_uzs: !data?.bonus ? data?.amount_uzs : 0,
-      amount_type: data?.amount_type,
-      kind: id as string,
+      amount: Number(removeCommas(data?.amount as string)),
+      kind: data?.bonus ? "BONUS" : id as string,
       car: "",
       flight: "",
-      comment: data?.bonus ? `Бонус ${"/" + data?.comment}` : data?.comment
+      comment: data?.bonus ? `Бонус ${"/" +data?.comment}` : data?.comment
     };
-    console.log(formData);
-    
+    console.log(data);
     createMutation(formData);
     // changeMutation({ id: selectedDriver?.value as string, balance_usz: data?.bonus ? balance : balance - data?.amount_uzs });
     reset();
