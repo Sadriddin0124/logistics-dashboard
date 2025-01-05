@@ -32,9 +32,6 @@ export default function GasManagementForm() {
   const [gasId, setGasId] = useState<string>("")
   const { push } = useRouter()
   useEffect(() => {
-    console.log(payed_price_uzs);
-    console.log(price_uzs);
-    
       const result =
         Number(removeCommas(payed_price_uzs?.toString())) /
         Number(removeCommas(price_uzs?.toString()));

@@ -250,7 +250,7 @@ export default function GasManagementForm() {
                 <TableRow key={index} className="border-b border-b-gray-300">
                   <TableCell>{entry?.car?.name}</TableCell>
                   <TableCell>{entry?.purchased_volume || 0} м3</TableCell>
-                  <TableCell>{entry?.payed_price_uzs} $</TableCell>
+                  <TableCell>{entry?.payed_price_uzs.toFixed(2)} $</TableCell>
                   <TableCell>
                     {formatDate(entry?.created_at as string, "/")}
                   </TableCell>

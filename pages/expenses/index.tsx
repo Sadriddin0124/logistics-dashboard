@@ -213,9 +213,7 @@ export default function Expenses() {
               </TableCell>
               <TableCell className="px-5">{(finance.amount_uzs as number)?.toFixed(2) || "0"} $</TableCell>
               <TableCell className="px-5">
-                <span className="line-clamp-1 overflow-hidden">
                   {finance.comment}
-                </span>
               </TableCell>
               <TableCell className="px-5 flex gap-1 items-center"></TableCell>
             </TableRow>

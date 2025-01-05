@@ -15,7 +15,6 @@ import { useQuery } from "@tanstack/react-query";
 import { queryClient } from "@/components/ui-items/ReactQueryProvider";
 import { OilUtilizedResponse } from "@/lib/types/oil.types";
 import { fetchUtilizedOils } from "@/lib/actions/oil.action";
-import { splitToHundreds } from "@/lib/utils";
 import { formatDate } from "@/lib/functions";
 
 export default function UtilizedOilTable() {
@@ -84,7 +83,7 @@ export default function UtilizedOilTable() {
             <TableRow key={utilized.id} className="border-b border-gray-200">
               <TableCell>{index + 1}</TableCell>
               <TableCell>
-                {splitToHundreds(Number(utilized.price_uzs))} $
+                {Number(utilized.price_uzs).toFixed(2)} $
               </TableCell>
               <TableCell>{utilized?.quantity_utilized} л</TableCell>
               <TableCell>

@@ -375,7 +375,7 @@ export default function FlightInfoForm() {
             {flight_type === "OUT" && <div className="space-y-2">
               <label className="text-sm font-medium">Баланс Рейса</label>
               <Input
-                value={flight?.flight_balance_uzs}
+                value={flight?.flight_balance_uzs.toFixed(2)}
                 className="bg-muted"
                 readOnly
               />
