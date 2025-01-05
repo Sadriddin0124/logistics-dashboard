@@ -125,21 +125,21 @@ export function ExpenseStats({ start, end, setStart, setEnd }: Props) {
             title="Активные рейсы"
             value={data?.active_flight_count || 0}
             icon={PlaneTakeoff}
-            url="/flight/info/"
+            url="/flight/info/?status=ACTIVE"
             name="Активные рейсы"
           />
           <StatCard
             title="Рейсы в Узбекистане"
             value={flights_in_uzb?.count || 0}
             icon={PlaneIcon}
-            url="/flight/info/"
+            url="/flight/info/?flight_type=IN_UZB"
             name="Рейсы в Узбекистане"
           />
           <StatCard
             title="Рейсы за пределы Узбекистана"
             value={flights_out?.count || 0}
             icon={PlaneTakeoffIcon}
-            url="/flight/info/"
+            url="/flight/info/?flight_type=OUT"
             name="Рейсы за пределы Узбекистана"
           />
           <StatCard
