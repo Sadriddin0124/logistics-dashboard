@@ -119,63 +119,63 @@ export function ExpenseStats({ start, end, setStart, setEnd }: Props) {
             value={data?.flight_count || 0}
             icon={PlaneIcon}
             url="/flight/info/"
-            name="Информация о Рейсе"
+            name="Рейсы"
           />
           <StatCard
             title="Активные рейсы"
             value={data?.active_flight_count || 0}
             icon={PlaneTakeoff}
             url="/flight/info/"
-            name="Информация о Рейсе"
+            name="Активные рейсы"
           />
           <StatCard
             title="Рейсы в Узбекистане"
             value={flights_in_uzb?.count || 0}
             icon={PlaneIcon}
-            url="/flight/info/?action=OUTCOME"
-            name="Информация о Рейсе"
+            url="/flight/info/"
+            name="Рейсы в Узбекистане"
           />
           <StatCard
             title="Рейсы за пределы Узбекистана"
             value={flights_out?.count || 0}
             icon={PlaneTakeoffIcon}
-            url="/flight/info/?action=OUTCOME"
-            name="Информация о Рейсе"
+            url="/flight/info/"
+            name="Рейсы за пределы Узбекистана"
           />
           <StatCard
             title="Рейс на заказ"
             value={ordered_flights?.count || 0}
             icon={PlaneTakeoffIcon}
-            url="/flight/info/?action=OUTCOME"
-            name="Информация о Рейсе"
+            url="/flight/info/?type=ordered"
+            name="Рейс на заказ"
           />
           <StatCard
             title="Сумма дохода"
             value={data?.income_sum?.toFixed(2) || 0}
             icon={TrendingUpIcon}
             url="/finance/export-logs/?action=INCOME"
-            name="финансовая информация"
+            name="Сумма дохода"
           />
           <StatCard
             title="Сумма расхода"
             value={data?.outcome_sum?.toFixed(2) || 0}
             icon={TrendingDownIcon}
-            url="/flight/info/?action=OUTCOME"
-            name="финансовая информация"
+            url="/finance/export-logs/?action=OUTCOME"
+            name="Сумма расхода"
           />
           <StatCard
             title="Расходы на сотрудников"
             value={salaries?.results[0]?.outcome_sum?.toFixed(2) || 0}
             icon={TrendingDownIcon}
-            url="/flight/info/?action=OUTCOME&kind=PAY_SALARY"
-            name="финансовая информация"
+            url="/finance/export-logs/?action=OUTCOME&kind=PAY_SALARY"
+            name="Расходы на сотрудников"
           />
           <StatCard
             title="Проче расходы"
             value={other_expenses?.results[0]?.outcome_sum?.toFixed(2) || 0}
             icon={TrendingDownIcon}
-            url="/flight/info/?action=OUTCOME&kind=OTHER"
-            name="финансовая информация"
+            url="/finance/export-logs/?action=OUTCOME&kind=OTHER"
+            name="Проче расходы"
           />
           <StatCard
             title="Лизинговый баланс"
@@ -196,9 +196,10 @@ export function ExpenseStats({ start, end, setStart, setEnd }: Props) {
             icon={AwardIcon}
             title1="Покупка газа"
             title2="Продажа газа"
+            name="Покупка газа"
+            name2="Продажа газа"
             url="/gas/gaz-info/?type=purchase"
             url2="/gas/gaz-info/?type=sale"
-            name="информация о добыче газа"
           />
           <StatCard
             status={true}
@@ -207,9 +208,10 @@ export function ExpenseStats({ start, end, setStart, setEnd }: Props) {
             icon={AwardIcon}
             title1="Покупка масло"
             title2="Продажа масло"
+            name2="Продажа масло"
+            name="Покупка масло"
             url="/oil/oil-info/?type=purchase"
             url2="/oil/oil-info/?type=recycle"
-            name="о производстве масла"
           />
           <StatCard
             status={true}
@@ -218,9 +220,10 @@ export function ExpenseStats({ start, end, setStart, setEnd }: Props) {
             icon={AwardIcon}
             title1="Покупка солярка"
             title2="Продажа солярка"
+            name="Покупка солярка"
+            name2="Продажа солярка"
             url="/oil/oil-info/?type=purchase"
             url2="/oil/oil-info/?type=recycle"
-            name="о производстве саларки"
           />
         </div>
       </div>
