@@ -98,6 +98,7 @@ export interface IStationSalesFetch {
   car: ICars;
   amount: number;
   created_at?: string
+  km: number
 }
 
 export type PurchasedGasListResponse = PaginationResponse<IGasStation>;
