@@ -32,7 +32,7 @@ const Flight = () => {
   };
   return (
     <div className=" container mx-auto p-8 mt-8 bg-white rounded-2xl">
-      <div className="flex justify-start gap-4">
+      {active === "flight" && <div className="flex justify-start gap-4">
         <div className="space-y-2 w-[30%]">
           <label className="text-sm font-medium">Статус</label>
           <Select onValueChange={(value) => handleSelect(value, "status")}>
@@ -59,7 +59,7 @@ const Flight = () => {
             </SelectContent>
           </Select>
         </div>
-      </div>
+      </div>}
       <div className="flex w-full justify-end gap-8">
         <Link href={"/flight/flight-order"} className="flex justify-end my-4">
           <Button className="bg-[#4880FF] text-white hover:bg-blue-600 w-[300px] rounded-md">
