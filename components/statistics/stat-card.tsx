@@ -35,7 +35,7 @@ export function StatCard({
           <Button
             variant={"ghost"}
             size={"sm"}
-            onClick={() => downloadExcelFile(url2 as string, name as string)}
+            onClick={() => downloadExcelFile(url2 as string, name2 as string)}
           >
             {title1 ? (
               title1
@@ -56,7 +56,7 @@ export function StatCard({
           <Button
             variant={"ghost"}
             size={"sm"}
-            onClick={() => downloadExcelFile(url as string, name2 as string)}
+            onClick={() => downloadExcelFile(url as string, name as string)}
           >
             {title2 ? (
               title2

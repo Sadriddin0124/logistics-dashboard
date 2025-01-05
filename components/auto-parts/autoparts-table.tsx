@@ -93,7 +93,7 @@ export default function AutoPartsTable({ setSelectedParts, selectedParts, status
               <TableCell>{part.car?.name}</TableCell>
               <TableCell>{part?.price_uzs.toFixed(2)} $</TableCell>
               <TableCell>{part?.id_detail}</TableCell>
-              <TableCell>{part?.in_sklad ? "В Склате" : "Не в машине"}</TableCell>
+              <TableCell>{part?.in_sklad ? "В Склате" : "В машине"}</TableCell>
             </TableRow>
           ))}
         </TableBody>

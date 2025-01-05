@@ -102,8 +102,10 @@ export interface IFlightFormEdit {
   departure_date: string; // Date in ISO format (required)
   arrival_date?: string | null; // Date in ISO format (nullable)
   price_uzs?: number; // Nullable
+  price_type?: string; // Nullable
   price?: string | null; // Nullable
   driver_expenses_uzs?: number; // Expenses allocated to the driver (nullable)
+  driver_expenses_type?: string; // Expenses allocated to the driver (nullable)
   driver_expenses?: string | null; // Expenses allocated to the driver (nullable)
   upload?: { id: string; file: string }; // UUID (nullable)
   cargo_info?: string | null; // Nullable
@@ -112,10 +114,13 @@ export interface IFlightFormEdit {
   created_at?: string;
   flight_balance: number;
   flight_balance_uzs: number;
+  flight_balance_type: string;
   flight_expenses_uzs?: number;
+  flight_expenses_type?: string;
   flight_expenses: number | string;
   other_expenses: number | string;
   other_expenses_uzs?: number;
+  other_expenses_type?: string;
   start_km: number;
   end_km?: number;
 }

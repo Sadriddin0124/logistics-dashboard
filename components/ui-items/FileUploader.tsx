@@ -7,7 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { uploadImage } from "@/lib/actions";
 import { ImageType } from "@/lib/types/file.types";
 import Image from "next/image";
-import { downloadImage } from "@/lib/functions";
+import { downloadExcelFile, downloadImage } from "@/lib/functions";
 
 interface FileUploaderProps {
   setImage: Dispatch<SetStateAction<ImageType>>;
@@ -148,7 +148,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
             <Download
               className="right-10 bottom-2 z-[2] absolute text-black text-[24px] cursor-pointer"
               onClick={() =>
-                downloadImage(
+                downloadExcelFile(
                   image?.file,
                   decodeURIComponent(image?.file?.split("/")[5])
                 )

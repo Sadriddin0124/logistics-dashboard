@@ -340,7 +340,7 @@ export default function FlightInfoForm() {
               <label className="text-sm font-medium">
                 Введите стоимость рейса*
               </label>
-              <CurrencyInputWithSelect disabled name="price" />
+              <CurrencyInputWithSelect disabled name="price" type={flight?.price_type}/>
             </div>
 
             {/* Departure Date */}
@@ -359,7 +359,7 @@ export default function FlightInfoForm() {
             {/* Spending */}
             <div className="space-y-2">
               <label className="text-sm font-medium">Расходы водителя*</label>
-              <CurrencyInputWithSelect disabled name="driver_expenses" />
+              <CurrencyInputWithSelect disabled name="driver_expenses" type={flight?.driver_expenses_type}/>
             </div>
 
             {/* Arrival Date */}
@@ -382,12 +382,12 @@ export default function FlightInfoForm() {
                 <label className="text-sm font-medium">
                   Расход на питание (за день)
                 </label>
-                <CurrencyInputWithSelect disabled name="other_expenses" />
+                <CurrencyInputWithSelect disabled name="other_expenses" type={flight?.other_expenses_type}/>
               </div>
             )}
             <div className="space-y-2 hidden">
               <label className="text-sm font-medium">Расходы на Рейс*</label>
-              <CurrencyInputWithSelect disabled name="flight_expenses" />
+              <CurrencyInputWithSelect disabled name="flight_expenses" type={flight?.flight_expenses_type}/>
             </div>
             {flight_type === "OUT" && <div className="space-y-2">
               <label className="text-sm font-medium">Баланс Рейса</label>
@@ -438,9 +438,7 @@ export default function FlightInfoForm() {
             flight_type={flight_type}
           />
         )}
-        {status?.toLowerCase() === "inactive" && (
          <DeleteFlight onContinue={handleDelete}/>
-        )}
       </div>
     </div>
   );
