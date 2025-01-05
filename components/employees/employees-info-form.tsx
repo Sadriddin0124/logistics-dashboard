@@ -69,7 +69,7 @@ export default function EmployeesInfoForm() {
       flight_type: employee?.flight_type,
     },
   });
-  
+
   const [isChanged, setIsChanged] = useState(false);
   const balance = watch("balance_uzs");
   const [passport, setPassport] = React.useState<FileType | null>(null);
@@ -279,7 +279,7 @@ export default function EmployeesInfoForm() {
             Баланс водителя
           </label>
           <Input
-            value={`${balanceConverter() || 0} Сум`}
+            value={`${employee?.balance_uzs} $ / ${balanceConverter() || 0} Сум`}
             readOnly
             placeholder="Введите баланс водителя..."
             className="bg-muted"
