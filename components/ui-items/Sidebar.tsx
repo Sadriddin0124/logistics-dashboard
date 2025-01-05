@@ -125,6 +125,8 @@ const menuItems: MenuItem[] = [
   },
 ];
 
+export let UsedCurrencies: ExchangeRate[] = []
+
 interface SideBarProps {
   setSubItemStatus: Dispatch<SetStateAction<boolean>>;
   setSideBar: Dispatch<SetStateAction<boolean>>;
@@ -145,9 +147,11 @@ export const AppSidebar: React.FC<SideBarProps> = ({
     queryKey: ["exchange"],
     queryFn: getExchangeRate,
   });
-  const EXCHANGE_RATE = exchange?.filter((item) =>
+ const EXCHANGE_RATE = exchange?.filter((item) =>
     ["USD", "RUB", "KZT"]?.includes(item?.Ccy)
   );
+
+  UsedCurrencies = EXCHANGE_RATE as ExchangeRate[]
 
   const handleLink = (item: MenuItem) => {
     setActiveSubItem(item.children as MenuItem[]);

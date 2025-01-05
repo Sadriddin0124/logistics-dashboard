@@ -304,9 +304,7 @@ export default function FlightInfoForm() {
             <div className="space-y-2">
               <label className="text-sm font-medium">Маршрут*</label>
               <Selector
-                disabled={
-                  flight?.status?.toLowerCase() === "inactive" ? true : false
-                }
+                disabled
                 value={flight?.route || ""}
                 onValueChange={(value) => handleSelectChange(value, "route")}
               >
@@ -335,9 +333,7 @@ export default function FlightInfoForm() {
               </label>
               <Input
                 type="date"
-                disabled={
-                  flight?.status?.toLowerCase() === "inactive" ? true : false
-                }
+                disabled
                 placeholder="Введите дату"
                 {...register("departure_date")}
               />

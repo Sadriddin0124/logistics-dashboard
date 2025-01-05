@@ -82,7 +82,7 @@ export default function EmployeesTable() {
               <TableCell>{index + 1}</TableCell>
               <TableCell>{employee?.full_name}</TableCell>
               <TableCell>{employee?.phone}</TableCell>
-              <TableCell>{employee?.balance_uzs} $</TableCell>
+              <TableCell>{employee?.balance_uzs || 0} $</TableCell>
               <TableCell>
                 <Link href={`/employees/employee-info?id=${employee?.id}`}>
                   <Button variant="ghost" size="icon" className="h-8 w-8">

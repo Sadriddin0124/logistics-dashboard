@@ -23,7 +23,8 @@ export interface IEmployeeGet {
   passport_photo?: {id: string, file: string};
   phone: string;
   flight_type: string;
-  balance_uzs: string;
+  balance_uzs: number;
+  balance_price_type: string;
   bonus?: boolean;
 }
 

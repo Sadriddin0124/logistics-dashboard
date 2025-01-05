@@ -27,6 +27,7 @@ import { EmployeeExpensesTable } from "./employe-expenses";
 import { FileType } from "@/lib/types/general.types";
 import { FileUploader } from "../ui-items/FileUploader";
 import { API_URL } from "@/pages/api/api";
+import { UsedCurrencies } from "../ui-items/Sidebar";
 
 // interface FormValues {
 //   full_name: string;
@@ -68,12 +69,11 @@ export default function EmployeesInfoForm() {
       flight_type: employee?.flight_type,
     },
   });
+  
   const [isChanged, setIsChanged] = useState(false);
-
   const balance = watch("balance_uzs");
   const [passport, setPassport] = React.useState<FileType | null>(null);
   const [license, setLicense] = React.useState<FileType | null>(null);
-  React.useEffect(() => {}, [setValue, passport, license]);
 
   useEffect(() => {
     setValue("full_name", employee?.full_name as string);
@@ -82,6 +82,7 @@ export default function EmployeesInfoForm() {
       reset(employee);
     }
   }, [employee, reset, passport, license, setValue]);
+
   useEffect(() => {
     setLicense({id: employee?.license_photo?.id as string, file: `${API_URL}${employee?.license_photo?.file}` as string})
     setPassport({id: employee?.passport_photo?.id as string, file: `${API_URL}${employee?.passport_photo?.file}` as string})
@@ -96,6 +97,7 @@ export default function EmployeesInfoForm() {
     });
     return () => subscription.unsubscribe();
   }, [employee, watch, getValues, isChanged]);
+
   const { mutate: updateMutation } = useMutation({
     mutationFn: updateEmployee,
     onSuccess: () => {
@@ -106,6 +108,7 @@ export default function EmployeesInfoForm() {
       toast.error("Ошибка сохранения!");
     },
   });
+
   const onSubmit = (data: IEmployeeGet) => {
     updateMutation({
       full_name: data?.full_name,
@@ -116,6 +119,7 @@ export default function EmployeesInfoForm() {
       id: id as string });
       reset();
   };
+
   const { mutate: deleteMutation } = useMutation({
     mutationFn: deleteEmployee,
     onSuccess: () => {
@@ -127,9 +131,17 @@ export default function EmployeesInfoForm() {
       toast.error("Ошибка сохранения!");
     },
   });
+
   const handleDelete = (id: string) => {
     deleteMutation(id as string);
   };
+
+  const balanceConverter = (): number => {
+    const type = employee?.balance_price_type;
+    const currency = UsedCurrencies?.find((rate) => rate?.Ccy === type);
+    return type === "UZS" ? employee?.balance_uzs as number : (employee?.balance_uzs ?? 0) * (Number(currency?.Rate) || 1);
+  };
+  
   return (
     <div className="container mx-auto space-y-8 mt-8 ">
       <form
@@ -267,7 +279,7 @@ export default function EmployeesInfoForm() {
             Баланс водителя
           </label>
           <Input
-            value={employee?.balance_uzs || "0"}
+            value={`${balanceConverter() || 0} Сум`}
             readOnly
             placeholder="Введите баланс водителя..."
             className="bg-muted"

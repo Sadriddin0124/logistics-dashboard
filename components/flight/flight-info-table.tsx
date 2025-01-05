@@ -167,10 +167,8 @@ export default function FlightTable() {
               </TableCell>
               {/* <TableCell className="px-5">{finance?.driver_expenses} $</TableCell> */}
               <TableCell className="px-5">
-                <span className="line-clamp-1 overflow-hidden">
                   {finance.comment}
                   {finance?.reason && "/" + finance.reason}
-                </span>
               </TableCell>
               <TableCell className="px-5 flex gap-1 items-center">
                 {/* Место для кнопок */}
