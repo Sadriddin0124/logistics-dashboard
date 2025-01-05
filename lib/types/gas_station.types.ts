@@ -27,6 +27,7 @@ export interface IGasStation {
   created_at?: string;
   updated_at?: string;
   km?: number;
+  used_volume?: number;
   station?: IGasStation
 }
 

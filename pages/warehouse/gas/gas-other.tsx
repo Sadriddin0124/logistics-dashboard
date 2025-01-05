@@ -37,6 +37,7 @@ import CurrencyInputWithSelect from "@/components/ui-items/currencySelect";
 export default function GasManagementForm() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [distance, setDistance] = useState(0);
+  const [carDistance, setCarDistance] = useState(0)
   const methods = useForm<AnotherStation>();
   const { register, handleSubmit, setValue, reset } = methods;
   const { data: carsList } = useQuery<ICars[]>({
@@ -112,6 +113,10 @@ export default function GasManagementForm() {
       queryClient.invalidateQueries({
         queryKey: ["another-stations", currentPage],
       });
+      updateMutation({
+        id: selectedCar?.value as string,
+        distance_travelled: carDistance,
+      });
       toast.success(" Сохранено успешно!");
       setSelectedCar(null);
     },
@@ -137,10 +142,7 @@ export default function GasManagementForm() {
       payed_price_uzs: Number(removeCommas(data?.payed_price_uzs?.toString())),
       payed_price: Number(removeCommas(data?.payed_price?.toString())),
     });
-    updateMutation({
-      id: selectedCar?.value as string,
-      distance_travelled: data?.next_gas_distance as number,
-    });
+    setCarDistance(data?.next_gas_distance as number)
     reset();
   };
   const handleSelectCar = (newVale: SingleValue<Option>) => {
