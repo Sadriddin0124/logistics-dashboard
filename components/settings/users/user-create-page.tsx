@@ -66,7 +66,7 @@ export default function UserManagement() {
   const { mutate: createMutation } = useMutation({
     mutationFn: createUser,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["users_data"] });
+      queryClient.invalidateQueries({ queryKey: ["users_data", currentPage] });
       toast.success("Сохранено успешно!");
     },
     onError: () => {
@@ -76,7 +76,7 @@ export default function UserManagement() {
   const { mutate: updateMutation } = useMutation({
     mutationFn: updateUser,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["users_data"] });
+      queryClient.invalidateQueries({ queryKey: ["users_data", currentPage] });
       toast.success("Сохранено успешно!");
     },
     onError: () => {
@@ -113,12 +113,12 @@ export default function UserManagement() {
     }
     setIsAlertOpen(false);
   };
-
+ 
   return (
     <div className="container mx-auto p-4">
       <div className="flex justify-between w-full">
       <h1 className="text-2xl font-bold mb-4">Управление пользователями</h1>
-      <Button onClick={handleAddUser} className="mb-4 bg-blue-500">
+      <Button onClick={handleAddUser} className="mb-4 bg-blue-500 hover:bg-blue-600">
         Добавить пользователя
       </Button>
       </div>

@@ -55,6 +55,7 @@ export function AutoPartsForm() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [index, setIndex] = useState<number>(10);
   const [skeletonStatus, setSkeletonStatus] = useState(false)
+  const [deleteMessage, setDeleteMessage] = useState("")
   const router = useRouter();
   const { id } = router.query;
   const { data: carDetails } = useQuery<PaginatedCarDetail>({
@@ -115,7 +116,7 @@ export function AutoPartsForm() {
     methods.reset();
     
     createMutation(formData);
-    // setSkeletonStatus(true)
+    setSkeletonStatus(true)
   };
 
   const watchedFields = watch("parts");
@@ -152,11 +153,16 @@ export function AutoPartsForm() {
   });
 
   const onDelete = () => {
-    const payload = {
-      id: [deleteId],
-      sell_price: Number(deletePrice),
-    };
-    deleteMutation(payload);
+    if (deletePrice) {
+      const payload = {
+        id: [deleteId],
+        sell_price: Number(deletePrice),
+      };
+      deleteMutation(payload);
+      setDeleteMessage("")
+    }else {
+      setDeleteMessage("Требуется цена продажи")
+    }
   };
   const itemsPerPage = 30;
   const indexOfLastOrder = currentPage * itemsPerPage;
@@ -295,7 +301,7 @@ export function AutoPartsForm() {
                       >
                         <X />
                       </Button>
-                      <DialogContent>
+                      <DialogContent className="bg-white">
                         <DialogHeader>
                           <DialogTitle>
                             Введите цену, чтобы отключить машину
@@ -313,6 +319,7 @@ export function AutoPartsForm() {
                               value={deletePrice}
                               onChange={(e) => setDeletePrice(e.target.value)}
                             />
+                    <p className="text-red-500">{deleteMessage}</p>
                           </div>
                         </div>
                         <DialogFooter>

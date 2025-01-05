@@ -75,3 +75,8 @@ export const updateFlightData = async (data: IFlightCreate) => {
   const response = await $api.patch(`/flight/${data?.id}/`, data);
   return response.data;
 };
+
+export const deleteFlight = async (id: string) => {
+  const response = await $api.delete(`/flight/delete/${id}`);
+  return response.data;
+};

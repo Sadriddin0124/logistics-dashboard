@@ -24,6 +24,7 @@ export function UserTable({ users, onEdit, onDelete }: UserTableProps) {
           <TableHead>ID</TableHead>
           <TableHead>Полное имя</TableHead>
           <TableHead>Телефон</TableHead>
+          <TableHead>Можно удалить</TableHead>
           <TableHead>Действия</TableHead>
         </TableRow>
       </TableHeader>
@@ -33,6 +34,7 @@ export function UserTable({ users, onEdit, onDelete }: UserTableProps) {
             <TableCell>{user.id}</TableCell>
             <TableCell>{user.full_name}</TableCell>
             <TableCell>{user.phone}</TableCell>
+            <TableCell>{user.can_delete ? "Да" : "Нет"}</TableCell>
             <TableCell>
               <Button
                 variant="ghost"

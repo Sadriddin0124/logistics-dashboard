@@ -7,7 +7,7 @@ export const fetchUser = async (page: number) => {
 };
 
 export const createUser = async (data: IUser) => {
-  const response = await $api.post(`/auth/create`, data);
+  const response = await $api.post(`/employees/Admin`, data);
   return response.data;
 };
 

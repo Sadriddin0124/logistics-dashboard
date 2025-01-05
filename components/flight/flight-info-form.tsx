@@ -15,7 +15,7 @@ import { IFlightFormEdit } from "@/lib/types/flight.types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient } from "../ui-items/ReactQueryProvider";
 import { toast } from "react-toastify";
-import { updateFlightData, fetchFlight } from "@/lib/actions/flight.action";
+import { updateFlightData, fetchFlight, deleteFlight } from "@/lib/actions/flight.action";
 import { Option } from "@/pages/warehouse/diesel";
 import { fetchCarNoPage } from "@/lib/actions/cars.action";
 import { ICars } from "@/lib/types/cars.types";
@@ -29,6 +29,7 @@ import EndFlight from "./end-flight";
 import CurrencyInputWithSelect from "../ui-items/currencySelect";
 import { removeCommas } from "@/lib/utils";
 import { API_URL } from "@/pages/api/api";
+import { DeleteFlight } from "./delete-flight";
 
 function calculateDaysBetweenDates(start: string, end: string): number {
   // Parse the dates into Date objects
@@ -73,7 +74,8 @@ export default function FlightInfoForm() {
   const [car, setCar] = useState<ICars | null>(null);
   const [travelPeriod, setTravelPeriod] = useState<number>(0);
   const [arrivalStatus, setArrivalStatus] = useState<string>("");
-  const { id } = useRouter()?.query;
+  const router = useRouter()
+  const { id } = router?.query;
 
   // Fetch Data
   const { data: cars } = useQuery<ICars[]>({
@@ -209,6 +211,21 @@ export default function FlightInfoForm() {
     setSelectedDriver(newValue);
     setValue("driver", newValue?.value || "");
   };
+
+  const { mutate: deleteMutation } = useMutation({
+    mutationFn: deleteFlight,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["recycled"] });
+      toast.success("Успешно удалено!");
+      router.push('/flight')
+    },
+    onError: () => {
+      toast.error("Вы не можете удалить этот pейс!");
+    },
+  });
+  const handleDelete = () => {
+    deleteMutation(id as string)
+  }
   return (
     <div className="mt-8 bg-white p-12 rounded-2xl">
       <FormProvider {...methods}>
@@ -420,6 +437,9 @@ export default function FlightInfoForm() {
             setArrivalStatus={setArrivalStatus}
             flight_type={flight_type}
           />
+        )}
+        {status?.toLowerCase() === "inactive" && (
+         <DeleteFlight onContinue={handleDelete}/>
         )}
       </div>
     </div>

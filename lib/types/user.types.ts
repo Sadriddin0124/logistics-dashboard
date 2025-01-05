@@ -5,6 +5,7 @@ export interface IUser {
   full_name?: string;
   phone: string;
   password: string;
+  can_delete: boolean;
 }
 
 export type PaginatedUser = PaginationResponse<IUser>;
