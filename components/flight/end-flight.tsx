@@ -202,11 +202,6 @@ const EndFlight: React.FC<EndFlightProps> = ({
               <div className="space-y-2">
                 <label className="text-sm font-medium">Баланс*</label>
                 <CurrencyInputWithSelect name="balance" />
-                {errors.balance && (
-                  <p className="text-red-500 text-sm">
-                    {errors.balance.message}
-                  </p>
-                )}
               </div>
             </div>
             <div className="flex justify-end gap-4">
