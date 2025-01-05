@@ -20,7 +20,7 @@ import {
 import { usePathname } from "next/navigation";
 import { Button } from "../ui/button";
 import { useRouter } from "next/router";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { ExchangeRate } from "@/lib/types/general.types";
 import { getExchangeRate } from "@/lib/actions/general";
 import { CurrencyStatus } from "./currency-status";
@@ -29,6 +29,8 @@ import { useStringContext } from "./CurrencyProvider";
 import Logo from "@/public/images/logo.webp";
 import Image from "next/image";
 import { Switch } from "../ui/switch";
+import { LogoutUser } from "@/lib/actions/auth";
+// import { toast } from "react-toastify";
 
 type MenuItem = {
   id?: string;
@@ -161,10 +163,20 @@ export const AppSidebar: React.FC<SideBarProps> = ({
       setSubItemStatus(false);
     }
   };
+  const { mutate: logoutMutation } = useMutation({
+    mutationFn: LogoutUser,
+    onSuccess: () => {
+      // toast.success("Успешно удалено!");
+      push("/login");
+    },
+    onError: () => {
+      // toast.error("Вы не можете удалить этот pейс!");
+    },
+  });
   const logOut = () => {
+    logoutMutation()
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("accessToken");
-    push("/login");
   };
 
   const handleReload = () => {
