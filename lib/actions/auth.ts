@@ -7,6 +7,6 @@ export const LoginUser = async (data: LoginTypes) => {
 };
 
 export const LogoutUser = async () => {
-  const response = await $api.post("/auth/logout");
+  const response = await $api.post("/auth/logout", {auth_token: localStorage.getItem("accessToken")});
   return response.data;
 };

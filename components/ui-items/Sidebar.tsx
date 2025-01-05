@@ -168,6 +168,8 @@ export const AppSidebar: React.FC<SideBarProps> = ({
     onSuccess: () => {
       // toast.success("Успешно удалено!");
       push("/login");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("accessToken");
     },
     onError: () => {
       // toast.error("Вы не можете удалить этот pейс!");
@@ -175,8 +177,6 @@ export const AppSidebar: React.FC<SideBarProps> = ({
   });
   const logOut = () => {
     logoutMutation()
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("accessToken");
   };
 
   const handleReload = () => {
