@@ -73,7 +73,7 @@ export default function UtilizedOilTable() {
       <Table>
         <TableHeader className="font-bold">
           <TableRow className="border-b border-gray-200">
-            <TableHead className="font-bold">T/R</TableHead>
+            <TableHead className="font-bold"></TableHead>
             <TableHead className="font-bold">Оплаченная сумма</TableHead>
             <TableHead className="font-bold">Количество</TableHead>
             <TableHead className="font-bold">Дата</TableHead>
@@ -86,7 +86,7 @@ export default function UtilizedOilTable() {
               <TableCell>
                 {splitToHundreds(Number(utilized.price_uzs))} $
               </TableCell>
-              <TableCell>{utilized?.quantity_utilized} литр</TableCell>
+              <TableCell>{utilized?.quantity_utilized} л</TableCell>
               <TableCell>
                 {formatDate(utilized.created_at as string, "/")}
               </TableCell>

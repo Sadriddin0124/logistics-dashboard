@@ -86,7 +86,7 @@ export function OilLog() {
               <TableCell>{entry?.oil?.oil_name}</TableCell>
               {/* <TableCell>{entry.supplier}</TableCell> */}
               <TableCell>
-                {entry?.remaining_oil} л    
+                {entry?.remaining_oil || 0} л    
               </TableCell>
               <TableCell>{formatDate(entry?.created_at as string, "/")}</TableCell>
               {/* <TableCell>

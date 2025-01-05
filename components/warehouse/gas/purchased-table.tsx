@@ -64,7 +64,7 @@ const buttons = getPaginationButtons();
       <Table>
         <TableHeader className="font-bold">
           <TableRow className='border-b border-gray-200'>
-            <TableHead className="font-bold">T/R</TableHead>
+            <TableHead className="font-bold"></TableHead>
             <TableHead className="font-bold">Оплаченная сумма</TableHead>
             <TableHead className="font-bold">Количество</TableHead>
             <TableHead className="font-bold">Дата</TableHead>
@@ -77,7 +77,7 @@ const buttons = getPaginationButtons();
             <TableRow key={purchased.id}  className='border-b border-gray-200'>
               <TableCell>{index + 1}</TableCell>
               <TableCell>{purchased.payed_price_uzs.toFixed(2)} $</TableCell>
-              <TableCell>{purchased?.amount?.toFixed(2)}</TableCell>
+              <TableCell>{purchased?.amount?.toFixed(2)} м3</TableCell>
               <TableCell>{formatDate(purchased?.created_at as string, "/")}</TableCell>
               <TableCell>{Number(purchased.price_uzs).toFixed(2)} $</TableCell>
               <TableCell>

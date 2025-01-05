@@ -138,6 +138,7 @@ export default function VehicleForm() {
       sell_price: value.toString(),
     });
   };
+  
   return (
     <div>
       <div className="p-10 mt-8 container mx-auto bg-white rounded-2xl">

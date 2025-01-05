@@ -70,7 +70,7 @@ export default function GasTable() {
       <Table>
         <TableHeader className="font-bold">
           <TableRow className="border-b border-gray-200">
-            <TableHead className="font-bold">T/R</TableHead>
+            <TableHead className="font-bold"></TableHead>
             <TableHead className="font-bold">Название заправки</TableHead>
             <TableHead className="font-bold">Остаточный газ</TableHead>
             <TableHead className="font-bold">День последней оплаты</TableHead>
@@ -82,7 +82,7 @@ export default function GasTable() {
             <TableRow key={station.id} className="border-b border-gray-200">
               <TableCell>{index + 1}</TableCell>
               <TableCell>{station.name}</TableCell>
-              <TableCell>{station?.remaining_gas?.toFixed(2)}</TableCell>
+              <TableCell>{station?.remaining_gas?.toFixed(2)} м3</TableCell>
               <TableCell>
                 {formatDate(station?.updated_at as string, "/")}
               </TableCell>

@@ -72,7 +72,7 @@ export default function SalesGasTable() {
       <Table>
         <TableHeader className="font-bold">
           <TableRow className="border-b border-gray-200">
-            <TableHead className="font-bold">T/R</TableHead>
+            <TableHead className="font-bold"></TableHead>
             <TableHead className="font-bold">Машина</TableHead>
             <TableHead className="font-bold">Название заправки</TableHead>
             <TableHead className="font-bold">Дата</TableHead>
@@ -87,7 +87,7 @@ export default function SalesGasTable() {
               <TableCell>{sales?.car?.name}</TableCell>
               <TableCell>{sales?.station?.name}</TableCell>
               <TableCell>{formatDate(sales?.created_at as string, "/")} $</TableCell>
-              <TableCell>{sales?.amount?.toFixed(2)}</TableCell>
+              <TableCell>{sales?.amount?.toFixed(2)} м3</TableCell>
             </TableRow>
           ))}
         </TableBody>

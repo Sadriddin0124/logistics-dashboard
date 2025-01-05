@@ -84,8 +84,8 @@ export function GasLog() {
           {purchased?.results?.map((entry, i) => (
             <TableRow key={i} className="border-b-gray-300 border-b">
               <TableCell>{entry.station?.name}</TableCell>
-              <TableCell>{entry?.amount}</TableCell>
-              <TableCell>{entry?.km} км</TableCell>
+              <TableCell>{entry?.amount || 0} м3</TableCell>
+              <TableCell>{entry?.km || 0} км</TableCell>
               <TableCell>{formatDate(entry?.created_at as string, "/")}</TableCell>
             </TableRow>
           ))}

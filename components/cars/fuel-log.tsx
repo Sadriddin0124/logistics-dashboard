@@ -82,8 +82,8 @@ export function FuelLog() {
         <TableBody>
           {purchased?.results.map((entry, i) => (
             <TableRow key={i} className="border-b-gray-300 border-b">
-              <TableCell>{entry?.volume}</TableCell>
-              <TableCell>{entry.price_uzs.toFixed(2)} $</TableCell>
+              <TableCell>{entry?.volume || 0} л</TableCell>
+              <TableCell>{entry.price_uzs.toFixed(2) || 0} $</TableCell>
               <TableCell>{formatDate(entry?.created_at, "/")}</TableCell>
             </TableRow>
           ))}

@@ -15,6 +15,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 import { IOilExchangedList } from "@/lib/types/oil.types";
 import { fetchOilExchange } from "@/lib/actions/oil.action";
+import { formatDate } from "@/lib/functions";
 
 export default function RecycledOilTable() {
   // const [currentPage, setCurrentPage] = useState<number>(1);
@@ -70,7 +71,7 @@ export default function RecycledOilTable() {
       <Table>
         <TableHeader className="font-bold">
           <TableRow className="border-b border-gray-200">
-            <TableHead className="font-bold">T/R</TableHead>
+            <TableHead className="font-bold"></TableHead>
             <TableHead className="font-bold">Машина</TableHead>
                 <TableHead className="font-bold">Количество</TableHead>
                 <TableHead className="font-bold">
@@ -89,9 +90,9 @@ export default function RecycledOilTable() {
               <TableCell>
                 {exchanged.car}
               </TableCell>
-              <TableCell>{exchanged?.remaining_oil}</TableCell>
+              <TableCell>{exchanged?.remaining_oil || 0} л</TableCell>
               <TableCell>
-                {exchanged?.updated_at?.slice(0,10)}
+                {formatDate(exchanged?.updated_at as string, "/")}
               </TableCell>
               {/* <TableCell>
                 {exchanged?.remaining_oil}

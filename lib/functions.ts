@@ -25,11 +25,10 @@ export const formatNumberAsPrice = (value: string) => {
 export const formatDate = (value: string, symbol: string) => {
   const dateMaker = new Date(value);
   const day = dateMaker.getDay();
-  console.log(day);
   
   const date = dateMaker.getDate();
   const year = dateMaker.getFullYear();
-  return `${date}${symbol}${day}${symbol}${year}`;
+  return value ? `${date}${symbol}${day}${symbol}${year}` : "";
 };
 
 

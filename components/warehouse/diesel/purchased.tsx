@@ -31,7 +31,7 @@ const PurchasedDiesel = ({ data }: { data: IDieselTypeForPagination[] }) => {
                     <TableCell className="font-medium">
                       {item?.car?.name}
                     </TableCell>
-                    <TableCell>{item?.volume}</TableCell>
+                    <TableCell>{item?.volume || 0} л</TableCell>
                     <TableCell>
                       {item?.price_uzs.toFixed(2)} $
                     </TableCell>

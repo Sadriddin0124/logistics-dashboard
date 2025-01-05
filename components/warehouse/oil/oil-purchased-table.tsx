@@ -72,7 +72,7 @@ export default function PurchasedOilTable() {
       <Table>
         <TableHeader className="font-bold">
           <TableRow className="border-b border-gray-200">
-            <TableHead className="font-bold">T/R</TableHead>
+            <TableHead className="font-bold"></TableHead>
             <TableHead className="font-bold">Оплаченная сумма</TableHead>
             <TableHead className="font-bold">Количество</TableHead>
             <TableHead className="font-bold">Цена</TableHead>
@@ -87,7 +87,7 @@ export default function PurchasedOilTable() {
               <TableCell>
                 {Number(purchased.amount_uzs).toFixed(2)} $
               </TableCell>
-              <TableCell>{purchased.oil_volume} литр</TableCell>
+              <TableCell>{purchased.oil_volume} л</TableCell>
               <TableCell>
                 {Number(purchased.price_uzs).toFixed(2)} $
               </TableCell>

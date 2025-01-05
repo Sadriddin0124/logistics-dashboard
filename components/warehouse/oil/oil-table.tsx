@@ -78,7 +78,7 @@ const buttons = getPaginationButtons();
           {OilList?.results?.map((oil) => (
             <TableRow key={oil?.id} className="border-b border-gray-200">
               <TableCell>{oil?.oil_name}</TableCell>
-              <TableCell>{oil?.oil_volume?.toFixed(2)}</TableCell>
+              <TableCell>{oil?.oil_volume?.toFixed(2)} л</TableCell>
               <TableCell>{formatDate(oil?.updated_at as string, "/")}</TableCell>
               <TableCell>
                 <Link href={`/warehouse/oil/oil-info?id=${oil?.id}`}>

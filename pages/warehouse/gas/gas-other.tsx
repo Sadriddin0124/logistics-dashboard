@@ -249,8 +249,8 @@ export default function GasManagementForm() {
               {stationList?.results?.map((entry, index) => (
                 <TableRow key={index} className="border-b border-b-gray-300">
                   <TableCell>{entry?.car?.name}</TableCell>
-                  <TableCell>{entry?.purchased_volume}</TableCell>
-                  <TableCell>{entry?.payed_price_uzs}</TableCell>
+                  <TableCell>{entry?.purchased_volume || 0} м3</TableCell>
+                  <TableCell>{entry?.payed_price_uzs} $</TableCell>
                   <TableCell>
                     {formatDate(entry?.created_at as string, "/")}
                   </TableCell>
@@ -259,7 +259,7 @@ export default function GasManagementForm() {
                       variant="secondary"
                       className="bg-red-100 hover:bg-red-200 text-red-600"
                     >
-                      Наличи
+                      Налили
                     </Button>
                   </TableCell>
                 </TableRow>

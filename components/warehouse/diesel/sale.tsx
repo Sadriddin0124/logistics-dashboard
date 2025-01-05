@@ -77,14 +77,14 @@ const SaleDiesel = () => {
             diesel_sale?.results?.map((item, index) => (
               <TableRow key={index}>
                 <TableCell className="font-medium">{item?.car?.name}</TableCell>
-                <TableCell>{item?.volume}</TableCell>
+                <TableCell>{item?.volume || 0} л</TableCell>
                 <TableCell>{formatDate(item?.created_at as string, "/")}</TableCell>
                 <TableCell>
                   <Button
                     variant="secondary"
                     className="bg-red-100 hover:bg-red-200 text-red-600"
                   >
-                    Наличи
+                    Налили
                   </Button>
                 </TableCell>
               </TableRow>
