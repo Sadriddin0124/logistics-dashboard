@@ -41,6 +41,7 @@ export default function GasSold() {
   const [selectedStation, setSelectedStation] = useState<Option | null>(null);
   const [selectedCar, setSelectedCar] = useState<Option | null>(null);
   const [stationOptions, setStationOptions] = useState<Option[]>([]);
+  const [carDistance, setCarDistance] = useState(0)
   const [remaining, setRemaining] = useState(0);
   const [distance, setDistance] = useState(0);
   const { push } = useRouter();
@@ -87,6 +88,10 @@ export default function GasSold() {
       queryClient.invalidateQueries({ queryKey: ["gas_stations"] });
       push(`/warehouse/gas/`);
       setSelectedStation(null);
+      updateMutation({
+        id: selectedCar?.value as string,
+        distance_travelled: carDistance
+      });
       toast.success("Сохранено успешно!");
     },
     onError: () => {
@@ -110,10 +115,7 @@ export default function GasSold() {
       car: selectedCar?.value as string,
       station: selectedStation?.value as string,
     });
-    updateMutation({
-      id: selectedCar?.value as string,
-      distance_travelled: data?.next_gas_distance,
-    });
+    setCarDistance(data?.next_gas_distance)
     reset();
   };
 
