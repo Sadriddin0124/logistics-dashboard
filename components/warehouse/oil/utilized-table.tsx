@@ -15,7 +15,7 @@ import { useQuery } from "@tanstack/react-query";
 import { queryClient } from "@/components/ui-items/ReactQueryProvider";
 import { OilUtilizedResponse } from "@/lib/types/oil.types";
 import { fetchUtilizedOils } from "@/lib/actions/oil.action";
-import { formatDate } from "@/lib/functions";
+import { currencyChange, formatDate } from "@/lib/functions";
 
 export default function UtilizedOilTable() {
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -83,7 +83,7 @@ export default function UtilizedOilTable() {
             <TableRow key={utilized.id} className="border-b border-gray-200">
               <TableCell>{index + 1}</TableCell>
               <TableCell>
-                {Number(utilized.price_uzs).toFixed(2)} $
+                {Number(utilized.price_uzs).toFixed(2)} $ / {(utilized?.price as number)?.toFixed(2) || "0"} {currencyChange(utilized?.price_type)}
               </TableCell>
               <TableCell>{utilized?.quantity_utilized} л</TableCell>
               <TableCell>

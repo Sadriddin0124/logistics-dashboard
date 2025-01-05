@@ -86,3 +86,17 @@ export const downloadImage = async (link: string, name: string) => {
 export const fuelChange = (fuel: string) => {
   return fuel === "GAS" ? "Газ" : "Солярка"
 }
+
+export const currencyChange = (value: string) => {
+  switch (value) {
+    case "UZS":
+      return "Сум";
+    case "USD":
+      return "$";
+    case "KZT":
+      return "Тенге";
+    case "RUB":
+      return "Рубль";
+    default:
+  }
+};

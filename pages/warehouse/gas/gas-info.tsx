@@ -59,9 +59,14 @@ export default function GasManagementForm() {
   });
   const onSubmit = (data: IGasStation) => {
     const formData: IGasCreate = {
+      
       amount: data?.remaining_gas,
-      price_uzs: Number(removeCommas(data?.price_uzs?.toString())),
-      payed_price_uzs: Number(removeCommas(data?.payed_price_uzs?.toString())),
+      price: Number(removeCommas(data?.price as string)),
+      payed_price: Number(removeCommas(data?.payed_price as string)),
+      payed_price_uzs: data?.payed_price_uzs,
+      payed_price_type: data?.payed_price_type,
+      price_uzs: data?.price_uzs as number,
+      price_type: data?.price_type,
     };
     updateMutation({ id: id as string, gasData: formData });
     reset();

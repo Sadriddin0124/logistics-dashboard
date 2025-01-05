@@ -15,10 +15,12 @@ import CurrencyInputWithSelect from "@/components/ui-items/currencySelect";
 interface FormValues {
   name?: string;
   remaining_gas?: number;
-  price_usd: number;
+  price: number | string;
   price_uzs: number;
-  payed_price_usd: number;
+  price_type: string;
+  payed_price: number | string;
   payed_price_uzs: number;
+  payed_price_type: string;
   amount: string
 }
 
@@ -75,8 +77,12 @@ export default function GasManagementForm() {
 
   const onSubmit = (data: FormValues) => {
     const formData: IGasCreate = {
-      price_uzs: Number(removeCommas(data?.price_uzs.toString())),
-      payed_price_uzs: Number(removeCommas(data?.payed_price_uzs.toString())),
+      price: Number(removeCommas(data?.price as string)),
+      payed_price: Number(removeCommas(data?.payed_price as string)),
+      payed_price_uzs: data?.payed_price_uzs,
+      payed_price_type: data?.payed_price_type,
+      price_uzs: data?.price_uzs as number,
+      price_type: data?.price_type,
     };
     setAddGasData({
       amount: data?.remaining_gas as number,

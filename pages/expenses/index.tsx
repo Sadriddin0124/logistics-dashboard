@@ -104,7 +104,7 @@ export default function Expenses() {
   };
 
   const downloadFile = async () => {
-    downloadExcelFile(`/finance/export-logs/?action=${action}`, "финансовая информация")
+    downloadExcelFile(`/finance/export-logs/?action=${action}&kind=${expenseType}`, handleChange(expenseType) || "Все" as string)
     // try {
     //   const response = await fetch(`http://16.171.242.109`, {
     //     method: "GET",

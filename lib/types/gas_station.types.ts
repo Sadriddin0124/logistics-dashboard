@@ -5,9 +5,11 @@ export interface IGasCreate {
   name?: string;
   remaining_gas?: number;
   amount?: number;
-  price_usd?: number;
+  price: number;
+  price_type: string;
   price_uzs: number;
-  payed_price_usd?: number;
+  payed_price?: number;
+  payed_price_type: string;
   payed_price_uzs: number;
 }
 
@@ -15,9 +17,11 @@ export interface IGasStation {
   id?: string;
   name?: string;
   remaining_gas?: number;
-  price_usd?: number | string;
+  price: number | string;
+  price_type: string;
   price_uzs: number | string;
-  payed_price_usd?: number;
+  payed_price?: number | string;
+  payed_price_type: string;
   payed_price_uzs: number;
   amount?: number;
   created_at?: string;
@@ -55,7 +59,8 @@ export interface AnotherStationList {
   car: ICars;
   purchased_volume: number;
   payed_price_uzs: number;
-  payed_price_usd: number;
+  payed_price: number;
+  payed_price_type: string;
   created_at?: string
 }
 

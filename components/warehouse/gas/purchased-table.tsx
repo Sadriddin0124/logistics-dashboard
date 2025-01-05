@@ -9,7 +9,7 @@ import { useQuery } from '@tanstack/react-query'
 import { PurchasedGasListResponse } from '@/lib/types/gas_station.types'
 import { queryClient } from '@/components/ui-items/ReactQueryProvider'
 import { useRouter } from 'next/router'
-import { formatDate } from '@/lib/functions'
+import { currencyChange, formatDate } from '@/lib/functions'
 
 
 
@@ -76,10 +76,10 @@ const buttons = getPaginationButtons();
           {purchased?.results?.map((purchased, index) => (
             <TableRow key={purchased.id}  className='border-b border-gray-200'>
               <TableCell>{index + 1}</TableCell>
-              <TableCell>{purchased.payed_price_uzs.toFixed(2)} $</TableCell>
+              <TableCell>{purchased.payed_price_uzs.toFixed(2)} $ / {(purchased?.payed_price as number)?.toFixed(2) || "0"} {currencyChange(purchased?.payed_price_type)}</TableCell>
               <TableCell>{purchased?.amount?.toFixed(2)} м3</TableCell>
               <TableCell>{formatDate(purchased?.created_at as string, "/")}</TableCell>
-              <TableCell>{Number(purchased.price_uzs).toFixed(2)} $</TableCell>
+              <TableCell>{Number(purchased.price_uzs).toFixed(2)} $ / {(purchased?.price as number)?.toFixed(2) || "0"} {currencyChange(purchased?.price_type)}</TableCell>
               <TableCell>
                 <Button variant="secondary" size="sm" className='bg-green-100 text-green-400'>
                 Куплено

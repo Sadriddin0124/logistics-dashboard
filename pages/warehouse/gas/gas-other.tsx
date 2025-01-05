@@ -31,7 +31,7 @@ import {
 } from "@/lib/types/gas_station.types";
 import { removeCommas } from "@/lib/utils";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
-import { formatDate } from "@/lib/functions";
+import { currencyChange, formatDate } from "@/lib/functions";
 import CurrencyInputWithSelect from "@/components/ui-items/currencySelect";
 
 export default function GasManagementForm() {
@@ -250,7 +250,7 @@ export default function GasManagementForm() {
                 <TableRow key={index} className="border-b border-b-gray-300">
                   <TableCell>{entry?.car?.name}</TableCell>
                   <TableCell>{entry?.purchased_volume || 0} м3</TableCell>
-                  <TableCell>{entry?.payed_price_uzs.toFixed(2)} $</TableCell>
+                  <TableCell>{entry?.payed_price_uzs.toFixed(2)} $ / {entry?.payed_price.toFixed(2)} {currencyChange(entry?.payed_price_type)}</TableCell>
                   <TableCell>
                     {formatDate(entry?.created_at as string, "/")}
                   </TableCell>

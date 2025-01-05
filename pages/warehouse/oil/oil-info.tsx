@@ -72,11 +72,12 @@ export default function GasManagementForm() {
   const onSubmit = (data: IOil) => {
     const formData = {
       oil_volume: data?.oil_volume,
-      // amount_usd: Number(removeCommas(data?.amount_usd)),
-      amount_uzs: Number(removeCommas(data?.amount_uzs?.toString())),
-      price_uzs: Number(removeCommas(data?.price_uzs?.toString())),
-      price: Number(removeCommas(data?.price?.toString())),
-      // price_usd: Number(removeCommas(data?.price_usd)),
+      price: Number(removeCommas(data?.price as string)),
+      amount: Number(removeCommas(data?.amount as string)),
+      amount_uzs: data?.amount_uzs,
+      amount_type: data?.amount_type,
+      price_uzs: data?.price_uzs as number,
+      price_type: data?.price_type,
     };
     createMutation({
       id: id as string,

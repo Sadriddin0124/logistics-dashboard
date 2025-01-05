@@ -49,7 +49,6 @@ export default function GasManagementForm() {
   const onSubmit = (data: FormValues) => {
     createMutation({
       ...data,
-      price_uzs: Number(removeCommas(data?.price_uzs?.toString())),
       price: Number(removeCommas(data?.price?.toString())),
     });
     reset()

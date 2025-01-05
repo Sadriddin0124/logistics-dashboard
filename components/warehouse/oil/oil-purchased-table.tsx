@@ -16,7 +16,7 @@ import { queryClient } from "@/components/ui-items/ReactQueryProvider";
 import { useRouter } from "next/router";
 import { OilResponse } from "@/lib/types/oil.types";
 import { fetchOilPurchase } from "@/lib/actions/oil.action";
-import { formatDate } from "@/lib/functions";
+import { currencyChange, formatDate } from "@/lib/functions";
 
 export default function PurchasedOilTable() {
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -85,11 +85,11 @@ export default function PurchasedOilTable() {
             <TableRow key={purchased.id} className="border-b border-gray-200">
               <TableCell>{index + 1}</TableCell>
               <TableCell>
-                {Number(purchased.amount_uzs).toFixed(2)} $
+                {Number(purchased.amount_uzs)?.toFixed(2)} $  / {(purchased?.amount as number)?.toFixed(2) || "0"} {currencyChange(purchased?.amount_type)}
               </TableCell>
               <TableCell>{purchased.oil_volume} л</TableCell>
               <TableCell>
-                {Number(purchased.price_uzs).toFixed(2)} $
+                {Number(purchased.price_uzs)?.toFixed(2)} $ / {(purchased?.price as number) || "0"} {currencyChange(purchased?.price_type)}
               </TableCell>
               <TableCell>
                 {formatDate(purchased.created_at as string, "/")}

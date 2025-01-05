@@ -122,7 +122,7 @@ export default function FlightTable({
                     <Pencil className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Button variant={"ghost"} size={"icon"} onClick={()=>downloadExcelFile(`/finance/flight-info/${flight?.id}`, "финансовая информация")}><Download/></Button>
+                <Button variant={"ghost"} size={"icon"} onClick={()=>downloadExcelFile(`/finance/flight-info/${flight?.id}`, "Отчеты о рейса")}><Download/></Button>
               </TableCell>
             </TableRow>
           ))}

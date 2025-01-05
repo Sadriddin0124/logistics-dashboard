@@ -18,9 +18,11 @@ export interface IOil {
   next_oil_recycle_distance: number;
   oil_recycle_distance: number;
   amount_uzs: string | number;
-  amount_usd: string | number;
+  amount: string | number;
+  amount_type: string;
   price_uzs: string | number;
   price: string | number;
+  price_type: string;
   updated_at?: string;
   created_at?: string;
 }
@@ -58,6 +60,8 @@ interface IUtilizedOil {
   created_at: string;
   id?: string;
   price_uzs: number;
+  price: number | string;
+  price_type: string;
   quantity_utilized: number;
   remaining_oil_quantity: number;
 }
