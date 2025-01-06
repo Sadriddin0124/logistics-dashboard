@@ -45,7 +45,7 @@ export default function Layout({ children }: LayoutProps) {
             )}
             <div className="flex flex-col w-full gap-3">
               {pathname !== "/login" && (
-                <div className="flex h-16 items-center gap-2 border-b">
+                <div className="flex sm:h-16 items-center gap-2 border-b">
                   <Header setSideBar={setSideBar} sideBar={sideBar} />
                 </div>
               )}
