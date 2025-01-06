@@ -15,7 +15,7 @@ export default function Header({
 }) {
   // const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
   return (
-    <header className="bg-white shadow-sm w-full">
+    <header className="bg-white shadow-sm w-full hidden sm:block">
       {/* <PasswordChangeDialog setIsDialogOpen={setIsDialogOpen} isDialogOpen={isDialogOpen}/> */}
       <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
         <div className="flex items-center gap-2">
