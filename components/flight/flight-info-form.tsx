@@ -28,8 +28,8 @@ import { useRouter } from "next/router";
 import EndFlight from "./end-flight";
 import CurrencyInputWithSelect from "../ui-items/currencySelect";
 import { removeCommas } from "@/lib/utils";
-import { API_URL } from "@/pages/api/api";
 import { DeleteFlight } from "./delete-flight";
+import { BASE_URL } from "../employees/employees-info-form";
 
 function calculateDaysBetweenDates(start: string, end: string): number {
   // Parse the dates into Date objects
@@ -139,7 +139,7 @@ export default function FlightInfoForm() {
       reset(flight);
       setImage({
         id: flight?.upload?.id || "",
-        file: `${API_URL}${flight?.upload?.file}`,
+        file: `${BASE_URL}${flight?.upload?.file}`,
       });
       setValue(
         "region",

@@ -1,5 +1,5 @@
 
-export interface ImageType {
-    id: string,
-    file: string
-}
+    export interface ImageType {
+        id: string,
+        file: string
+    }
