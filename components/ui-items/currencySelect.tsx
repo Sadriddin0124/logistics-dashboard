@@ -11,7 +11,7 @@ interface CurrencyInputWithSelectProps {
   name: string;
   required?: boolean;
   disabled?: boolean;
-  type?: string
+  type?: string;
 }
 
 // Utility functions
@@ -30,15 +30,15 @@ const parseAndValidateNumber = (value: string | number): number | null => {
   const sanitizedValue =
     typeof value === "string" ? parseFloat(value.replace(/,/g, "")) : value;
 
-  // Explicitly allow 0 as valid
-  return !isNaN(sanitizedValue) && sanitizedValue >= 0 ? sanitizedValue : null;
+  // Allow any valid number (positive or negative)
+  return !isNaN(sanitizedValue) ? sanitizedValue : null;
 };
 
 const CurrencyInputWithSelect: React.FC<CurrencyInputWithSelectProps> = ({
   name,
   required,
   disabled,
-  type
+  type,
 }) => {
   const { data: exchangeRates } = useQuery<ExchangeRate[]>({
     queryKey: ["exchangeRates"],
@@ -52,9 +52,9 @@ const CurrencyInputWithSelect: React.FC<CurrencyInputWithSelectProps> = ({
     formState: { errors },
   } = useFormContext();
   const [selectedCurrency, setSelectedCurrency] = useState(type || "USD");
-  
+
   const inputValue = watch(name);
-  
+
   // Precomputed exchange rates
   const exchangeRatesMap = exchangeRates?.reduce<Record<string, number>>(
     (acc, rate) => {
@@ -63,59 +63,59 @@ const CurrencyInputWithSelect: React.FC<CurrencyInputWithSelectProps> = ({
     },
     {}
   );
-  
-// Separate useEffect for initializing selectedCurrency
-useEffect(() => {
-  if (type) {
-    setSelectedCurrency(type); // Set default value only when type changes
-  }
-}, [type]); // Runs only when `type` changes
 
-// Main useEffect for calculations
-useEffect(() => {
-  if (!exchangeRatesMap || !inputValue) return;
-
-  const parsedInput = parseAndValidateNumber(inputValue);
-  if (parsedInput !== null) {
-    const usdRate = currencyStatus
-      ? Number(dollar)
-      : exchangeRatesMap["USD"] ?? 1;
-    const rubRate = currencyStatus
-      ? Number(ruble)
-      : exchangeRatesMap["RUB"] ?? 1;
-    const kztRate = currencyStatus
-      ? Number(tenge)
-      : exchangeRatesMap["KZT"] ?? 1;
-
-    const convertedValue =
-      selectedCurrency === "USD"
-        ? parsedInput
-        : selectedCurrency === "RUB"
-        ? parsedInput * (rubRate / usdRate)
-        : selectedCurrency === "KZT"
-        ? parsedInput * (kztRate / usdRate)
-        : parsedInput / usdRate;
-
-    if (watch(`${name}_uzs`) !== convertedValue) {
-      setValue(`${name}_uzs`, convertedValue, { shouldValidate: true });
+  // Separate useEffect for initializing selectedCurrency
+  useEffect(() => {
+    if (type) {
+      setSelectedCurrency(type); // Set default value only when type changes
     }
+  }, [type]); // Runs only when `type` changes
 
-    if (watch(`${name}_type`) !== selectedCurrency) {
-      setValue(`${name}_type`, selectedCurrency, { shouldValidate: true });
+  // Main useEffect for calculations
+  useEffect(() => {
+    if (!exchangeRatesMap || !inputValue) return;
+
+    const parsedInput = parseAndValidateNumber(inputValue);
+    if (parsedInput !== null) {
+      const usdRate = currencyStatus
+        ? Number(dollar)
+        : exchangeRatesMap["USD"] ?? 1;
+      const rubRate = currencyStatus
+        ? Number(ruble)
+        : exchangeRatesMap["RUB"] ?? 1;
+      const kztRate = currencyStatus
+        ? Number(tenge)
+        : exchangeRatesMap["KZT"] ?? 1;
+
+      const convertedValue =
+        selectedCurrency === "USD"
+          ? parsedInput
+          : selectedCurrency === "RUB"
+          ? parsedInput * (rubRate / usdRate)
+          : selectedCurrency === "KZT"
+          ? parsedInput * (kztRate / usdRate)
+          : parsedInput / usdRate;
+
+      if (watch(`${name}_uzs`) !== convertedValue) {
+        setValue(`${name}_uzs`, convertedValue, { shouldValidate: true });
+      }
+
+      if (watch(`${name}_type`) !== selectedCurrency) {
+        setValue(`${name}_type`, selectedCurrency, { shouldValidate: true });
+      }
     }
-  }
-}, [
-  inputValue,
-  selectedCurrency,
-  exchangeRatesMap,
-  setValue,
-  name,
-  currencyStatus,
-  dollar,
-  ruble,
-  tenge,
-  watch,
-]);
+  }, [
+    inputValue,
+    selectedCurrency,
+    exchangeRatesMap,
+    setValue,
+    name,
+    currencyStatus,
+    dollar,
+    ruble,
+    tenge,
+    watch,
+  ]);
 
   return (
     <div className="flex gap-2 items-start">
@@ -136,14 +136,11 @@ useEffect(() => {
           onInput={(e: ChangeEvent<HTMLInputElement>) => {
             const rawValue = e.target.value;
 
-            // Keep only valid characters (numbers, one period for decimals)
-            const sanitizedValue = rawValue.replace(/[^0-9.]/g, "");
-
-            // Ensure only one period is allowed in the input
-            if ((sanitizedValue.match(/\./g) || []).length > 1) {
-              e.preventDefault();
-              return;
-            }
+            // Allow negative sign only at the start and only one decimal point
+            const sanitizedValue = rawValue
+              .replace(/[^0-9.-]/g, "") // Allow numbers, decimal point, and negative sign
+              .replace(/(?!^)-/g, "") // Allow only one minus sign, and only at the start
+              .replace(/(\..*)\./g, "$1"); // Allow only one decimal point
 
             // Update the input value dynamically
             e.target.value = sanitizedValue;
@@ -154,18 +151,19 @@ useEffect(() => {
           onBlur={(e: ChangeEvent<HTMLInputElement>) => {
             const rawValue = e.target.value;
             const parsedValue = parseAndValidateNumber(rawValue);
-          
+
             if (parsedValue !== null) {
               const formattedValue = formatNumberWithCommas(parsedValue);
               e.target.value = formattedValue;
               setValue(name, formattedValue, { shouldValidate: true });
             } else {
-              // If the value is invalid (e.g., empty), reset it to 0
-              e.target.value = "0";
-              setValue(name, "0", { shouldValidate: true });
+              // Reset only if the input is empty or invalid (not a valid number)
+              e.target.value = rawValue === "" ? "0" : rawValue;
+              setValue(name, rawValue === "" ? "0" : rawValue, {
+                shouldValidate: true,
+              });
             }
           }}
-          
         />
 
         {errors[name] && (
@@ -177,7 +175,7 @@ useEffect(() => {
 
       <div className="flex flex-col gap-2">
         <select
-        disabled={disabled}
+          disabled={disabled}
           id="currency-select"
           className="border rounded-md p-2"
           value={selectedCurrency}

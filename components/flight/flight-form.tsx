@@ -106,32 +106,41 @@ export default function FlightForm() {
     },
   });
   const onSubmit = (data: IFlightData) => {
-    console.log(data);
-    
-    createMutation({
+    const formData = {
       ...data,
       upload: image?.id,
-      driver_expenses_uzs: Number(
-        removeCommas(data?.driver_expenses_uzs?.toString())
-      ),
-      driver_expenses: Number(
-        removeCommas(data?.driver_expenses_uzs?.toString())
-      ),
-      price_uzs: Number(removeCommas(data?.price_uzs?.toString())),
-      price: Number(removeCommas(data?.price_uzs?.toString())),
-      flight_expenses: Number(removeCommas(data?.flight_expenses?.toString())),
-      other_expenses: Number(removeCommas(data?.other_expenses?.toString())),
-      flight_balance: data?.flight_expenses_uzs,
+      price:
+        data?.price != null
+          ? typeof data.price === "string"
+            ? Number(removeCommas(data.price))
+            : data.price
+          : undefined,
+      flight_expenses:
+        typeof data?.flight_expenses === "string"
+          ? Number(removeCommas(data?.flight_expenses as string))
+          : data?.flight_expenses,
+      other_expenses:
+        typeof data?.other_expenses === "string"
+          ? Number(removeCommas(data?.other_expenses as string))
+          : data?.other_expenses,
+      driver_expenses:
+        data?.driver_expenses != null
+          ? typeof data?.driver_expenses === "string"
+            ? Number(removeCommas(data?.driver_expenses as string))
+            : data?.driver_expenses
+          : undefined,
+      flight_balance: data?.flight_expenses as number,
       flight_balance_uzs: data?.flight_expenses_uzs,
       arrival_date: data?.arrival_date || null,
-    });
+    };
+    createMutation(formData);
     updateCarMutation({
       id: selectedCar?.value as string,
       distance_travelled: data?.start_km || distance,
     });
     reset();
   };
-console.log(watch("region"));
+  console.log(watch("region"));
 
   const handleSelectChange = (value: string, name: "flight_type" | "route") => {
     setValue(name, value);
@@ -140,14 +149,12 @@ console.log(watch("region"));
       setValue("driver", "");
       setValue("region", "");
       setValue("driver_expenses", "");
-      setValue(
-        "driver_expenses_uzs", ""
-      );
+      setValue("driver_expenses_uzs", "");
       setValue("price", "");
       setValue("price_uzs", "");
       reset(
         {
-          route: undefined
+          route: undefined,
         },
         { keepDirty: true, keepValues: true } // Retain specified values
       );
@@ -155,10 +162,10 @@ console.log(watch("region"));
       setSelectedDriver(null);
     }
     if (name === "route") {
-      handleSelectRegion(watch("region"))
+      handleSelectRegion(watch("region"));
     }
   };
-  
+
   const handleSelectCar = (newValue: SingleValue<Option>) => {
     setSelectedCar(newValue);
     setValue("car", newValue?.value as string);
@@ -188,8 +195,8 @@ console.log(watch("region"));
     }
     setSelectedRegion(region as IRegion);
   };
-  console.log(route);
-  
+  console.log(watch("driver_expenses"));
+
   return (
     <FormProvider {...methods}>
       <form
@@ -205,10 +212,13 @@ console.log(watch("region"));
               control={methods.control}
               rules={{ required: "Поле обязательно для заполнения." }}
               render={({ field }) => (
-                <Selector onValueChange={(newValue) => {
-                  field.onChange(newValue); // Update the form value
-                  handleSelectChange(newValue, "flight_type"); // Trigger your custom handler
-                }} value={field.value}>
+                <Selector
+                  onValueChange={(newValue) => {
+                    field.onChange(newValue); // Update the form value
+                    handleSelectChange(newValue, "flight_type"); // Trigger your custom handler
+                  }}
+                  value={field.value}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Выберите..." />
                   </SelectTrigger>
@@ -386,7 +396,9 @@ console.log(watch("region"));
           {flight_type === "OUT" && (
             <div className="space-y-2">
               <label className="text-sm font-medium">Расходы на Рейс*</label>
-              <CurrencyInputWithSelect name="flight_expenses" />
+              <CurrencyInputWithSelect
+                name="flight_expenses"
+              />
             </div>
           )}
           {flight_type === "OUT" && (
@@ -416,7 +428,6 @@ console.log(watch("region"));
               <label className="text-sm font-medium">
                 Расход на питание (за день)
               </label>
-              <CurrencyInputWithSelect name="other_expenses" />
             </div>
           )}
         </div>

@@ -160,7 +160,7 @@ export default function FlightForm() {
 
             <div className="space-y-2">
               <label className="text-sm font-medium">
-                Комментарий о ремонте
+                Комментарий о рейсе
               </label>
               <Textarea
                 placeholder="Напишите комментарий..."
