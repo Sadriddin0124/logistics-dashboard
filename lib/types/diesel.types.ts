@@ -23,4 +23,5 @@ export type IDieselPaginated = PaginationResponse<IDieselTypeForPagination>;
 export interface IDieselSale {
   car: string;
   volume: string;
+  created_at: string
 }

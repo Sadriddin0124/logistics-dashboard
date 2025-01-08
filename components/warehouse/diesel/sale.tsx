@@ -76,7 +76,7 @@ const SaleDiesel = () => {
           {!isLoading ? (
             diesel_sale?.results?.map((item, index) => (
               <TableRow key={index}>
-                <TableCell className="font-medium">{item?.car?.name}</TableCell>
+                <TableCell className="">{item?.car?.name} {item?.car?.number}</TableCell>
                 <TableCell>{item?.volume || 0} л</TableCell>
                 <TableCell>{formatDate(item?.created_at as string, "/")}</TableCell>
                 <TableCell>

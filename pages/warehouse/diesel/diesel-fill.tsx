@@ -114,6 +114,13 @@ export default function DieselFill() {
                     </p>
                   )}
                 </div>
+                <div className="space-y-2">
+                  <label className="text-sm">Дата создания</label>
+                  <Input
+                    type="date"
+                    {...register("created_at", { required: true })}
+                  />
+                </div>
                 <div className="flex justify-end col-span-2">
                   <Button
                     className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded"
