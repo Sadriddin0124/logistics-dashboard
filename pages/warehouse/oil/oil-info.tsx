@@ -48,8 +48,8 @@ export default function GasManagementForm() {
       setValue("oil_volume", Number(result.toFixed(2)));
       if (result < 1) {
         setStatus("Цена на масла не должна быть выше уплаченной суммы.");
-      }else {
-        setStatus("")
+      } else {
+        setStatus("");
       }
     } else {
       setValue("oil_volume", 0);
@@ -78,6 +78,7 @@ export default function GasManagementForm() {
       amount_type: data?.amount_type,
       price_uzs: data?.price_uzs as number,
       price_type: data?.price_type,
+      created_at: data?.created_at,
     };
     createMutation({
       id: id as string,
@@ -132,6 +133,13 @@ export default function GasManagementForm() {
                 <label className="text-sm">Цена на масло (литр)</label>
                 <CurrencyInputWithSelect name="price" />
                 {status && <p className="text-sm text-red-500">{status}</p>}
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm">Дата создания</label>
+                <Input
+                  type="date"
+                  {...register("created_at", { required: true })}
+                />
               </div>
 
               <div className="flex justify-end mt-4 gap-2 col-span-2">

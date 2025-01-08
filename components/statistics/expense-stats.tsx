@@ -178,11 +178,18 @@ export function ExpenseStats({ start, end, setStart, setEnd }: Props) {
             name="Проче расходы"
           />
           <StatCard
+            title="Итого по всем автомобилям"
+            value={data?.car_price?.toFixed(2) || 0}
+            icon={TrendingDownIcon}
+            // url="/flight/info/?action=OUTCOME"
+            name="Итого по всем автомобилям"
+          />
+          <StatCard
             title="Лизинговый баланс"
             value={data?.leasing_balance?.toFixed(2) || 0}
             icon={TrendingDownIcon}
             // url="/flight/info/?action=OUTCOME"
-            name="финансовая информация"
+            name="Лизинговый баланс"
           />
           <StatCard
             title={"Сумма лизинга выплачена"}

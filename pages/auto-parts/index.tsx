@@ -1,3 +1,4 @@
+import AddPartsForm from "@/components/auto-parts/add-autopart";
 import { AutoPartsDelete } from "@/components/auto-parts/auto-parts-delete";
 import AutoPartsTable from "@/components/auto-parts/autoparts-table";
 import {
@@ -35,6 +36,7 @@ const AutoParts = () => {
           </Select>
         </div>
         <AutoPartsDelete id={selectedParts} />
+        <AddPartsForm/>
       </div>
       <AutoPartsTable
         setSelectedParts={setSelectedParts}

@@ -37,8 +37,8 @@ export default function GasManagementForm() {
       console.log(result);
       if (result < 1) {
         setStatus("Цена на масла не должна быть выше уплаченной суммы.");
-      }else {
-        setStatus("")
+      } else {
+        setStatus("");
       }
       setValue("oil_volume", Number(result.toFixed(2)));
     } else {
@@ -87,6 +87,7 @@ export default function GasManagementForm() {
       oil_volume: 0,
     });
     setAddOilData({
+      created_at: data?.created_at,
       oil_volume: data?.oil_volume,
       ...formData,
     });
@@ -130,6 +131,13 @@ export default function GasManagementForm() {
                   <label className="text-sm">Цена на масло (литр)</label>
                   <CurrencyInputWithSelect name="price" />
                   {status && <p className="text-sm text-red-500">{status}</p>}
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm">Дата создания</label>
+                  <Input
+                    type="date"
+                    {...register("created_at", { required: true })}
+                  />
                 </div>
               </div>
 

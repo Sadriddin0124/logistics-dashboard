@@ -23,7 +23,6 @@ import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import TableSkeleton from "@/components/ui-items/SkeletonTable";
 import CurrencyInputWithSelect from "@/components/ui-items/currencySelect";
 
-
 export interface Option {
   label: string;
   value: string;
@@ -85,12 +84,14 @@ export default function GasManagementForm() {
   const buttons = getPaginationButtons();
 
   useEffect(() => {
-    const carOption = cars?.filter(car=> car?.fuel_type === "DIESEL")?.map((car) => {
-      return {
-        label: `${car?.name} ${car?.number}`,
-        value: car?.id,
-      };
-    });
+    const carOption = cars
+      ?.filter((car) => car?.fuel_type === "DIESEL")
+      ?.map((car) => {
+        return {
+          label: `${car?.name} ${car?.number}`,
+          value: car?.id,
+        };
+      });
     setCarOptions(carOption as Option[]);
   }, [cars]);
   const { mutate: createMutation } = useMutation({
@@ -146,6 +147,13 @@ export default function GasManagementForm() {
                     </p>
                   )}
                 </div>
+                <div className="space-y-2">
+                  <label className="text-sm">Дата создания</label>
+                  <Input
+                    type="date"
+                    {...register("created_at", { required: true })}
+                  />
+                </div>
               </div>
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
@@ -196,7 +204,6 @@ export default function GasManagementForm() {
       </Card>
 
       {/* Middle Table Section */}
-     
 
       {/* Bottom Summary Section */}
       <Card>
@@ -211,8 +218,8 @@ export default function GasManagementForm() {
             )}
             <div className="mt-4 flex justify-between items-center">
               <div>
-              Итого: {diesel?.count} с {indexOfFirstOrder + 1} до {Math.min(indexOfLastOrder, diesel?.count as number) || 0}
-
+                Итого: {diesel?.count} с {indexOfFirstOrder + 1} до{" "}
+                {Math.min(indexOfLastOrder, diesel?.count as number) || 0}
               </div>
               <div className="flex space-x-2 items-center">
                 <Button

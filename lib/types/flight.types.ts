@@ -50,6 +50,8 @@ export interface IFlightData {
   driver: string; // Required
   departure_date: string; // Date in ISO format (required)
   arrival_date?: string | null; // Date in ISO format (nullable)
+  price_come_uzs: string | number;
+  price_come?: string | number;
   price_uzs: string | number;
   price?: string | number;
   driver_expenses_uzs: number | string;
@@ -66,6 +68,7 @@ export interface IFlightData {
   flight_balance: number;
   start_km: number;
   end_km?: number;
+  payment_type: string
 }
  
 export interface CloseFlight {
@@ -104,6 +107,9 @@ export interface IFlightFormEdit {
   price_uzs?: number; // Nullable
   price_type?: string; // Nullable
   price?: string | null; // Nullable
+  price_come_uzs?: number; // Nullable
+  price_come_type?: string; // Nullable
+  price_come?: string | null; // Nullable
   driver_expenses_uzs?: number; // Expenses allocated to the driver (nullable)
   driver_expenses_type?: string; // Expenses allocated to the driver (nullable)
   driver_expenses?: string | null; // Expenses allocated to the driver (nullable)

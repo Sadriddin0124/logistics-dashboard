@@ -23,13 +23,21 @@ export const formatNumberAsPrice = (value: string) => {
 };
 
 export const formatDate = (value: string, symbol: string) => {
+  if (!value) return "";
+
   const dateMaker = new Date(value);
-  const day = dateMaker.getDay();
-  
-  const date = dateMaker.getDate();
-  const year = dateMaker.getFullYear();
-  return value ? `${date}${symbol}${day}${symbol}${year}` : "";
+
+  const day = dateMaker.getDate(); // Day of the month
+  const month = dateMaker.getMonth() + 1; // Month (0-based, so add 1)
+  const year = dateMaker.getFullYear(); // Full year
+
+  // Format with leading zero for day and month if needed
+  const formattedDay = day < 10 ? `0${day}` : day;
+  const formattedMonth = month < 10 ? `0${month}` : month;
+
+  return `${formattedDay}${symbol}${formattedMonth}${symbol}${year}`;
 };
+
 
 
 export const downloadExcelFile = async (link: string, name: string) => {

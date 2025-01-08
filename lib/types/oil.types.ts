@@ -10,6 +10,7 @@ export interface IOilType {
   price_usd?: number;
   updated_at?: string;
   remaining_oil_quantity?: string;
+  created_at?: string;
 }
 export interface IOil {
   id?: string;

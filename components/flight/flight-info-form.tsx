@@ -397,8 +397,15 @@ export default function FlightInfoForm() {
                 readOnly
               />
             </div>}
+            {flight_type === "OUT" && watch("route") === "BEEN_TO" && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium">
+                Введите стоимость рейса (обратно)*
+              </label>
+              <CurrencyInputWithSelect name="price_come" type={flight?.price_come_type} disabled/>
+            </div>
+          )}
           </div>
-
           {/* Cargo Information */}
           {/* <div className="space-y-2">
           <label className="text-sm font-medium">Информация о грузе</label>

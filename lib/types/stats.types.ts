@@ -18,6 +18,7 @@ export type IStats = {
     total_leasing_paid: number; // Resulting balance or net value\
     flight_count: number
     active_flight_count: number
+    car_price: number
   };
 
   export type StatsPaginated = PaginationResponse<IStats>

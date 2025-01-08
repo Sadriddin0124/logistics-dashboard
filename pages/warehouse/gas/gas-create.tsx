@@ -22,6 +22,7 @@ interface FormValues {
   payed_price_uzs: number;
   payed_price_type: string;
   amount: string
+  created_at: string
 }
 
 export default function GasManagementForm() {
@@ -85,6 +86,7 @@ export default function GasManagementForm() {
       price_type: data?.price_type,
     };
     setAddGasData({
+      created_at: data?.created_at,
       amount: data?.remaining_gas as number,
       ...formData,
     } as IGasStation);
@@ -127,6 +129,13 @@ export default function GasManagementForm() {
                   <label className="text-sm">Цена на газ (м3)</label>
                   <CurrencyInputWithSelect name="price" />
                   {status && <p className="text-sm text-red-500">{status}</p>}
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm">Дата создания</label>
+                  <Input
+                  type="date"
+                    {...register("created_at", { required: true })}
+                  />
                 </div>
               </div>
 

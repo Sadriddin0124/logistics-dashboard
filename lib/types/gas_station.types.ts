@@ -5,6 +5,7 @@ export interface IGasCreate {
   name?: string;
   remaining_gas?: number;
   amount?: number;
+  created_at?: string;
   price: number;
   price_type: string;
   price_uzs: number;

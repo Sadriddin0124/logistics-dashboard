@@ -37,7 +37,11 @@ export default function FlightForm() {
   const [selectedCar, setSelectedCar] = useState<Option | null>(null);
   const [distance, setDistance] = useState<number>(0);
   const [selectedRegion, setSelectedRegion] = useState<IRegion | null>(null);
-  const methods = useForm<IFlightData>();
+  const methods = useForm<IFlightData>({
+    defaultValues: {
+      payment_type: "CASH"
+    }
+  });
   const {
     register,
     handleSubmit,
@@ -115,6 +119,12 @@ export default function FlightForm() {
             ? Number(removeCommas(data.price))
             : data.price
           : undefined,
+      price_come:
+        data?.price_come != null
+          ? typeof data.price_come === "string"
+            ? Number(removeCommas(data.price_come))
+            : data.price_come
+          : undefined,
       flight_expenses:
         typeof data?.flight_expenses === "string"
           ? Number(removeCommas(data?.flight_expenses as string))
@@ -129,7 +139,12 @@ export default function FlightForm() {
             ? Number(removeCommas(data?.driver_expenses as string))
             : data?.driver_expenses
           : undefined,
-      flight_balance: data?.flight_expenses as number,
+      flight_balance:
+        data?.driver_expenses != null
+          ? typeof data?.driver_expenses === "string"
+            ? Number(removeCommas(data?.driver_expenses as string))
+            : data?.driver_expenses
+          : undefined,
       flight_balance_uzs: data?.flight_expenses_uzs,
       arrival_date: data?.arrival_date || null,
     };
@@ -142,7 +157,7 @@ export default function FlightForm() {
   };
   console.log(watch("region"));
 
-  const handleSelectChange = (value: string, name: "flight_type" | "route") => {
+  const handleSelectChange = (value: string, name: "flight_type" | "route"| "payment_type") => {
     setValue(name, value);
     if (name === "flight_type") {
       setValue("car", "");
@@ -195,7 +210,6 @@ export default function FlightForm() {
     }
     setSelectedRegion(region as IRegion);
   };
-  console.log(watch("driver_expenses"));
 
   return (
     <FormProvider {...methods}>
@@ -328,23 +342,23 @@ export default function FlightForm() {
               <p className="text-red-500">{errors?.region?.message}</p>
             )}
           </div>
-          {/* Trip Price */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">
-              Введите стоимость рейса*
-            </label>
-            <CurrencyInputWithSelect
-              name="price"
-              type={
-                route === "BEEN_TO"
-                  ? selectedRegion?.been_flight_price_type
-                  : selectedRegion?.gone_flight_price_type
-              }
-            />
-            {/* {errors?.price_uzs && (
-              <p className="text-red-500">{errors?.price_uzs?.message}</p>
-            )} */}
+            <label className="text-sm font-medium">Выберите тип оплаты</label>
+            <Selector
+              onValueChange={(value) => handleSelectChange(value, "payment_type")}
+              {...register("payment_type")}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Выберите тип оплаты..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={"PERECHESLINIYA"}>Перечисления</SelectItem>
+                <SelectItem value={"CASH"}>Наличные</SelectItem>
+              </SelectContent>
+            </Selector>
+            
           </div>
+          {/* Trip Price */}
 
           {/* Departure Date */}
           <div className="space-y-2">
@@ -360,22 +374,23 @@ export default function FlightForm() {
               <p className="text-red-500">{errors?.departure_date?.message}</p>
             )}
           </div>
-
-          {/* Spending */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Расходы водителя*</label>
+            <label className="text-sm font-medium">
+              Введите стоимость рейса {flight_type === "OUT" && "(туда)"}*
+            </label>
             <CurrencyInputWithSelect
-              name="driver_expenses"
+              name="price"
               type={
                 route === "BEEN_TO"
-                  ? selectedRegion?.been_driver_expenses_type
-                  : selectedRegion?.gone_driver_expenses_type
+                  ? selectedRegion?.been_flight_price_type
+                  : selectedRegion?.gone_flight_price_type
               }
             />
-            {/* {errors?.driver_expenses_uzs && (
-              <p className="text-red-500">{errors?.driver_expenses_uzs?.message}</p>
+            {/* {errors?.price_uzs && (
+              <p className="text-red-500">{errors?.price_uzs?.message}</p>
             )} */}
           </div>
+
 
           {/* Arrival Date */}
           {flight_type === "OUT" && (
@@ -393,14 +408,21 @@ export default function FlightForm() {
               )}
             </div>
           )}
-          {flight_type === "OUT" && (
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Расходы на Рейс*</label>
-              <CurrencyInputWithSelect
-                name="flight_expenses"
-              />
-            </div>
-          )}
+          {/* Spending */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Расходы водителя*</label>
+            <CurrencyInputWithSelect
+              name="driver_expenses"
+              type={
+                route === "BEEN_TO"
+                  ? selectedRegion?.been_driver_expenses_type
+                  : selectedRegion?.gone_driver_expenses_type
+              }
+            />
+            {/* {errors?.driver_expenses_uzs && (
+              <p className="text-red-500">{errors?.driver_expenses_uzs?.message}</p>
+            )} */}
+          </div>
           {flight_type === "OUT" && (
             <div className="space-y-2">
               <label className="text-sm font-medium">
@@ -425,9 +447,26 @@ export default function FlightForm() {
           )}
           {flight_type === "OUT" && (
             <div className="space-y-2">
+              <label className="text-sm font-medium">Расходы на Рейс*</label>
+              <CurrencyInputWithSelect name="flight_expenses" />
+            </div>
+          )}
+          {flight_type === "OUT" && (
+            <div className="space-y-2">
               <label className="text-sm font-medium">
                 Расход на питание (за день)
               </label>
+              <div className="space-y-2">
+                <CurrencyInputWithSelect name="other_expenses" />
+              </div>
+            </div>
+          )}
+          {flight_type === "OUT" && route === "BEEN_TO" && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium">
+                Введите стоимость рейса (обратно)*
+              </label>
+              <CurrencyInputWithSelect name="price_come" />
             </div>
           )}
         </div>

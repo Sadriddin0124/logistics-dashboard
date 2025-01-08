@@ -7,6 +7,7 @@ export interface IDieselType {
   price_uzs: number;
   car: string;
   remaining_volume?: string;
+  created_at: string
 }
 export interface IDieselTypeForPagination {
   volume: string;
