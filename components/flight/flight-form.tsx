@@ -408,6 +408,14 @@ export default function FlightForm() {
               )}
             </div>
           )}
+          {flight_type === "OUT" && route === "BEEN_TO" && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium">
+                Введите стоимость рейса (обратно)*
+              </label>
+              <CurrencyInputWithSelect name="price_come" />
+            </div>
+          )}
           {/* Spending */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Расходы водителя*</label>
@@ -461,14 +469,7 @@ export default function FlightForm() {
               </div>
             </div>
           )}
-          {flight_type === "OUT" && route === "BEEN_TO" && (
-            <div className="space-y-2">
-              <label className="text-sm font-medium">
-                Введите стоимость рейса (обратно)*
-              </label>
-              <CurrencyInputWithSelect name="price_come" />
-            </div>
-          )}
+          
         </div>
 
         {/* Cargo Information */}

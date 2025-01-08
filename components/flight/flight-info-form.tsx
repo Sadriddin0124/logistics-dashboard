@@ -355,13 +355,20 @@ export default function FlightInfoForm() {
                 {...register("departure_date")}
               />
             </div>
+            {flight_type === "OUT" && watch("route") === "BEEN_TO" && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium">
+                Введите стоимость рейса (обратно)*
+              </label>
+              <CurrencyInputWithSelect name="price_come" type={flight?.price_come_type} disabled/>
+            </div>
+          )}
 
             {/* Spending */}
             <div className="space-y-2">
               <label className="text-sm font-medium">Расходы водителя*</label>
               <CurrencyInputWithSelect disabled name="driver_expenses" type={flight?.driver_expenses_type}/>
             </div>
-
             {/* Arrival Date */}
             {flight_type === "OUT" && <div className="space-y-2">
               <label className="text-sm font-medium">
@@ -377,6 +384,7 @@ export default function FlightInfoForm() {
               />
               {arrivalStatus && <p className="text-red-500 text-sm">{arrivalStatus}</p>}
             </div>}
+
             {flight_type === "OUT" && (
               <div className="space-y-2">
                 <label className="text-sm font-medium">
@@ -397,14 +405,7 @@ export default function FlightInfoForm() {
                 readOnly
               />
             </div>}
-            {flight_type === "OUT" && watch("route") === "BEEN_TO" && (
-            <div className="space-y-2">
-              <label className="text-sm font-medium">
-                Введите стоимость рейса (обратно)*
-              </label>
-              <CurrencyInputWithSelect name="price_come" type={flight?.price_come_type} disabled/>
-            </div>
-          )}
+            
           </div>
           {/* Cargo Information */}
           {/* <div className="space-y-2">

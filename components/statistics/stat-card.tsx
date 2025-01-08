@@ -37,8 +37,8 @@ export function StatCard({
             size={"sm"}
             onClick={() => downloadExcelFile(url2 as string, name2 as string)}
           >
-            {title1 ? (
-              title1
+            {title2 ? (
+              title2
             ) : (
               <Download
                 className="h-4 w-4 text-muted-foreground"
@@ -58,8 +58,8 @@ export function StatCard({
             size={"sm"}
             onClick={() => downloadExcelFile(url as string, name as string)}
           >
-            {title2 ? (
-              title2
+            {title1 ? (
+              title1
             ) : (
               <Download
                 className="h-4 w-4 text-muted-foreground"
