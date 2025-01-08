@@ -17,6 +17,8 @@ export const createDiesel = async (data: IDieselType) => {
 };
 
 export const createDieselSale = async (data: IDieselSale) => {
+  console.log(data);
+  
   const response = await $api.post(`/salarka/sale`, data);
   return response.data;
 };

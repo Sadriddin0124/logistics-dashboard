@@ -65,6 +65,8 @@ export default function GasManagementForm() {
     },
   });
   const onSubmit = (data: IGasStation) => {
+    const created_at = data?.created_at ? { created_at: data.created_at } : {};
+
     const formData: IGasCreate = {
       amount: data?.remaining_gas,
       price: Number(removeCommas(data?.price as string)),
@@ -73,7 +75,7 @@ export default function GasManagementForm() {
       payed_price_type: data?.payed_price_type,
       price_uzs: data?.price_uzs as number,
       price_type: data?.price_type,
-      created_at: data?.created_at
+      ...created_at
     };
     updateMutation({ id: id as string, gasData: formData });
     reset();

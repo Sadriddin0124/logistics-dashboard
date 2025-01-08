@@ -86,8 +86,9 @@ export default function GasManagementForm() {
       oil_name: data?.oil_name,
       oil_volume: 0,
     });
+    const created_at = data?.created_at ? { created_at: data.created_at } : {};
     setAddOilData({
-      created_at: data?.created_at,
+      ...created_at,
       oil_volume: data?.oil_volume,
       ...formData,
     });

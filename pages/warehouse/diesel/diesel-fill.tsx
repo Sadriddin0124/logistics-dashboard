@@ -64,7 +64,12 @@ export default function DieselFill() {
   });
 
   const onSubmit = (data: IDieselSale) => {
-    createMutation(data);
+    const created_at = data?.created_at ? { created_at: data.created_at } : {};
+    createMutation({
+      ...created_at,
+      car: data?.car,
+      volume: data?.volume
+    });
     reset();
   };
 

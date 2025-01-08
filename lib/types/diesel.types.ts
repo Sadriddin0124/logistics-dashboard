@@ -5,9 +5,10 @@ export interface IDieselType {
   volume: string;
   price: number | string;
   price_uzs: number;
+  price_type: string;
   car: string;
   remaining_volume?: string;
-  created_at: string
+  created_at?: string
 }
 export interface IDieselTypeForPagination {
   volume: string;
@@ -23,5 +24,5 @@ export type IDieselPaginated = PaginationResponse<IDieselTypeForPagination>;
 export interface IDieselSale {
   car: string;
   volume: string;
-  created_at: string
+  created_at?: string
 }

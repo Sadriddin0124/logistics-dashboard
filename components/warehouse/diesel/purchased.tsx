@@ -13,50 +13,49 @@ import { formatDate } from "@/lib/functions";
 const PurchasedDiesel = ({ data }: { data: IDieselTypeForPagination[] }) => {
   return (
     <div>
-      
-          <Table>
-            <TableHeader className="font-bold">
-              <TableRow className="border-b border-b-gray-300">
-                <TableHead className="font-bold">Машина</TableHead>
-                <TableHead className="font-bold">Количество</TableHead>
-                <TableHead className="font-bold">Цена</TableHead>
-                <TableHead className="font-bold">Дата</TableHead>
-                <TableHead className="font-bold"></TableHead>
+      <Table>
+        <TableHeader className="font-bold">
+          <TableRow className="border-b border-b-gray-300">
+            <TableHead className="font-bold">Машина</TableHead>
+            <TableHead className="font-bold">Количество</TableHead>
+            <TableHead className="font-bold">Цена</TableHead>
+            <TableHead className="font-bold">Дата</TableHead>
+            <TableHead className="font-bold"></TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {data?.length > 0 ? (
+            data.map((item, index) => (
+              <TableRow key={index}>
+                <TableCell className="font-medium">
+                  {item?.car?.models?.name}
+                  {" "}{item?.car?.name}
+                  {" "}{item?.car?.number}
+                </TableCell>
+                <TableCell>{item?.volume || 0} л</TableCell>
+                <TableCell>{item?.price_uzs.toFixed(2)} $</TableCell>
+                <TableCell>
+                  {formatDate(item?.created_at as string, "/")}
+                </TableCell>
+                <TableCell>
+                  <Button
+                    variant="secondary"
+                    className="bg-green-100 hover:bg-green-200 text-green-600"
+                  >
+                    Куплено
+                  </Button>
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data?.length > 0 ? (
-                data.map((item, index) => (
-                  <TableRow key={index}>
-                    <TableCell className="font-medium">
-                      {item?.car?.name}
-                    </TableCell>
-                    <TableCell>{item?.volume || 0} л</TableCell>
-                    <TableCell>
-                      {item?.price_uzs.toFixed(2)} $
-                    </TableCell>
-                    <TableCell>
-                      {formatDate(item?.created_at as string, "/")} 
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="secondary"
-                        className="bg-green-100 hover:bg-green-200 text-green-600"
-                      >
-                        Куплено
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={4} className="text-center">
-                    Нет данных
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={4} className="text-center">
+                Нет данных
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
     </div>
   );
 };

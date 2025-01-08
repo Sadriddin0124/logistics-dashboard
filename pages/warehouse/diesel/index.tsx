@@ -106,9 +106,14 @@ export default function GasManagementForm() {
   });
   const onSubmit = (data: IDieselType) => {
     // price_usd: Number(removeCommas(data?.price_usd?.toString())),
+    const created_at = data?.created_at ? { created_at: data.created_at } : {};
     createMutation({
-      ...data,
+      ...created_at,
+      car: data?.car,
+      price_uzs: data?.price_uzs,
+      price_type: data?.price_type,
       price: Number(removeCommas(data?.price as string)),
+      volume: data?.volume,
     });
     reset();
   };

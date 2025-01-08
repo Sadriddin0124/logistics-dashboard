@@ -37,7 +37,7 @@ import { UsedCurrencies } from "../ui-items/Sidebar";
 //   balance_uzs: string;
 //   bonus?: boolean 
 // }
-export const BASE_URL = "https://api.logic.sector-soft.ru"
+export const BASE_URL = "https://api.megastroy.sector-soft.ru"
 
 export function areObjectsEqual(obj1: IEmployeeGet, obj2: IEmployeeGet): boolean {
   for (const key in obj1) {
@@ -86,6 +86,7 @@ export default function EmployeesInfoForm() {
   useEffect(() => {
     setLicense({id: employee?.license_photo?.id as string, file: `${BASE_URL}${employee?.license_photo?.file}` as string})
     setPassport({id: employee?.passport_photo?.id as string, file: `${BASE_URL}${employee?.passport_photo?.file}` as string})
+    console.log(`${BASE_URL}${employee?.license_photo?.file}`);
     
     const subscription = watch((_, { name, type }) => {
       const currentValues = getValues();
@@ -279,7 +280,7 @@ export default function EmployeesInfoForm() {
             Баланс водителя
           </label>
           <Input
-            value={`${employee?.balance_uzs.toFixed(2) || 0} $ / ${balanceConverter() || 0} Сум`}
+            value={`${employee?.balance_uzs?.toFixed(2) || 0} $ / ${balanceConverter() || 0} Сум`}
             readOnly
             placeholder="Введите баланс водителя..."
             className="bg-muted"

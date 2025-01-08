@@ -21,31 +21,31 @@ interface FormValues {
   payed_price: number | string;
   payed_price_uzs: number;
   payed_price_type: string;
-  amount: string
-  created_at: string
+  amount: string;
+  created_at: string;
 }
 
 export default function GasManagementForm() {
   const methods = useForm<FormValues>();
   const { register, handleSubmit, watch, setValue, reset } = methods;
   const [addGasData, setAddGasData] = useState<IGasStation | null>(null);
-  const [status, setStatus] = useState<string>("")
+  const [status, setStatus] = useState<string>("");
   const payed_price_uzs = watch("payed_price_uzs");
   const price_uzs = watch("price_uzs");
-  const [gasId, setGasId] = useState<string>("")
-  const { push } = useRouter()
+  const [gasId, setGasId] = useState<string>("");
+  const { push } = useRouter();
   useEffect(() => {
-      const result =
-        Number(removeCommas(payed_price_uzs?.toString())) /
-        Number(removeCommas(price_uzs?.toString()));
-        if (price_uzs && payed_price_uzs) {
-          setValue("remaining_gas", Number(result.toFixed(2)) || 0);
-        }
-        if (result < 1) {
-          setStatus("Цена газа не должна быть выше уплаченной суммы.")
-        }else {
-          setStatus("")
-        }
+    const result =
+      Number(removeCommas(payed_price_uzs?.toString())) /
+      Number(removeCommas(price_uzs?.toString()));
+    if (price_uzs && payed_price_uzs) {
+      setValue("remaining_gas", Number(result.toFixed(2)) || 0);
+    }
+    if (result < 1) {
+      setStatus("Цена газа не должна быть выше уплаченной суммы.");
+    } else {
+      setStatus("");
+    }
   }, [price_uzs, payed_price_uzs, setValue]);
 
   const { mutate: addMutation } = useMutation({
@@ -53,7 +53,7 @@ export default function GasManagementForm() {
       addGas(data.id, data?.gasData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["gas_stations"] });
-      push(`/warehouse/gas/gas-info?id=${gasId}`)
+      push(`/warehouse/gas/gas-info?id=${gasId}`);
     },
     onError: () => {
       toast.error("Ошибка сохранения!");
@@ -64,7 +64,7 @@ export default function GasManagementForm() {
     mutationFn: createGasStation,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["gas_stations"] });
-      setGasId(data?.id)
+      setGasId(data?.id);
       addMutation({
         id: data.id,
         gasData: addGasData as IGasCreate,
@@ -85,13 +85,16 @@ export default function GasManagementForm() {
       price_uzs: data?.price_uzs as number,
       price_type: data?.price_type,
     };
+    const created_at = data?.created_at ? { created_at: data.created_at } : {};
+
     setAddGasData({
-      created_at: data?.created_at,
+      ...created_at,
       amount: data?.remaining_gas as number,
       ...formData,
     } as IGasStation);
-    createMutation({ ...formData, name: data?.name });    
-    reset()      
+
+    createMutation({ ...formData, name: data?.name });
+    reset();
   };
 
   return (
@@ -132,10 +135,7 @@ export default function GasManagementForm() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm">Дата создания</label>
-                  <Input
-                  type="date"
-                    {...register("created_at")}
-                  />
+                  <Input type="date" {...register("created_at")} />
                 </div>
               </div>
 

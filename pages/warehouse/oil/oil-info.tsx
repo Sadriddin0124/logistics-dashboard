@@ -70,6 +70,7 @@ export default function GasManagementForm() {
   });
 
   const onSubmit = (data: IOil) => {
+    const created_at = data?.created_at ? { created_at: data.created_at } : {};
     const formData = {
       oil_volume: data?.oil_volume,
       price: Number(removeCommas(data?.price as string)),
@@ -78,7 +79,7 @@ export default function GasManagementForm() {
       amount_type: data?.amount_type,
       price_uzs: data?.price_uzs as number,
       price_type: data?.price_type,
-      created_at: data?.created_at,
+      ...created_at,
     };
     createMutation({
       id: id as string,
@@ -111,7 +112,7 @@ export default function GasManagementForm() {
             >
               <div className="space-y-2">
                 <label className="text-sm">Название масло</label>
-                <Input {...register("oil_name")} placeholder="Название..." />
+                <Input {...register("oil_name")} disabled placeholder="Название..." />
               </div>
 
               <div className="space-y-2">
