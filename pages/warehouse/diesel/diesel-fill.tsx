@@ -118,7 +118,7 @@ export default function DieselFill() {
                   <label className="text-sm">Дата создания</label>
                   <Input
                     type="date"
-                    {...register("created_at", { required: true })}
+                    {...register("created_at")}
                   />
                 </div>
                 <div className="flex justify-end col-span-2">

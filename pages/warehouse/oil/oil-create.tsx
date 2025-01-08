@@ -136,7 +136,7 @@ export default function GasManagementForm() {
                   <label className="text-sm">Дата создания</label>
                   <Input
                     type="date"
-                    {...register("created_at", { required: true })}
+                    {...register("created_at")}
                   />
                 </div>
               </div>
