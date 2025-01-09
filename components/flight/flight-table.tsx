@@ -189,7 +189,6 @@ export default function FlightTable({
                 >
                   <Download />
                 </Button>
-                {flight?.status.toLowerCase() === "inactive" && (
                   <Button
                     variant={"ghost"}
                     size={"icon"}
@@ -197,7 +196,6 @@ export default function FlightTable({
                   >
                     {isArchived ? <ArchiveRestore /> : <Archive />}
                   </Button>
-                )}
                 {flight?.status.toLowerCase() === "inactive" && isArchived && (
                   <Dialog>
                     <DialogTrigger>

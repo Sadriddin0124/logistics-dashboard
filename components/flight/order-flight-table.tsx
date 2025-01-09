@@ -149,13 +149,13 @@ export default function OrderedFlightTable({
                     <Pencil className="h-4 w-4" />
                   </Button>
                   </Link>
-                  {flight?.status.toLowerCase() === "inactive" &&<Button
+                 <Button
                     variant={"ghost"}
                     size={"icon"}
                     onClick={() => handleArchive(flight?.id || "")}
                   >
                     {isArchived ? <ArchiveRestore /> : <Archive />}
-                  </Button>}
+                  </Button>
                 {flight?.status.toLowerCase() === "inactive" && isArchived && (
                   <Dialog>
                     <DialogTrigger>
