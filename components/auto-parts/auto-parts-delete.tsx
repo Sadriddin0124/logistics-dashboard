@@ -17,6 +17,7 @@ import { toast } from "react-toastify";
 import { deleteAutoDetail } from "@/lib/actions/cars.action";
 import { FormProvider, useForm } from "react-hook-form";
 import CurrencyInputWithSelect from "../ui-items/currencySelect";
+import { removeCommas } from "@/lib/utils";
 
 interface DeleteDialogProps {
   id: string[]; // The ids of the items to delete
@@ -24,10 +25,11 @@ interface DeleteDialogProps {
   description?: string; // Optional description for the confirmation dialog
 }
 
-interface DeleteType {
-  id: string; // ID of the item being deleted
-  amount_usd?: number;
-  amount_uzs: number;
+export interface IDeleteDetailType {
+  id: string[]; // ID of the item being deleted
+  sell_price?: number | string;
+  sell_price_uzs: number;
+  sell_price_type: string;
 }
 
 export function AutoPartsDelete({
@@ -35,11 +37,7 @@ export function AutoPartsDelete({
   title = "Вы абсолютно уверены?",
   description = "Это действие невозможно отменить. Это приведет к безвозвратному удалению элемента и его удалению с наших серверов.",
 }: DeleteDialogProps) {
-  const methods = useForm<DeleteType>({
-    defaultValues: {
-      // amount_usd: "",
-    },
-  });
+  const methods = useForm<IDeleteDetailType>();
   const [open, setOpen] = React.useState(false)
   // Mutation for deleting auto parts
   const { mutate: deleteMutation } = useMutation({
@@ -55,10 +53,11 @@ export function AutoPartsDelete({
   });
 
   // Handle delete form submission
-  const onDelete = (data: DeleteType) => {
+  const onDelete = (data: IDeleteDetailType) => {
     const payload = {
+      ...data,
+      sell_price: Number(removeCommas(data?.sell_price as string)),
       id: id,
-      sell_price: data.amount_uzs,
     };
     deleteMutation(payload); // Pass the mapped payload to the mutation
   };
@@ -84,10 +83,10 @@ export function AutoPartsDelete({
             className="flex flex-col gap-4"
           >
             <div>
-              <label htmlFor="amount" className="block text-sm font-medium">
+              <label htmlFor="sell_price" className="block text-sm font-medium">
                 Сумма
               </label>
-              <CurrencyInputWithSelect name="amount" />
+              <CurrencyInputWithSelect name="sell_price" />
             </div>
             <Button
               type="submit"

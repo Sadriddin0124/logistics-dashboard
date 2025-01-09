@@ -21,6 +21,7 @@ interface FormValues {
   amount_uzs: string;
   amount: string;
   comment?: string;
+  created_at: string;
   parts: {
     name: string;
     id_detail: string;
@@ -103,7 +104,12 @@ export default function RepairingForm() {
     },
   });
   const onSubmit = (data: FormValues) => {
+    const created_at = data?.created_at ? { created_at: data.created_at } : {};
+    if (data.created_at === "") {
+      delete (data as { created_at?: string }).created_at;
+    }
     const formData = {
+      ...created_at,
       car: data?.car,
       action: "OUTCOME",
       amount: Number(removeCommas(data?.amount)),
@@ -111,7 +117,6 @@ export default function RepairingForm() {
       employee: "",
       kind: id as string,
     };
-    console.log(data);
     const formData2 = data.parts.map((item) => ({
       ...item,
       price: Number(removeCommas(item?.price)),
@@ -148,6 +153,10 @@ export default function RepairingForm() {
                 Введите сумму на ремонт*
               </label>
               <CurrencyInputWithSelect name="amount" />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm">Дата создания</label>
+              <Input type="date" {...register("created_at")} />
             </div>
             <div className="space-y-2 col-span-2">
               <label className="text-sm font-medium">
@@ -193,9 +202,7 @@ export default function RepairingForm() {
                 {/* Price */}
                 <div className="space-y-2">
                   <label>Цена</label>
-                  <CurrencyInputWithSelect
-                    name={`parts.${index}.price`}
-                  />
+                  <CurrencyInputWithSelect name={`parts.${index}.price`} />
                   {errors.parts?.[index]?.price && (
                     <p className="text-red-500">
                       {errors.parts[index].price.message}

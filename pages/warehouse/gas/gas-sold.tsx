@@ -21,6 +21,7 @@ interface FormValues {
   amount: number;
   next_gas_distance: number;
   car: string;
+  created_at: string
 }
 
 interface Option {
@@ -41,7 +42,7 @@ export default function GasSold() {
   const [selectedStation, setSelectedStation] = useState<Option | null>(null);
   const [selectedCar, setSelectedCar] = useState<Option | null>(null);
   const [stationOptions, setStationOptions] = useState<Option[]>([]);
-  const [carDistance, setCarDistance] = useState(0)
+  const [carDistance, setCarDistance] = useState(0);
   const [remaining, setRemaining] = useState(0);
   const [distance, setDistance] = useState(0);
   const { push } = useRouter();
@@ -49,10 +50,12 @@ export default function GasSold() {
     queryKey: ["cars"],
     queryFn: fetchCarNoPage,
   });
+
   const { data: stations } = useQuery<IGasStation[]>({
     queryKey: ["all_stations"],
     queryFn: fetchAllGasStation,
   });
+
   useEffect(() => {
     if (cars && stations) {
       const carOption = cars
@@ -90,7 +93,7 @@ export default function GasSold() {
       setSelectedStation(null);
       updateMutation({
         id: selectedCar?.value as string,
-        distance_travelled: carDistance
+        distance_travelled: carDistance,
       });
       toast.success("Сохранено успешно!");
     },
@@ -110,12 +113,17 @@ export default function GasSold() {
   });
 
   const onSubmit = (data: FormValues) => {
+    const created_at = data?.created_at ? { created_at: data.created_at } : {};
+    if (data.created_at === "") {
+      delete (data as { created_at?: string }).created_at;
+    }
     createMutation({
+      ...created_at,
       ...data,
       car: selectedCar?.value as string,
       station: selectedStation?.value as string,
     });
-    setCarDistance(data?.next_gas_distance)
+    setCarDistance(data?.next_gas_distance);
     reset();
   };
 
@@ -219,6 +227,10 @@ export default function GasSold() {
                       }
                     </p>
                   )}
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm">Дата создания</label>
+                  <Input type="date" {...register("created_at")} />
                 </div>
               </div>
 

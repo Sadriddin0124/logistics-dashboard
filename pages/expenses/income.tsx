@@ -130,6 +130,7 @@ interface PartsFormData {
   balance: string;
   reason: string;
   comment: string;
+  created_at: string;
 }
 
 export default function IncomeForm() {
@@ -152,7 +153,12 @@ export default function IncomeForm() {
   });
 
   const onSubmit = (data: PartsFormData) => {
+    const created_at = data?.created_at ? { created_at: data.created_at } : {};
+    if (data.created_at === "") {
+      delete (data as { created_at?: string }).created_at;
+    }
     const formData = {
+      ...created_at,
       ...data,
       action: "INCOME",
       amount: Number(removeCommas(data?.amount as string)),
@@ -187,10 +193,12 @@ export default function IncomeForm() {
                 </label>
                 <CurrencyInputWithSelect name="amount" />
               </div>
-              {errors?.amount_uzs && (
-                <p className="text-red-500">{errors?.amount_uzs?.message}</p>
-              )}
+            <div className="space-y-2">
+              <label className="text-sm">Дата создания</label>
+              <Input type="date" {...register("created_at")} />
             </div>
+            </div>
+
 
             <div className="space-y-2">
               <label className="text-sm font-medium">

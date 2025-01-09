@@ -50,6 +50,7 @@ export interface AnotherStation {
   id?: string;
   car: string;
   name: string;
+  created_at: string;
   purchased_volume: number;
   next_gas_distance?: number;
   payed_price_uzs: number | string;

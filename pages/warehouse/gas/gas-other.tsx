@@ -37,13 +37,16 @@ import CurrencyInputWithSelect from "@/components/ui-items/currencySelect";
 export default function GasManagementForm() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [distance, setDistance] = useState(0);
-  const [carDistance, setCarDistance] = useState(0)
+  const [carDistance, setCarDistance] = useState(0);
+
   const methods = useForm<AnotherStation>();
   const { register, handleSubmit, setValue, reset } = methods;
+  
   const { data: carsList } = useQuery<ICars[]>({
     queryKey: ["cars_no_page"],
     queryFn: fetchCarNoPage,
   });
+
   const { data: stationList } = useQuery<AnotherStationListResponse>({
     queryKey: ["another-stations", currentPage],
     queryFn: () => fetchAnotherStation(currentPage),
@@ -125,24 +128,28 @@ export default function GasManagementForm() {
     },
   });
 
-    const { mutate: updateMutation } = useMutation({
-      mutationFn: updateCarDistance,
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["gas_stations"] });
-        setSelectedCar(null);
-      },
-      onError: () => {
-        toast.error("Ошибка сохранения!");
-      },
-    });
+  const { mutate: updateMutation } = useMutation({
+    mutationFn: updateCarDistance,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["gas_stations"] });
+      setSelectedCar(null);
+    },
+    onError: () => {
+      toast.error("Ошибка сохранения!");
+    },
+  });
 
   const onSubmit = (data: AnotherStation) => {
+    const created_at = data?.created_at ? { created_at: data.created_at } : {};
+    if (data.created_at === "") {
+      delete (data as { created_at?: string }).created_at;
+    }
     createMutation({
+      ...created_at,
       ...data,
-      payed_price_uzs: Number(removeCommas(data?.payed_price_uzs?.toString())),
       payed_price: Number(removeCommas(data?.payed_price?.toString())),
     });
-    setCarDistance(data?.next_gas_distance as number)
+    setCarDistance(data?.next_gas_distance as number);
     reset();
   };
   const handleSelectCar = (newVale: SingleValue<Option>) => {
@@ -222,6 +229,10 @@ export default function GasManagementForm() {
                     </p>
                   )}
                 </div>
+                <div className="space-y-2">
+                  <label className="text-sm">Дата создания</label>
+                  <Input type="date" {...register("created_at")} />
+                </div>
               </div>
 
               <div className="flex justify-end">
@@ -252,7 +263,11 @@ export default function GasManagementForm() {
                 <TableRow key={index} className="border-b border-b-gray-300">
                   <TableCell>{entry?.car?.name}</TableCell>
                   <TableCell>{entry?.purchased_volume || 0} м3</TableCell>
-                  <TableCell>{entry?.payed_price_uzs.toFixed(2)} $ / {entry?.payed_price.toFixed(2)} {currencyChange(entry?.payed_price_type)}</TableCell>
+                  <TableCell>
+                    {entry?.payed_price_uzs.toFixed(2)} $ /{" "}
+                    {entry?.payed_price.toFixed(2)}{" "}
+                    {currencyChange(entry?.payed_price_type)}
+                  </TableCell>
                   <TableCell>
                     {formatDate(entry?.created_at as string, "/")}
                   </TableCell>

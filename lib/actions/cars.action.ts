@@ -1,5 +1,6 @@
 import { $api } from "@/pages/api/api";
 import { ICars, ICarsDetail } from "../types/cars.types";
+import { IDeleteDetailType } from "@/components/auto-parts/auto-parts-delete";
 
 export const fetchCar = async (page: number) => {
   const response = await $api.get(`/cars/list/?page=${page}`);
@@ -130,10 +131,7 @@ export const updateAutoDetail = async (data: ICarsDetail[]) => {
   return response.data;
 };
 
-export const deleteAutoDetail = async (data: {
-  id: string[];
-  sell_price: number;
-}) => {
+export const deleteAutoDetail = async (data: IDeleteDetailType) => {
   const response = await $api.post(`/cars/detail-delete/`, data);
   return response.data;
 };

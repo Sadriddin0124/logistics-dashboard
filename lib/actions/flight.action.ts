@@ -11,8 +11,8 @@ export const fetchOrderedFlight = async (id: string) => {
   return response.data;
 };
 
-export const fetchFlights = async (page: number, type?: string, status?: string) => {
-  const response = await $api.get(`/flight/?page=${page}&flight_type=${type}&status=${status}`);
+export const fetchFlights = async (page: number, type?: string, status?: string, is_archived?: boolean) => {
+  const response = await $api.get(`/flight/?page=${page}&flight_type=${type}&status=${status}&is_archived=${is_archived}`);
   return response.data;
 };
 
@@ -26,8 +26,8 @@ export const fetchAllFlights = async () => {
   return response.data;
 };
 
-export const fetchOrderedFlights = async (page: number) => {
-  const response = await $api.get(`/flight/ordered?page=${page}`);
+export const fetchOrderedFlights = async (is_archived?: boolean | string, page?: number) => {
+  const response = await $api.get(`/flight/ordered?is_archived=${is_archived}&page=${page}`);
   return response.data;
 };
 
@@ -51,6 +51,16 @@ export const updateOrderedFlight = async (data: IFlightCreate) => {
   return response.data;
 };
 
+export const archiveOrderedFlight = async (data: {id: string, is_archived: boolean}) => {
+  const response = await $api.patch(`/flight/ordered/${data?.id}`, data);
+  return response.data;
+};
+
+export const deleteOrderedFlight = async (id: string) => {
+  const response = await $api.delete(`/flight/ordered/${id}`);
+  return response.data;
+};
+
 export const updateOrderedStatus = async (id: string) => {
   const response = await $api.patch(`/flight/ordered/${id}`, {status: "INACTIVE" });
   return response.data;
@@ -61,10 +71,17 @@ export const updateFlight = async (data: {id: string, endKm: number, arrival_dat
   return response.data;
 };
 
+export const archiveFlight = async (data: {id: string, is_archived: boolean}) => {
+  const response = await $api.patch(`/flight/${data?.id}/`, data);
+  return response.data;
+};
+
 export const closeFlight = async (data: CloseFlight) => {
   const response = await $api.put(`/flight/close/${data?.id}`, data);
   return response.data;
 };
+
+
 
 // export const updateFlightB $api.patch(`/flight/${data?.id}/`, {flight_balance: data?.flight_balance});
 //   return responsealance = async (data: {id: string, flight_balance: number}) => {

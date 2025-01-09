@@ -100,6 +100,7 @@ export default function FlightForm() {
       toast.error("Ошибка сохранения!");
     },
   });
+  
   const { mutate: updateCarMutation } = useMutation({
     mutationFn: updateCarDistance,
     onSuccess: () => {

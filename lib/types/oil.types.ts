@@ -32,6 +32,7 @@ export interface IOilExchange {
   oil: string;
   amount: number;
   car: string;
+  created_at: string;
   remaining_oil: number;
   updated_at?: string;
   next_oil_recycle_distance: number;

@@ -10,36 +10,53 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { ChevronLeftIcon, ChevronRightIcon, Download, Pencil } from "lucide-react";
+import {
+  Archive,
+  ArchiveRestore,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  Download,
+  Pencil,
+  Trash2,
+} from "lucide-react";
 import Link from "next/link";
-import { fetchFlights } from "@/lib/actions/flight.action";
-import { useQuery } from "@tanstack/react-query";
+import {
+  archiveFlight,
+  deleteFlight,
+  fetchFlights,
+} from "@/lib/actions/flight.action";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient } from "../ui-items/ReactQueryProvider";
 import { FlightPaginatedResponse2 } from "@/lib/types/flight.types";
 import { downloadExcelFile, formatDate } from "@/lib/functions";
+import { toast } from "react-toastify";
+import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
 
 export default function FlightTable({
   active,
   setActive,
   flightType,
-  status
+  status,
+  isArchived,
 }: {
   active: string;
   setActive: Dispatch<SetStateAction<string>>;
-  status: string
-  flightType: string
+  status: string;
+  flightType: string;
+  isArchived: boolean;
 }) {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const { data: flights } = useQuery<FlightPaginatedResponse2>({
-    queryKey: ["flights", currentPage, flightType, status],
-    queryFn: () => fetchFlights(currentPage, flightType, status),
+    queryKey: ["flights", currentPage, flightType, status, isArchived],
+    queryFn: () => fetchFlights(currentPage, flightType, status, isArchived),
   });
   useEffect(() => {
     queryClient.prefetchQuery({
-      queryKey: ["flights", currentPage + 1, flightType, status],
-      queryFn: () => fetchFlights(currentPage + 1, flightType, status),
+      queryKey: ["flights", currentPage + 1, flightType, status, isArchived],
+      queryFn: () =>
+        fetchFlights(currentPage + 1, flightType, status, isArchived),
     });
-  }, [currentPage, flightType, status]);
+  }, [currentPage, flightType, status, isArchived]);
 
   const itemsPerPage = 30;
   const indexOfLastOrder = currentPage * itemsPerPage;
@@ -74,6 +91,35 @@ export default function FlightTable({
     return buttons;
   };
   const buttons = getPaginationButtons();
+  const { mutate: archiveMutation } = useMutation({
+    mutationFn: archiveFlight,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["flights"] });
+      toast.success(" Сохранено успешно!");
+    },
+    onError: () => {
+      toast.error("Ошибка сохранения!");
+    },
+  });
+
+  const handleArchive = (id: string) => {
+    archiveMutation({ id, is_archived: !isArchived });
+  };
+
+  const { mutate: deleteMutation } = useMutation({
+    mutationFn: deleteFlight,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["flights"] });
+      toast.success(" Сохранено успешно!");
+    },
+    onError: () => {
+      toast.error("Ошибка сохранения!");
+    },
+  });
+
+  const handleDelete = (id: string) => {
+    deleteMutation(id);
+  };
   return (
     <div className="w-full container mx-auto bg-white rounded-2xl min-h-screen">
       <Table>
@@ -111,18 +157,68 @@ export default function FlightTable({
           {flights?.results.map((flight, index) => (
             <TableRow key={index} className="border-b border-gray-200">
               <TableCell className="px-5 w-[100px]">{index + 1}</TableCell>
-              <TableCell>{flight?.car?.name} {flight?.car?.models?.name} {flight?.car?.number}</TableCell>
+              <TableCell>
+                {flight?.car?.name} {flight?.car?.models?.name}{" "}
+                {flight?.car?.number}
+              </TableCell>
               <TableCell>{flight?.region?.name}</TableCell>
-              <TableCell>{flight?.status.toLowerCase() === "active" ? "Активный" : "Завершенный"}</TableCell>
-              <TableCell>{formatDate(flight?.created_at as string, "/")}</TableCell>
+              <TableCell>
+                {flight?.status.toLowerCase() === "active"
+                  ? "Активный"
+                  : "Завершенный"}
+              </TableCell>
+              <TableCell>
+                {formatDate(flight?.created_at as string, "/")}
+              </TableCell>
               <TableCell>{Number(flight?.price_uzs).toFixed(2)} $</TableCell>
-              <TableCell className="px-5 text-end">
+              <TableCell className="px-5 flex">
                 <Link href={`/flight/flight-info?id=${flight?.id}`}>
                   <Button variant="ghost" size="icon" className="h-8 w-8">
                     <Pencil className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Button variant={"ghost"} size={"icon"} onClick={()=>downloadExcelFile(`/finance/flight-info/${flight?.id}`, "Отчеты о рейса")}><Download/></Button>
+                <Button
+                  variant={"ghost"}
+                  size={"icon"}
+                  onClick={() =>
+                    downloadExcelFile(
+                      `/finance/flight-info/${flight?.id}`,
+                      "Отчеты о рейса"
+                    )
+                  }
+                >
+                  <Download />
+                </Button>
+                {flight?.status.toLowerCase() === "inactive" && (
+                  <Button
+                    variant={"ghost"}
+                    size={"icon"}
+                    onClick={() => handleArchive(flight?.id || "")}
+                  >
+                    {isArchived ? <ArchiveRestore /> : <Archive />}
+                  </Button>
+                )}
+                {flight?.status.toLowerCase() === "inactive" && isArchived && (
+                  <Dialog>
+                    <DialogTrigger>
+                      <Button variant={"ghost"} size={"icon"}>
+                        <Trash2 className="text-red-500" />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <h3 className="my-3 text-lg">Вы уверены, что хотите удалить этот рейс?</h3>
+                      <DialogTrigger className="flex justify-end gap-3">
+                        <Button variant={"outline"}>Отмена</Button>
+                        <Button
+                          onClick={() => handleDelete(flight?.id || "")}
+                          className="bg-[#4880FF] text-white hover:bg-blue-600 rounded-md"
+                        >
+                          Удалить 
+                        </Button>
+                      </DialogTrigger>
+                    </DialogContent>
+                  </Dialog>
+                )}
               </TableCell>
             </TableRow>
           ))}

@@ -31,6 +31,7 @@ interface FormValues {
   comment: string;
   reason: string;
   volume: string;
+  created_at: string;
 }
 
 export default function DieselExpense() {
@@ -69,7 +70,10 @@ export default function DieselExpense() {
           modelName = flight.car.models?.name;
         }
         return {
-          label: `${regionName} ${carName} ${modelName}  ${formatDate(flight?.created_at as string, "/")}`,
+          label: `${regionName} ${carName} ${modelName}  ${formatDate(
+            flight?.created_at as string,
+            "/"
+          )}`,
           value: flight?.id,
         };
       });
@@ -88,7 +92,7 @@ export default function DieselExpense() {
     onSuccess: () => {
       setSelectedFlight(null);
       queryClient.invalidateQueries({ queryKey: ["finance"] });
-            toast.success("Данные успешно добавлены!");
+      toast.success("Данные успешно добавлены!");
     },
     onError: () => {
       toast.error("Ошибка сохранения!");
@@ -116,15 +120,18 @@ export default function DieselExpense() {
     //   employee: "",
     //   kind: id as string,
     // };
+    const created_at = data?.created_at ? { created_at: data.created_at } : {};
+
     const formData2 = {
+      ...created_at,
       car: data?.car,
       flight: data?.flight,
       price: Number(removeCommas(data?.amount as string)),
       price_uzs: data?.amount_uzs,
       price_type: data?.amount_type,
-      volume: data?.volume
+      volume: data?.volume,
     };
-    createMutation(formData2)
+    createMutation(formData2);
     // createFinanceMutation(formData);
     methods.reset();
   };
@@ -199,9 +206,13 @@ export default function DieselExpense() {
                     valueAsNumber: true,
                   })}
                 />
-              {errors?.volume && (
-                <p className="text-red-500">{errors?.volume?.message}</p>
-              )}
+                {errors?.volume && (
+                  <p className="text-red-500">{errors?.volume?.message}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm">Дата создания</label>
+                <Input type="date" {...register("created_at")} />
               </div>
             </div>
           </div>

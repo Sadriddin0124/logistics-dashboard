@@ -50,7 +50,10 @@ export default function FlightForm() {
           modelName = flight.car.models?.name;
         }
         return {
-          label: `${regionName} ${carName} ${modelName} ${formatDate(flight?.created_at as string, "/")}`,
+          label: `${regionName} ${carName} ${modelName} ${formatDate(
+            flight?.created_at as string,
+            "/"
+          )}`,
           value: flight?.id,
         };
       });
@@ -73,27 +76,40 @@ export default function FlightForm() {
     },
   });
 
-    // const { mutate: updateMutation } = useMutation({
-    //   mutationFn: updateFlightBalance,
-    //   onSuccess: () => {
-    //     queryClient.invalidateQueries({ queryKey: ["all_flights"] });
-    //     reset();
-    //   },
-    //   onError: () => {
-    //     toast.error("Ошибка при завершении рейса!");
-    //   },
-    // });
+  // const { mutate: updateMutation } = useMutation({
+  //   mutationFn: updateFlightBalance,
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ["all_flights"] });
+  //     reset();
+  //   },
+  //   onError: () => {
+  //     toast.error("Ошибка при завершении рейса!");
+  //   },
+  // });
 
   const onSubmit = (data: SalaryFormData) => {
+    const created_at = data?.created_at ? { created_at: data.created_at } : {};
+    if (data.created_at === "") {
+      delete (data as { created_at?: string }).created_at;
+    }
+    
     const formData = {
       ...data,
+      ...created_at,
       action: "OUTCOME",
       amount: Number(removeCommas(data?.amount as string)),
       car: "",
       employee: "",
       kind: id as string,
-      comment: data?.comment + ` / ${flight?.car?.name} ${flight?.car?.number} ${formatDate(flight?.created_at as string, "/")}`
+      comment:
+        data?.comment +
+        ` / ${flight?.car?.name} ${flight?.car?.number} ${formatDate(
+          flight?.created_at as string,
+          "/"
+        )}`,
     };
+    console.log(formData);
+    
     createMutation(formData);
     reset();
   };
@@ -101,8 +117,8 @@ export default function FlightForm() {
   const handleSelectFlight = (newValue: SingleValue<Option>) => {
     setSelectedFlight(newValue);
     setValue("flight", newValue?.value as string);
-    const flight = flights?.find(item=> item?.id === newValue?.value)
-    setFlight(flight as IFlightForm)
+    const flight = flights?.find((item) => item?.id === newValue?.value);
+    setFlight(flight as IFlightForm);
   };
   return (
     <div>
@@ -148,8 +164,12 @@ export default function FlightForm() {
                 )}
               </div>
               <div className="space-y-2">
-              <label className="text-sm font-medium">Баланс Рейса</label>
-              <Input
+                <label className="text-sm">Дата создания</label>
+                <Input type="date" {...register("created_at")} />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Баланс Рейса</label>
+                <Input
                   value={balance}
                   className="bg-muted"
                   readOnly
@@ -159,9 +179,7 @@ export default function FlightForm() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">
-                Комментарий о рейсе
-              </label>
+              <label className="text-sm font-medium">Комментарий о рейсе</label>
               <Textarea
                 placeholder="Напишите комментарий..."
                 className="min-h-[120px] resize-none"

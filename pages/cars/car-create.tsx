@@ -39,6 +39,7 @@ interface FormValues {
   price: string;
   price_uzs: string;
   distance_travelled: string;
+  created_at: string;
   income_status: boolean;
 }
 
@@ -55,7 +56,7 @@ export default function VehicleForm() {
     formState: { errors },
     setValue,
     watch,
-    reset
+    reset,
   } = methods;
   const [modelOptions, setModelOptions] = useState<Option[]>([]);
   const [selectedModel, setSelectedModel] = useState<Option | null>(null);
@@ -88,7 +89,12 @@ export default function VehicleForm() {
     },
   });
   const onSubmit: SubmitHandler<FormValues> = (data) => {
+    const created_at = data?.created_at ? { created_at: data.created_at } : {};
+    if (data.created_at === "") {
+      delete (data as { created_at?: string }).created_at;
+    }
     const formData = {
+      ...created_at,
       ...data,
       with_trailer: data?.with_trailer === "false" ? false : true,
       type_of_payment: data?.type_of_payment || "CASH",
@@ -97,7 +103,7 @@ export default function VehicleForm() {
       price: Number(removeCommas(data?.price)),
     };
     createMutation({ ...formData, model: selectedModel?.value as string });
-    reset()
+    reset();
   };
 
   const with_trailer = watch("with_trailer");
@@ -347,7 +353,7 @@ export default function VehicleForm() {
                     Введите цену автомобиля*
                   </label>
                   {/* <CurrencyInputs name="price" /> */}
-                  <CurrencyInputWithSelect name="price"/>
+                  <CurrencyInputWithSelect name="price" />
                 </div>
               </div>
 
@@ -399,6 +405,10 @@ export default function VehicleForm() {
                       {errors.distance_travelled.message}
                     </p>
                   )}
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm">Дата создания</label>
+                  <Input type="date" {...register("created_at")} />
                 </div>
               </div>
 

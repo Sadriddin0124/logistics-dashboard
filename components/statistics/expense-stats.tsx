@@ -79,7 +79,7 @@ export function ExpenseStats({ start, end, setStart, setEnd }: Props) {
   });
   const { data: ordered_flights } = useQuery<IDieselPaginated>({
     queryKey: ["ordered_flights"],
-    queryFn: () => fetchOrderedFlights(1),
+    queryFn: () => fetchOrderedFlights("", 1),
     refetchOnWindowFocus: true,
   });
 

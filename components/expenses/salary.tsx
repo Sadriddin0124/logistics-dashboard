@@ -27,6 +27,7 @@ export interface SalaryFormData {
   balance: string;
   comment: string;
   reason: string;
+  created_at: string;
   volume?: number;
   bonus: boolean;
 }
@@ -89,8 +90,12 @@ export default function Salary() {
   
 
   const onSubmit = (data: SalaryFormData) => {
-    
+    const created_at = data?.created_at ? { created_at: data.created_at } : {};
+    if (data.created_at === "") {
+      delete (data as { created_at?: string }).created_at;
+    }
     const formData = {
+      ...created_at,
       ...data,
       action: "OUTCOME",
       amount: Number(removeCommas(data?.amount as string)),
@@ -153,18 +158,25 @@ export default function Salary() {
                   />
                 </div>
             </div>
+                  <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+                  <label className="text-sm">Дата создания</label>
+                  <Input
+                    type="date"
+                    {...register("created_at")}
+                  />
+                </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Баланс водителя*</label>
-                <Input readOnly value={balance} className="bg-muted" />
-              </div>
 
               <div className="space-y-2">
                 <label className="text-sm font-medium">
                   Введите сумму расхода.*
                 </label>
                 <CurrencyInputWithSelect name="amount" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Баланс водителя*</label>
+                <Input readOnly value={balance} className="bg-muted" />
               </div>
             </div>
 

@@ -93,9 +93,13 @@ export default function OilExchange() {
     },
   });
   const onSubmit = (data: IOilExchange) => {
-    console.log(data);
+    const created_at = data?.created_at ? { created_at: data.created_at } : {};
+    if (data.created_at === "") {
+      delete (data as { created_at?: string }).created_at;
+    }
 
     createMutation({
+      ...created_at,
       ...data,
       car: selectedCar?.value as string,
       oil: selectedOil?.value as string,
@@ -147,7 +151,9 @@ export default function OilExchange() {
                     placeholder="0"
                   />
                   {errors.remaining_oil && (
-                    <p className="text-red-500">{errors.remaining_oil.message}</p> // Display error message
+                    <p className="text-red-500">
+                      {errors.remaining_oil.message}
+                    </p> // Display error message
                   )}
                 </div>
                 <div className="space-y-2">
@@ -209,6 +215,10 @@ export default function OilExchange() {
                       {errors?.next_oil_recycle_distance?.message}
                     </p>
                   )}
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm">Дата создания</label>
+                  <Input type="date" {...register("created_at")} />
                 </div>
               </div>
 

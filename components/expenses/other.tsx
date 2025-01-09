@@ -21,6 +21,7 @@ interface PartsFormData {
   balance: string;
   comment: string;
   reason: string;
+  created_at: string;
 }
 
 export default function OtherExpenseForm() {
@@ -28,7 +29,7 @@ export default function OtherExpenseForm() {
   const {
     register,
     formState: { errors },
-    reset
+    reset,
   } = methods;
   const { id } = useRouter()?.query;
   const { mutate: createMutation } = useMutation({
@@ -36,7 +37,6 @@ export default function OtherExpenseForm() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["finance"] });
       toast.success(" Сохранено успешно!");
-      
     },
     onError: () => {
       toast.error("Ошибка сохранения!");
@@ -44,7 +44,12 @@ export default function OtherExpenseForm() {
   });
 
   const onSubmit = (data: PartsFormData) => {
+    const created_at = data?.created_at ? { created_at: data.created_at } : {};
+    if (data.created_at === "") {
+      delete (data as { created_at?: string }).created_at;
+    }
     const formData = {
+      ...created_at,
       ...data,
       action: "OUTCOME",
       amount: Number(removeCommas(data?.amount)),
@@ -55,7 +60,7 @@ export default function OtherExpenseForm() {
       employee: "",
     };
     createMutation(formData);
-    reset()
+    reset();
   };
 
   return (
@@ -81,11 +86,12 @@ export default function OtherExpenseForm() {
                 </label>
                 <CurrencyInputWithSelect name="amount" />
               </div>
-              {errors?.amount_uzs && (
-                <p className="text-red-500">{errors?.amount_uzs?.message}</p>
-              )}
+              
+            <div className="space-y-2">
+              <label className="text-sm">Дата создания</label>
+              <Input type="date" {...register("created_at")} />
             </div>
-
+            </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">
                 Комментарий о ремонте

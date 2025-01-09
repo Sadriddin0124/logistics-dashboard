@@ -16,8 +16,9 @@ import CurrencyInputWithSelect from "@/components/ui-items/currencySelect";
 
 interface FormValues {
   quantity_utilized: number;
-  price: number
+  price: number;
   price_uzs: number;
+  created_at: string;
 }
 
 export default function GasManagementForm() {
@@ -47,17 +48,24 @@ export default function GasManagementForm() {
     },
   });
   const onSubmit = (data: FormValues) => {
-    createMutation({
+    const created_at = data?.created_at ? { created_at: data.created_at } : {};
+    if (data.created_at === "") {
+      delete (data as { created_at?: string }).created_at;
+    }
+    const formData = {
+      ...created_at,
       ...data,
-      price: Number(removeCommas(data?.price?.toString())),
-    });
-    reset()
+      price:
+        Number(removeCommas(data?.price?.toString())) * data?.quantity_utilized,
+      price_uzs: data?.price_uzs * data?.quantity_utilized,
+    };
+    createMutation(formData);
+    reset();
   };
   const oil_volume = quantity?.results?.[0]?.remaining_oil_quantity;
 
   return (
     <div className="w-full container mx-auto mt-8 space-y-8">
-      {/* Top Form Section */}
       <Card>
         <CardContent className="p-6 space-y-6">
           <FormProvider {...methods}>
@@ -68,7 +76,7 @@ export default function GasManagementForm() {
                     Цена на утилизированное масло (литр)
                   </label>
                   <CurrencyInputWithSelect name="price" />
-                  </div>
+                </div>
                 <div className="space-y-2">
                   <label className="text-sm">
                     Количество утилизированного масла (литр)
@@ -91,6 +99,10 @@ export default function GasManagementForm() {
                     </p>
                   )}
                 </div>
+                <div className="space-y-2">
+                  <label className="text-sm">Дата создания</label>
+                  <Input type="date" {...register("created_at")} />
+                </div>
               </div>
 
               <div className="flex justify-end">
@@ -111,7 +123,7 @@ export default function GasManagementForm() {
           </div>
         </CardContent>
       </Card>
-      <UtilizedOilTable/>
+      <UtilizedOilTable />
     </div>
   );
 }

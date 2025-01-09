@@ -31,11 +31,16 @@ interface FormValues {
   id_detail: string;
   in_sklad: boolean;
   price_uzs: number;
-  price?: string ;
+  price?: string;
 }
 
 export function AutoPartsForm() {
-  const methods = useForm<{ parts: FormValues[] }>({
+  const methods = useForm<{
+    sell_price_uzs: number;
+    sell_price: string | number;
+    sell_price_type: string;
+    parts: FormValues[];
+  }>({
     defaultValues: {
       parts: [],
     },
@@ -49,13 +54,12 @@ export function AutoPartsForm() {
     formState: { errors },
   } = methods;
 
-  const [deletePrice, setDeletePrice] = useState<string>("");
   const [deleteId, setDeleteId] = useState<string>("");
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [index, setIndex] = useState<number>(10);
-  const [skeletonStatus, setSkeletonStatus] = useState(false)
-  const [deleteMessage, setDeleteMessage] = useState("")
+  const [skeletonStatus, setSkeletonStatus] = useState(false);
+  const [deleteMessage, setDeleteMessage] = useState("");
   const router = useRouter();
   const { id } = router.query;
   const { data: carDetails } = useQuery<PaginatedCarDetail>({
@@ -98,25 +102,27 @@ export function AutoPartsForm() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["car_details"] });
       setTimeout(() => {
-        setSkeletonStatus(false)
+        setSkeletonStatus(false);
       }, 1000);
     },
     onError: () => {
       toast.error("Ошибка при сохранении!");
     },
   });
-  
+
   const onSubmit = (data: { parts: FormValues[] }) => {
     const formData = data.parts.map((item) => ({
       ...item,
-      price: Number(removeCommas(item?.price as string)),
-      price_uzs: Number(removeCommas(item?.price as string)),
+      price:
+        typeof item?.price === "string"
+          ? Number(removeCommas(item?.price as string))
+          : item?.price,
       car: id as string,
     }));
     methods.reset();
-    
+
     createMutation(formData);
-    setSkeletonStatus(true)
+    setSkeletonStatus(true);
   };
 
   const watchedFields = watch("parts");
@@ -153,15 +159,23 @@ export function AutoPartsForm() {
   });
 
   const onDelete = () => {
-    if (deletePrice) {
+    const sell_price = watch("sell_price");
+    const sell_price_uzs = watch("sell_price_uzs");
+    const sell_price_type = watch("sell_price_type");
+    if (sell_price) {
       const payload = {
         id: [deleteId],
-        sell_price: Number(deletePrice),
+        sell_price:
+          typeof sell_price === "string"
+            ? Number(removeCommas(sell_price as string))
+            : sell_price,
+        sell_price_type,
+        sell_price_uzs,
       };
       deleteMutation(payload);
-      setDeleteMessage("")
-    }else {
-      setDeleteMessage("Требуется цена продажи")
+      setDeleteMessage("");
+    } else {
+      setDeleteMessage("Требуется цена продажи");
     }
   };
   const itemsPerPage = 30;
@@ -207,7 +221,7 @@ export function AutoPartsForm() {
         {skeletonStatus ? (
           <div className="flex flex-col gap-[50px]">
             <div className="space-y-2">
-              {Array((carDetails?.results?.length ?? 0) + 1)
+              {Array((carDetails?.results?.length ?? 0))
                 .fill(null) // Ensures each index has a value to avoid undefined elements
                 .map((item, index) => {
                   return (
@@ -269,27 +283,7 @@ export function AutoPartsForm() {
                   </div>
                   <div className="flex-1">
                     <label className="text-sm mb-2 block">Цена</label>
-                    <CurrencyInputWithSelect name={`parts.${index}.price`}/>
-                    {/* <Input
-                      {...register(`parts.${index}.price_uzs`)}
-                      placeholder="Цена..."
-                      onInput={(e) => {
-                        const rawValue = e.currentTarget.value.replace(
-                          /,/g,
-                          ""
-                        );
-
-                        if (rawValue === "0") {
-                          // If the user types 0, allow it without formatting
-                          e.currentTarget.value = "0";
-                        } else {
-                          const parsedValue = parseFloat(rawValue);
-                          // Apply formatting if it's not 0
-                          e.currentTarget.value =
-                            formatNumberWithCommas(parsedValue);
-                        }
-                      }}
-                    /> */}
+                    <CurrencyInputWithSelect name={`parts.${index}.price`} />
                   </div>
 
                   <div className=" self-end">
@@ -315,11 +309,8 @@ export function AutoPartsForm() {
                             >
                               Сумма
                             </label>
-                            <Input
-                              value={deletePrice}
-                              onChange={(e) => setDeletePrice(e.target.value)}
-                            />
-                    <p className="text-red-500">{deleteMessage}</p>
+                            <CurrencyInputWithSelect name="sell_price" />
+                            <p className="text-red-500">{deleteMessage}</p>
                           </div>
                         </div>
                         <DialogFooter>

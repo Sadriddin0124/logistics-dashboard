@@ -114,6 +114,18 @@ const Breadcrumb = () => {
       key: "outcome",
       value: "Расход",
     },
+    {
+      key: "income",
+      value: "Приходы",
+    },
+    {
+      key: "outcome",
+      value: "Расход",
+    },
+    {
+      key: "archived",
+      value: "Архив",
+    },
   ];
 
   const findLabel = (segment: string) => {

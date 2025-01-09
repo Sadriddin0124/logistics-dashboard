@@ -10,31 +10,35 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { ChevronLeftIcon, ChevronRightIcon, Pencil } from "lucide-react";
+import { Archive, ArchiveRestore, ChevronLeftIcon, ChevronRightIcon, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { fetchOrderedFlights } from "@/lib/actions/flight.action";
-import { useQuery } from "@tanstack/react-query";
+import { archiveOrderedFlight, deleteOrderedFlight, fetchOrderedFlights } from "@/lib/actions/flight.action";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient } from "../ui-items/ReactQueryProvider";
 import { FlightPaginatedResponse } from "@/lib/types/flight.types";
+import { toast } from "react-toastify";
+import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
 
 export default function OrderedFlightTable({
   active,
   setActive,
+  isArchived
 }: {
   active: string;
   setActive: Dispatch<SetStateAction<string>>;
+  isArchived: boolean
 }) {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const { data: flights } = useQuery<FlightPaginatedResponse>({
-    queryKey: ["ordered-flights", currentPage],
-    queryFn: () => fetchOrderedFlights(currentPage),
+    queryKey: ["ordered-flights", isArchived, currentPage],
+    queryFn: () => fetchOrderedFlights(isArchived, currentPage),
   });
   useEffect(() => {
     queryClient.prefetchQuery({
-      queryKey: ["ordered-flights", currentPage + 1],
-      queryFn: () => fetchOrderedFlights(currentPage + 1),
+      queryKey: ["ordered-flights", isArchived, currentPage + 1],
+      queryFn: () => fetchOrderedFlights(isArchived, currentPage + 1),
     });
-  }, [currentPage]);
+  }, [isArchived, currentPage]);
 
   const itemsPerPage = 30;
   const indexOfLastOrder = currentPage * itemsPerPage;
@@ -69,6 +73,36 @@ export default function OrderedFlightTable({
     return buttons;
   };
   const buttons = getPaginationButtons();
+
+  const { mutate: archiveMutation } = useMutation({
+    mutationFn: archiveOrderedFlight,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["ordered-flights"] });
+      toast.success(" Сохранено успешно!");
+    },
+    onError: () => {
+      toast.error("Ошибка сохранения!");
+    },
+  });
+
+  const handleArchive = (id: string) => {
+    archiveMutation({ id, is_archived: !isArchived });
+  };
+
+  const { mutate: deleteMutation } = useMutation({
+    mutationFn: deleteOrderedFlight,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["ordered-flights"] });
+      toast.success(" Сохранено успешно!");
+    },
+    onError: () => {
+      toast.error("Ошибка сохранения!");
+    },
+  });
+
+  const handleDelete = (id: string) => {
+    deleteMutation(id); 
+  };
   return (
     <div className="w-full container mx-auto bg-white rounded-2xl min-h-screen">
       <Table>
@@ -114,7 +148,35 @@ export default function OrderedFlightTable({
                   <Button variant="ghost" size="icon" className="h-8 w-8">
                     <Pencil className="h-4 w-4" />
                   </Button>
-                </Link>
+                  </Link>
+                  {flight?.status.toLowerCase() === "inactive" &&<Button
+                    variant={"ghost"}
+                    size={"icon"}
+                    onClick={() => handleArchive(flight?.id || "")}
+                  >
+                    {isArchived ? <ArchiveRestore /> : <Archive />}
+                  </Button>}
+                {flight?.status.toLowerCase() === "inactive" && isArchived && (
+                  <Dialog>
+                    <DialogTrigger>
+                      <Button variant={"ghost"} size={"icon"}>
+                        <Trash2 className="text-red-500" />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <h3 className="my-3 text-lg">Вы уверены, что хотите удалить этот рейс?</h3>
+                      <DialogTrigger className="flex justify-end gap-3">
+                        <Button variant={"outline"}>Отмена</Button>
+                        <Button
+                          onClick={() => handleDelete(flight?.id || "")}
+                          className="bg-[#4880FF] text-white hover:bg-blue-600 rounded-md"
+                        >
+                          Удалить 
+                        </Button>
+                      </DialogTrigger>
+                    </DialogContent>
+                  </Dialog>
+                )}
               </TableCell>
             </TableRow>
           ))}

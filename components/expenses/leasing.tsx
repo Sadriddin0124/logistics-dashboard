@@ -13,12 +13,14 @@ import { toast } from "react-toastify";
 import { removeCommas } from "@/lib/utils";
 import { useRouter } from "next/router";
 import CurrencyInputWithSelect from "../ui-items/currencySelect";
+import { Input } from "../ui/input";
 
 interface FormValues {
   car?: string;
   amount_uzs: string;
   amount: string | number;
   comment?: string;
+  created_at: string,
   parts: {
     name: string;
     id_detail: string;
@@ -86,7 +88,12 @@ export default function LeasingForm() {
     },
   });
   const onSubmit = (data: FormValues) => {
+    const created_at = data?.created_at ? { created_at: data.created_at } : {};
+    if (data.created_at === "") {
+      delete (data as { created_at?: string }).created_at;
+    }
     const formData = {
+      ...created_at,
       ...data,
       car: data?.car,
       action: "OUTCOME",
@@ -129,6 +136,13 @@ export default function LeasingForm() {
               </label>
               <CurrencyInputWithSelect name="amount" />
             </div>
+            <div className="space-y-2">
+                  <label className="text-sm">Дата создания</label>
+                  <Input
+                    type="date"
+                    {...register("created_at")}
+                  />
+                </div>
             <div className="space-y-2 col-span-2">
               <label className="text-sm font-medium">
                 Комментарий о ремонте
