@@ -92,6 +92,7 @@ export interface ICarsDetail2 {
   car: ICars; // Assuming this is a UUID as a string
   price_uzs: number;
   price?: number;
+  created_at?: string;
 }
 
 interface FuelLog {

@@ -23,7 +23,10 @@ interface FormValues {
 
 export default function AddPartsForm() {
   const [open, setOpen] = useState(false);
-  const methods = useForm<{ parts: FormValues[] }>({
+  const methods = useForm<{
+    created_at: string;
+    parts: FormValues[];
+  }>({
     defaultValues: {
       parts: [
         {
@@ -59,16 +62,21 @@ export default function AddPartsForm() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["details"] });
       toast.success("Утилизация завершена успешно!");
-      setOpen(false)
-      methods.reset()
+      setOpen(false);
+      methods.reset();
     },
     onError: () => {
       toast.error("Ошибка при утилизации!");
     },
   });
 
-  const onSubmit = (data: { parts: FormValues[] }) => {
+  const onSubmit = (data: { created_at: string,  parts: FormValues[] }) => {
+    const created_at = data?.created_at ? { created_at: data.created_at } : {};
+    if (data.created_at === "") {
+      delete (data as { created_at?: string }).created_at;
+    }
     const formData = data.parts.map((item) => ({
+      ...created_at,
       ...item,
       price: Number(removeCommas(item?.price as string)),
       car: id as string,
@@ -97,17 +105,21 @@ export default function AddPartsForm() {
       <Button
         className="bg-[#4880FF] text-white hover:bg-blue-600 w-[250px] rounded-md"
         onClick={() => setOpen(true)}
-      >Добавить запчасть</Button>
+      >
+        Добавить запчасть
+      </Button>
       <DialogContent className="max-w-[1000px] p-8">
         <Card className="rounded-2xl">
           <CardHeader>
-            <CardTitle className="text-2xl">
-              Старые запчасти для автомобиля
-            </CardTitle>
+            <CardTitle className="text-2xl">Добавить запчасть</CardTitle>
           </CardHeader>
           <CardContent>
             <FormProvider {...methods}>
               <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
+                <div className="space-y-2 w-[50%] pr-2 mb-2">
+                  <label className="text-sm">Дата создания</label>
+                  <Input type="date" {...register("created_at")} />
+                </div>
                 {fields.map((item, index) => (
                   <div key={item.id} className="grid grid-cols-2 gap-4 mb-4">
                     <div className="flex-1">

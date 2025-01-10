@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { queryClient } from "../ui-items/ReactQueryProvider";
 import { PaginatedCarDetail } from "@/lib/types/cars.types";
 import { Button } from "../ui/button";
+import { formatDate } from "@/lib/functions";
 
 export default function AutoPartsTable({ setSelectedParts, selectedParts, status }: { setSelectedParts: React.Dispatch<React.SetStateAction<string[]>>, selectedParts: string[], status: string }) {
   const [currentPage, setCurrentPage] = React.useState<number>(1);
@@ -76,7 +77,8 @@ export default function AutoPartsTable({ setSelectedParts, selectedParts, status
             <TableHead>Название автозапчасти</TableHead>
             <TableHead>Машина</TableHead>
             <TableHead>Цена автозапчасти</TableHead>
-            <TableHead>Местоположение</TableHead>
+            <TableHead>ID автозапчастей</TableHead>
+            <TableHead>Дата создания</TableHead>
             <TableHead>Статус</TableHead>
           </TableRow>
         </TableHeader>
@@ -93,6 +95,7 @@ export default function AutoPartsTable({ setSelectedParts, selectedParts, status
               <TableCell>{part.car?.name}</TableCell>
               <TableCell>{part?.price_uzs.toFixed(2)} $</TableCell>
               <TableCell>{part?.id_detail}</TableCell>
+              <TableCell>{formatDate(part?.created_at as string, "/")}</TableCell>
               <TableCell>{part?.in_sklad ? "В Склате" : "В машине"}</TableCell>
             </TableRow>
           ))}
