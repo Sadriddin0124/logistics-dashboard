@@ -25,6 +25,7 @@ export function UserModal({ isOpen, onClose, onSave, user }: UserModalProps) {
     control,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<IUser>({
     defaultValues: {
@@ -39,7 +40,7 @@ export function UserModal({ isOpen, onClose, onSave, user }: UserModalProps) {
   // Update form values when the user changes
   useEffect(() => {
     if (user) {
-      reset({ ...user });
+      reset({ ...user, password: "" });
     } else {
       reset({
         id: "",
@@ -49,10 +50,11 @@ export function UserModal({ isOpen, onClose, onSave, user }: UserModalProps) {
         can_delete: false,
       });
     }
-  }, [user, reset]);
+  }, [user, reset, setValue]);
 
   const onSubmit = (data: IUser) => {
     onSave(data);
+    reset()
   };
   const handleClose = () => {
     onClose()
