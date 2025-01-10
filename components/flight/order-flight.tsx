@@ -1,4 +1,4 @@
-import { FormProvider, useForm } from "react-hook-form";
+import { Controller, FormProvider, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
   Select as Selector,
@@ -27,7 +27,8 @@ export default function FlightForm() {
     handleSubmit,
     setValue,
     formState: { errors },
-    reset
+    reset,
+    watch
   } = methods;
   const { push } = useRouter();
 
@@ -35,6 +36,8 @@ export default function FlightForm() {
     queryKey: ["regions"],
     queryFn: fetchRegionsAll,
   });
+
+  const flight_type = watch("flight_type")
 
   const { mutate: createMutation } = useMutation({
     mutationFn: orderFlight,
@@ -48,12 +51,11 @@ export default function FlightForm() {
     },
   });
   const onSubmit = (data: IFlightData) => {
+    const today = new Date();
     createMutation({
       ...data,
       driver_expenses: Number(removeCommas(data?.driver_expenses as string)),
-      arrival_date: data?.arrival_date || "2024-12-26",
-      departure_date: data?.arrival_date || "2024-12-26",
-      // upload: image?.id
+      departure_date: data?.departure_date || today.toISOString().split("T")[0]
     });
     reset()
   };
@@ -68,6 +70,39 @@ export default function FlightForm() {
         className="space-y-6 w-full container mx-auto mt-8 bg-white p-12 rounded-2xl"
       >
         <div className="grid grid-cols-2 gap-6">
+        <div className="space-y-2">
+            <label className="text-sm font-medium">Выберите регион*</label>
+            <Controller
+              name="flight_type"
+              control={methods.control}
+              rules={{ required: "Поле обязательно для заполнения." }}
+              render={({ field }) => (
+                <Selector
+                  onValueChange={(newValue) => {
+                    field.onChange(newValue); // Update the form value
+                    handleSelectChange(newValue, "flight_type"); // Trigger your custom handler
+                  }}
+                  value={field.value}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Выберите..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="OUT">
+                      За территории Узбекистана
+                    </SelectItem>
+                    <SelectItem value="IN_UZB">
+                      На территории Узбекистана
+                    </SelectItem>
+                  </SelectContent>
+                </Selector>
+              )}
+            />
+            {errors?.flight_type && (
+              <p className="text-red-500">{errors?.flight_type?.message}</p>
+            )}
+          </div>
+
           <div className="space-y-2">
             <label className="text-sm font-medium">Выберите область*</label>
             <Selector
@@ -79,7 +114,7 @@ export default function FlightForm() {
               </SelectTrigger>
               <SelectContent>
                 {regions
-                  ?.filter((item) => item?.flight_type === "IN_UZB")
+                  ?.filter((item) => item?.flight_type === flight_type)
                   ?.map((region) => (
                     <SelectItem key={region.id} value={region.id as string}>
                       {region.name}
@@ -146,6 +181,20 @@ export default function FlightForm() {
             {errors?.car_number && (
               <p className="text-red-500">{errors?.car_number?.message}</p>
             )}
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Введите дату отъезда*</label>
+            <Input
+              type="date"
+              placeholder="Введите дату"
+              {...register("departure_date", {
+                required: false
+                // "Это значение является обязательным",
+              })}
+            />
+            {/* {errors?.departure_date && (
+              <p className="text-red-500">{errors?.departure_date?.message}</p>
+            )} */}
           </div>
         </div>
 

@@ -280,7 +280,7 @@ export default function EmployeesInfoForm() {
             Баланс водителя
           </label>
           <Input
-            value={`${employee?.balance_uzs?.toFixed(2) || 0} $ / ${balanceConverter() || 0} Сум`}
+            value={`${employee?.balance_uzs?.toFixed(2) || 0} $ / ${balanceConverter().toFixed(2) || 0} Сум`}
             readOnly
             placeholder="Введите баланс водителя..."
             className="bg-muted"
