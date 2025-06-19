@@ -67,3 +67,8 @@ export const fetchCarStats = async (id: string) => {
   const response = await $api.get(`/cars/car-infos/${id}`);
   return response.data;
 };
+
+export const fetchCarPrices = async () => {
+  const response = await $api.get(`/cars/car-finance/`);
+  return response.data;
+};

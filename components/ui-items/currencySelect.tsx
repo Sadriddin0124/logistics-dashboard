@@ -1,3 +1,5 @@
+"use client";
+
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Input } from "@/components/ui/input";
@@ -14,11 +16,10 @@ interface CurrencyInputWithSelectProps {
   type?: string;
 }
 
-// Utility functions
+// Utility: Format number with commas
 const formatNumberWithCommas = (value: string | number): string => {
-  if (value === 0 || value === "0") return "0"; // Explicitly handle zero
+  if (value === 0 || value === "0") return "0";
   if (!value) return "";
-
   const [integerPart, decimalPart] = value.toString().split(".");
   const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   return decimalPart !== undefined
@@ -26,11 +27,10 @@ const formatNumberWithCommas = (value: string | number): string => {
     : formattedInteger;
 };
 
+// Utility: Convert string to number
 const parseAndValidateNumber = (value: string | number): number | null => {
   const sanitizedValue =
     typeof value === "string" ? parseFloat(value.replace(/,/g, "")) : value;
-
-  // Allow any valid number (positive or negative)
   return !isNaN(sanitizedValue) ? sanitizedValue : null;
 };
 
@@ -44,6 +44,7 @@ const CurrencyInputWithSelect: React.FC<CurrencyInputWithSelectProps> = ({
     queryKey: ["exchangeRates"],
     queryFn: getExchangeRate,
   });
+
   const { dollar, ruble, tenge, currencyStatus } = useStringContext();
   const {
     register,
@@ -51,71 +52,62 @@ const CurrencyInputWithSelect: React.FC<CurrencyInputWithSelectProps> = ({
     setValue,
     formState: { errors },
   } = useFormContext();
-  const [selectedCurrency, setSelectedCurrency] = useState(type || "USD");
+
+  const [selectedCurrency, setSelectedCurrency] = useState<string>(type || "USD");
 
   const inputValue = watch(name);
+  const uzsValue = watch(`${name}_uzs`);
+  const typeValue = watch(`${name}_type`);
 
-  // Precomputed exchange rates
-  const exchangeRatesMap = exchangeRates?.reduce<Record<string, number>>(
-    (acc, rate) => {
-      acc[rate.Ccy] = parseFloat(rate.Rate);
-      return acc;
-    },
-    {}
-  );
+  // Precompute exchange rate map
+  const exchangeRatesMap = exchangeRates?.reduce<Record<string, number>>((acc, rate) => {
+    acc[rate.Ccy] = parseFloat(rate.Rate);
+    return acc;
+  }, {});
 
-  // Separate useEffect for initializing selectedCurrency
-  useEffect(() => {
-    if (type) {
-      setSelectedCurrency(type); // Set default value only when type changes
+useEffect(() => {
+  if (!exchangeRatesMap || inputValue == null) return;
+
+  const parsedInput = parseAndValidateNumber(inputValue);
+  if (parsedInput !== null) {
+    const usdRate = currencyStatus ? Number(dollar) : exchangeRatesMap["USD"] ?? 1;
+    const rubRate = currencyStatus ? Number(ruble) : exchangeRatesMap["RUB"] ?? 1;
+    const kztRate = currencyStatus ? Number(tenge) : exchangeRatesMap["KZT"] ?? 1;
+
+    if (!usdRate || !rubRate || !kztRate) return;
+
+    let convertedValue = parsedInput;
+
+    if (selectedCurrency === "USD") {
+      convertedValue = parsedInput * usdRate;
+    } else if (selectedCurrency === "RUB") {
+      convertedValue = parsedInput * rubRate;
+    } else if (selectedCurrency === "KZT") {
+      convertedValue = parsedInput * kztRate;
+    } // UZS stays as-is
+
+    if (uzsValue !== convertedValue) {
+      setValue(`${name}_uzs`, convertedValue, { shouldValidate: true });
     }
-  }, [type]); // Runs only when `type` changes
 
-  // Main useEffect for calculations
-  useEffect(() => {
-    if (!exchangeRatesMap || !inputValue) return;
-
-    const parsedInput = parseAndValidateNumber(inputValue);
-    if (parsedInput !== null) {
-      const usdRate = currencyStatus
-        ? Number(dollar)
-        : exchangeRatesMap["USD"] ?? 1;
-      const rubRate = currencyStatus
-        ? Number(ruble)
-        : exchangeRatesMap["RUB"] ?? 1;
-      const kztRate = currencyStatus
-        ? Number(tenge)
-        : exchangeRatesMap["KZT"] ?? 1;
-
-      const convertedValue =
-        selectedCurrency === "USD"
-          ? parsedInput
-          : selectedCurrency === "RUB"
-          ? parsedInput * (rubRate / usdRate)
-          : selectedCurrency === "KZT"
-          ? parsedInput * (kztRate / usdRate)
-          : parsedInput / usdRate;
-
-      if (watch(`${name}_uzs`) !== convertedValue) {
-        setValue(`${name}_uzs`, convertedValue, { shouldValidate: true });
-      }
-
-      if (watch(`${name}_type`) !== selectedCurrency) {
-        setValue(`${name}_type`, selectedCurrency, { shouldValidate: true });
-      }
+    if (typeValue !== selectedCurrency) {
+      setValue(`${name}_type`, selectedCurrency, { shouldValidate: true });
     }
-  }, [
-    inputValue,
-    selectedCurrency,
-    exchangeRatesMap,
-    setValue,
-    name,
-    currencyStatus,
-    dollar,
-    ruble,
-    tenge,
-    watch,
-  ]);
+  }
+}, [
+  inputValue,
+  selectedCurrency,
+  exchangeRatesMap,
+  setValue,
+  name,
+  currencyStatus,
+  dollar,
+  ruble,
+  tenge,
+  uzsValue,
+  typeValue,
+]);
+
 
   return (
     <div className="flex gap-2 items-start">
@@ -123,53 +115,48 @@ const CurrencyInputWithSelect: React.FC<CurrencyInputWithSelectProps> = ({
         <Label htmlFor={name} className="absolute right-3 top-3">
           ({selectedCurrency})
         </Label>
+
         <Input
           id={name}
           disabled={disabled}
           {...register(name, {
-            validate: (value) =>
-              required ||
-              parseAndValidateNumber(value) !== null ||
-              "Поле не должно быть пустым",
+            validate: (value) => {
+              if (required && !value) return "Обязательное поле";
+              return parseAndValidateNumber(value) !== null
+                ? true
+                : "Неверное значение";
+            },
           })}
           type="text"
           onInput={(e: ChangeEvent<HTMLInputElement>) => {
-            const rawValue = e.target.value;
+            const raw = e.target.value;
 
-            // Allow negative sign only at the start and only one decimal point
-            const sanitizedValue = rawValue
-              .replace(/[^0-9.-]/g, "") // Allow numbers, decimal point, and negative sign
-              .replace(/(?!^)-/g, "") // Allow only one minus sign, and only at the start
-              .replace(/(\..*)\./g, "$1"); // Allow only one decimal point
+            const sanitized = raw
+              .replace(/[^0-9.-]/g, "")
+              .replace(/(?!^)-/g, "")
+              .replace(/(\..*)\./g, "$1");
 
-            // Update the input value dynamically
-            e.target.value = sanitizedValue;
-
-            // Update the value in the form context
-            setValue(name, sanitizedValue, { shouldValidate: true });
+            e.target.value = sanitized;
+            setValue(name, sanitized, { shouldValidate: true });
           }}
           onBlur={(e: ChangeEvent<HTMLInputElement>) => {
             const rawValue = e.target.value;
-            const parsedValue = parseAndValidateNumber(rawValue);
+            const parsed = parseAndValidateNumber(rawValue);
 
-            if (parsedValue !== null) {
-              const formattedValue = formatNumberWithCommas(parsedValue);
-              e.target.value = formattedValue;
-              setValue(name, formattedValue, { shouldValidate: true });
+            if (parsed !== null) {
+              const formatted = formatNumberWithCommas(parsed);
+              e.target.value = formatted;
+              setValue(name, formatted, { shouldValidate: true });
             } else {
-              // Reset only if the input is empty or invalid (not a valid number)
-              e.target.value = rawValue === "" ? "0" : rawValue;
-              setValue(name, rawValue === "" ? "0" : rawValue, {
-                shouldValidate: true,
-              });
+              const fallback = rawValue === "" ? "0" : rawValue;
+              e.target.value = fallback;
+              setValue(name, fallback, { shouldValidate: true });
             }
           }}
         />
 
         {errors[name] && (
-          <p className="text-red-500 text-sm">
-            {errors[name]?.message as string}
-          </p>
+          <p className="text-red-500 text-sm">{errors[name]?.message as string}</p>
         )}
       </div>
 

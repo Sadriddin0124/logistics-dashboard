@@ -77,6 +77,7 @@ export default function VehicleForm() {
     });
     setModelOptions(modelOptions as Option[]);
   }, [models, setValue]);
+
   const { mutate: createMutation } = useMutation({
     mutationFn: createCar,
     onSuccess: (data) => {
@@ -88,6 +89,8 @@ export default function VehicleForm() {
       toast.error("Ошибка сохранения!");
     },
   });
+
+
   const onSubmit: SubmitHandler<FormValues> = (data) => {
     const created_at = data?.created_at ? { created_at: data.created_at } : {};
     if (data.created_at === "") {
@@ -102,6 +105,7 @@ export default function VehicleForm() {
       distance_travelled: Number(data?.distance_travelled),
       price: Number(removeCommas(data?.price)),
     };
+    
     createMutation({ ...formData, model: selectedModel?.value as string });
     reset();
   };
