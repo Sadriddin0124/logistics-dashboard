@@ -170,7 +170,7 @@ export default function FlightTable({
               <TableCell>
                 {formatDate(flight?.created_at as string, "/")}
               </TableCell>
-              <TableCell>{Number(flight?.price_uzs).toFixed(2)} $</TableCell>
+              <TableCell>{Number(flight?.price).toFixed(2)} $</TableCell>
               <TableCell className="px-5 flex">
                 <Link href={`/flight/flight-info?id=${flight?.id}`}>
                   <Button variant="ghost" size="icon" className="h-8 w-8">
