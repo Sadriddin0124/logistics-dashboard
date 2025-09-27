@@ -23,6 +23,7 @@ import {
   formatPhoneNumber,
 } from "@/lib/functions";
 import { LoginTypes } from "@/lib/types/auth.types";
+import PhoneInput from "@/components/ui-items/phone-input";
 
 const loginSchema = z.object({
   phone: z.string(),
@@ -98,10 +99,10 @@ export default function LoginForm() {
                 name="phone"
                 control={control}
                 render={({ field: { value, ...field } }) => (
-                  <Input
+                  <PhoneInput
                     {...field}
-                    id="phone"
-                    type="tel"
+                    // id="phone"
+                    // type="tel"
                     value={value}
                     placeholder="Введите номер телефона"
                     aria-describedby="phone-hint"

@@ -101,8 +101,10 @@ export default function CitiesTable() {
           <TableRow className="border-b border-gray-200">
             <TableHead className="font-bold"></TableHead>
             <TableHead className="font-bold">Имя</TableHead>
-            <TableHead className="font-bold">Расходы водителя</TableHead>
-            <TableHead className="font-bold">Стоимость рейса</TableHead>
+            <TableHead className="font-bold">Расходы водителя (Туда и обратно)</TableHead>
+            <TableHead className="font-bold">Расходы водителя (Туда)</TableHead>
+            <TableHead className="font-bold">Стоимость рейса (Туда и обратно)</TableHead>
+            <TableHead className="font-bold">Стоимость рейса (Туда)</TableHead>
             <TableHead className="font-bold">Тип области</TableHead>
             <TableHead className="font-bold w-[50px]"></TableHead>
           </TableRow>
@@ -112,8 +114,10 @@ export default function CitiesTable() {
             <TableRow key={index} className="border-b border-gray-200">
               <TableCell>{index + 1}</TableCell>
               <TableCell>{region?.name}</TableCell>
-              <TableCell>{region?.been_driver_expenses_uzs?.toFixed(2) || 0} $ / {region?.gone_driver_expenses_uzs?.toFixed(2) || 0} $</TableCell>
-              <TableCell>{region?.been_flight_price_uzs?.toFixed(2) || 0} $ / {region?.gone_flight_price_uzs?.toFixed(2) || 0} $</TableCell>
+              <TableCell>{Number(region?.been_driver_expenses_uzs?.toFixed(2))?.toLocaleString() || 0} сум </TableCell>
+              <TableCell>{Number(region?.gone_driver_expenses_uzs?.toFixed(2))?.toLocaleString() || 0} сум</TableCell>
+              <TableCell>{Number(region?.been_flight_price_uzs?.toFixed(2))?.toLocaleString() || 0} сум </TableCell>
+              <TableCell>{Number(region?.gone_flight_price_uzs?.toFixed(2))?.toLocaleString() || 0} сум</TableCell>
               <TableCell>{region?.flight_type === "OUT" ? "За территории Узбекистана" : "На территории Узбекистана"}</TableCell>
               <TableCell className="flex items-center gap-1">
                 <Button

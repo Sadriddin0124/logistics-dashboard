@@ -14,6 +14,7 @@ interface StatCardProps {
   name2?: string;
   title1?: string;
   title2?: string;
+  sum?:boolean
 }
 
 export function StatCard({
@@ -26,6 +27,7 @@ export function StatCard({
   name2,
   title1,
   title2,
+  sum = false,
 }: StatCardProps) {
   return (
     <Card>
@@ -51,7 +53,7 @@ export function StatCard({
         )}
       </CardHeader>
       <CardContent className="flex justify-between w-full">
-        <div className="text-lg font-bold">{value}</div>
+        <div className="text-lg font-bold">{value}{sum && " сум"}</div>
         {url && (
           <Button
             variant={"ghost"}

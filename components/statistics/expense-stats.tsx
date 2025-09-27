@@ -170,6 +170,7 @@ export function ExpenseStats({ start, end, setStart, setEnd }: Props) {
             icon={TrendingUpIcon}
             url="/finance/export-logs/?action=INCOME"
             name="Сумма дохода"
+            // sum
           />
           <StatCard
             title="Сумма расхода"
@@ -177,6 +178,7 @@ export function ExpenseStats({ start, end, setStart, setEnd }: Props) {
             icon={TrendingDownIcon}
             url="/finance/export-logs/?action=OUTCOME"
             name="Сумма расхода"
+            // sum
           />
           <StatCard
             title="Расходы на сотрудников"
@@ -184,6 +186,7 @@ export function ExpenseStats({ start, end, setStart, setEnd }: Props) {
             icon={TrendingDownIcon}
             url="/finance/export-logs/?action=OUTCOME&kind=PAY_SALARY"
             name="Расходы на сотрудников"
+            // sum
           />
           <StatCard
             title="Проче расходы"
@@ -191,6 +194,7 @@ export function ExpenseStats({ start, end, setStart, setEnd }: Props) {
             icon={TrendingDownIcon}
             url="/finance/export-logs/?action=OUTCOME&kind=OTHER"
             name="Проче расходы"
+            // sum
           />
           <StatCard
             title="Итого по всем автомобилям"
@@ -198,6 +202,7 @@ export function ExpenseStats({ start, end, setStart, setEnd }: Props) {
             icon={TrendingDownIcon}
             // url="/flight/info/?action=OUTCOME"
             name="Итого по всем автомобилям"
+            // sum
           />
           <StatCard
             title="Лизинговый баланс"
@@ -205,11 +210,13 @@ export function ExpenseStats({ start, end, setStart, setEnd }: Props) {
             icon={TrendingDownIcon}
             // url="/flight/info/?action=OUTCOME"
             name="Лизинговый баланс"
+            // sum
           />
           <StatCard
             title={"Сумма лизинга выплачена"}
             value={data?.total_leasing_paid?.toFixed(2) || 0}
             icon={AwardIcon}
+            // sum
           />
           <StatCard
             status={true}
