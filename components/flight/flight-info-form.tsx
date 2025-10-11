@@ -15,7 +15,11 @@ import { IFlightFormEdit } from "@/lib/types/flight.types";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient } from "../ui-items/ReactQueryProvider";
 import { toast } from "react-toastify";
-import { updateFlightData, fetchFlight, deleteFlight } from "@/lib/actions/flight.action";
+import {
+  updateFlightData,
+  fetchFlight,
+  deleteFlight,
+} from "@/lib/actions/flight.action";
 import { Option } from "@/pages/warehouse/diesel";
 import { fetchCarNoPage } from "@/lib/actions/cars.action";
 import { ICars } from "@/lib/types/cars.types";
@@ -27,7 +31,7 @@ import { fetchEmployeesAll } from "@/lib/actions/employees.action";
 import { useRouter } from "next/router";
 import EndFlight from "./end-flight";
 import CurrencyInputWithSelect from "../ui-items/currencySelect";
-import { removeCommas } from "@/lib/utils";
+import { formatNumber, removeCommas } from "@/lib/utils";
 import { DeleteFlight } from "./delete-flight";
 import { BASE_URL } from "../employees/employees-info-form";
 
@@ -74,7 +78,7 @@ export default function FlightInfoForm() {
   const [car, setCar] = useState<ICars | null>(null);
   const [travelPeriod, setTravelPeriod] = useState<number>(0);
   const [arrivalStatus, setArrivalStatus] = useState<string>("");
-  const router = useRouter()
+  const router = useRouter();
   const { id } = router?.query;
 
   // Fetch Data
@@ -198,7 +202,6 @@ export default function FlightInfoForm() {
     });
   };
 
-
   // Handlers for select components
   const handleSelectChange = (value: string, name: string) => {
     setValue(name as "region", value);
@@ -217,15 +220,15 @@ export default function FlightInfoForm() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["recycled"] });
       toast.success("Успешно удалено!");
-      router.push('/flight')
+      router.push("/flight");
     },
     onError: () => {
       toast.error("Вы не можете удалить этот pейс!");
     },
   });
   const handleDelete = () => {
-    deleteMutation(id as string)
-  }
+    deleteMutation(id as string);
+  };
   return (
     <div className="mt-8 bg-white p-12 rounded-2xl">
       <FormProvider {...methods}>
@@ -329,8 +332,8 @@ export default function FlightInfoForm() {
                   <SelectValue placeholder="Выберите..." />
                 </SelectTrigger>
                 <SelectContent>
-                <SelectItem value={"GONE_TO"}>Туда</SelectItem>
-                <SelectItem value={"BEEN_TO"}>Туда и обратно</SelectItem>
+                  <SelectItem value={"GONE_TO"}>Туда</SelectItem>
+                  <SelectItem value={"BEEN_TO"}>Туда и обратно</SelectItem>
                 </SelectContent>
               </Selector>
             </div>
@@ -340,7 +343,11 @@ export default function FlightInfoForm() {
               <label className="text-sm font-medium">
                 Введите стоимость рейса*
               </label>
-              <CurrencyInputWithSelect disabled name="price" type={flight?.price_type}/>
+              <CurrencyInputWithSelect
+                disabled
+                name="price"
+                type={flight?.price_type}
+              />
             </div>
 
             {/* Departure Date */}
@@ -356,56 +363,77 @@ export default function FlightInfoForm() {
               />
             </div>
             {flight_type === "OUT" && watch("route") === "BEEN_TO" && (
-            <div className="space-y-2">
-              <label className="text-sm font-medium">
-                Введите стоимость рейса (обратно)*
-              </label>
-              <CurrencyInputWithSelect name="price_come" type={flight?.price_come_type} disabled/>
-            </div>
-          )}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                  Введите стоимость рейса (обратно)*
+                </label>
+                <CurrencyInputWithSelect
+                  name="price_come"
+                  type={flight?.price_come_type}
+                  disabled
+                />
+              </div>
+            )}
 
             {/* Spending */}
             <div className="space-y-2">
               <label className="text-sm font-medium">Расходы водителя*</label>
-              <CurrencyInputWithSelect disabled name="driver_expenses" type={flight?.driver_expenses_type}/>
+              <CurrencyInputWithSelect
+                disabled
+                name="driver_expenses"
+                type={flight?.driver_expenses_type}
+              />
             </div>
             {/* Arrival Date */}
-            {flight_type === "OUT" && <div className="space-y-2">
-              <label className="text-sm font-medium">
-                Введите дату прибытия*
-              </label>
-              <Input
-                type="date"
-                disabled={
-                  flight?.status?.toLowerCase() === "inactive" ? true : false
-                }
-                placeholder="Введите дату"
-                {...register("arrival_date")}
-              />
-              {arrivalStatus && <p className="text-red-500 text-sm">{arrivalStatus}</p>}
-            </div>}
+            {flight_type === "OUT" && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                  Введите дату прибытия*
+                </label>
+                <Input
+                  type="date"
+                  disabled={
+                    flight?.status?.toLowerCase() === "inactive" ? true : false
+                  }
+                  placeholder="Введите дату"
+                  {...register("arrival_date")}
+                />
+                {arrivalStatus && (
+                  <p className="text-red-500 text-sm">{arrivalStatus}</p>
+                )}
+              </div>
+            )}
 
             {flight_type === "OUT" && (
               <div className="space-y-2">
                 <label className="text-sm font-medium">
                   Расход на питание (за день)
                 </label>
-                <CurrencyInputWithSelect disabled name="other_expenses" type={flight?.other_expenses_type}/>
+                <CurrencyInputWithSelect
+                  disabled
+                  name="other_expenses"
+                  type={flight?.other_expenses_type}
+                />
               </div>
             )}
             <div className="space-y-2 hidden">
               <label className="text-sm font-medium">Расходы на Рейс*</label>
-              <CurrencyInputWithSelect disabled name="flight_expenses" type={flight?.flight_expenses_type}/>
-            </div>
-            {flight_type === "OUT" && <div className="space-y-2">
-              <label className="text-sm font-medium">Баланс Рейса</label>
-              <Input
-                value={flight?.flight_balance_uzs.toFixed(2)}
-                className="bg-muted"
-                readOnly
+              <CurrencyInputWithSelect
+                disabled
+                name="flight_expenses"
+                type={flight?.flight_expenses_type}
               />
-            </div>}
-            
+            </div>
+            {flight_type === "OUT" && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Баланс Рейса</label>
+                <Input
+                  value={formatNumber(flight?.flight_balance || 0)}
+                  className="bg-muted"
+                  readOnly
+                />
+              </div>
+            )}
           </div>
           {/* Cargo Information */}
           {/* <div className="space-y-2">
@@ -446,7 +474,7 @@ export default function FlightInfoForm() {
             flight_type={flight_type}
           />
         )}
-         <DeleteFlight onContinue={handleDelete}/>
+        <DeleteFlight onContinue={handleDelete} />
       </div>
     </div>
   );

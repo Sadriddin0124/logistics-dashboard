@@ -75,6 +75,7 @@ import { useQuery } from "@tanstack/react-query";
 import { queryClient } from "../ui-items/ReactQueryProvider";
 import { useRouter } from "next/router";
 import { IFinanceResponse } from "@/lib/types/finance.types";
+import { formatNumber } from "@/lib/utils";
 
 export default function FlightTable() {
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -163,7 +164,7 @@ export default function FlightTable() {
                 {handleChange(finance?.kind as string)}
               </TableCell>
               <TableCell className="px-5">
-                {Number(finance.amount_uzs).toFixed(2)} $
+                {formatNumber(finance.amount_uzs)} $
               </TableCell>
               {/* <TableCell className="px-5">{finance?.driver_expenses} $</TableCell> */}
               <TableCell className="px-5">

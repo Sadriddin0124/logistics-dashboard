@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Download, type LucideIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import { downloadExcelFile } from "@/lib/functions";
+import { formatNumberWithCommas } from "../ui-items/currency-inputs";
 
 interface StatCardProps {
   title: string;
@@ -53,7 +54,7 @@ export function StatCard({
         )}
       </CardHeader>
       <CardContent className="flex justify-between w-full">
-        <div className="text-lg font-bold">{value}{sum && " сум"}</div>
+        <div className="text-lg font-bold">{formatNumberWithCommas(value) || 0}{sum && " сум"}</div>
         {url && (
           <Button
             variant={"ghost"}

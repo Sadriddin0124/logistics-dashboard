@@ -155,8 +155,8 @@ export default function FlightForm() {
       distance_travelled: data?.start_km || distance,
     });
     reset();
+    console.log(formData);
   };
-  console.log(watch("region"));
 
   const handleSelectChange = (value: string, name: "flight_type" | "route"| "payment_type") => {
     setValue(name, value);
