@@ -77,12 +77,6 @@ export const closeFlight = async (data: CloseFlight) => {
 };
 
 
-
-// export const updateFlightB $api.patch(`/flight/${data?.id}/`, {flight_balance: data?.flight_balance});
-//   return responsealance = async (data: {id: string, flight_balance: number}) => {
-//   const response = await.data;
-// };
-
 export const updateFlightData = async (data: IFlightCreate) => {
   const response = await $api.patch(`/flight/${data?.id}/`, data);
   return response.data;
