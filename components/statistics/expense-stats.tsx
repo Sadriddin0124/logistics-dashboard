@@ -1,10 +1,8 @@
 "use client";
 
 import {
-  fetchCarPrices,
   fetchFinanceStats,
-  fetchOtherExpenses,
-  fetchSalaries,
+  fetchFlightStats,
 } from "@/lib/actions/stats.ction";
 import { StatCard } from "./stat-card";
 import {
@@ -16,19 +14,8 @@ import {
   PlaneTakeoffIcon,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { StatsPaginated } from "@/lib/types/stats.types";
-import { IGasStation } from "@/lib/types/gas_station.types";
-import { fetchAllGasStation } from "@/lib/actions/gas.action";
-import { IOilType } from "@/lib/types/oil.types";
-import { fetchWholeOils } from "@/lib/actions/oil.action";
-import { IDieselPaginated } from "@/lib/types/diesel.types";
-import { fetchDiesel } from "@/lib/actions/diesel.action";
 import { Input } from "../ui/input";
 import { Dispatch, SetStateAction } from "react";
-import {
-  fetchFlightStats,
-  fetchOrderedFlights,
-} from "@/lib/actions/flight.action";
 
 type Props = {
   start: string;
@@ -37,75 +24,48 @@ type Props = {
   setEnd: Dispatch<SetStateAction<string>>;
 };
 
+interface WarehouseStatsType {
+  gas_purchase_volume: number;
+  gas_sale_volume: number;
+  gas_total_volume: number;
+  leasing_balance: number;
+  leasing_paid: number;
+  oil_purchase_volume: number;
+  oil_sale_volume: number;
+  oil_total_volume: number;
+  salarka_purchase_volume: number;
+  salarka_sale_volume: number;
+  salarka_total_volume: number;
+}
+
+interface FinanceStatsType {
+  active_flights: number;
+  employee_expense: number;
+  in_uzb_flights: number;
+  leasing_balance: number;
+  leasing_paid: number;
+  order_flight: number;
+  other_expense: number;
+  out_uzb_flights: number;
+  total_expense: number;
+  total_flights: number;
+  total_for_all_cars: number;
+  total_income: number;
+  total_orders: number;
+}
+
 export function ExpenseStats({ start, end, setStart, setEnd }: Props) {
-  const { data: stats } = useQuery<StatsPaginated>({
-    queryKey: ["stats", 1, start, end],
-    queryFn: () => fetchFinanceStats(1, start, end, ""),
+  const { data: warehouse_stats } = useQuery<WarehouseStatsType>({
+    queryKey: ["warehouse_stats"],
+    queryFn: () => fetchFlightStats(start, end),
     refetchOnWindowFocus: true,
   });
 
-  const { data: salaries } = useQuery<StatsPaginated>({
-    queryKey: ["salaries", 1, start, end],
-    queryFn: () => fetchSalaries(1, start, end, "PAY_SALARY"),
+  const { data: finance_stats } = useQuery<FinanceStatsType>({
+    queryKey: ["finance_stats"],
+    queryFn: () => fetchFinanceStats(start, end),
     refetchOnWindowFocus: true,
   });
-
-  const { data: other_expenses } = useQuery<StatsPaginated>({
-    queryKey: ["other_expenses", 1, start, end],
-    queryFn: () => fetchOtherExpenses(1, start, end, "OTHER"),
-    refetchOnWindowFocus: true,
-  });
-
-  const { data: stations } = useQuery<IGasStation[]>({
-    queryKey: ["all_stations"],
-    queryFn: fetchAllGasStation,
-    refetchOnWindowFocus: true,
-  });
-
-  const { data: oil } = useQuery<IOilType[]>({
-    queryKey: ["all_oil"],
-    queryFn: fetchWholeOils,
-    refetchOnWindowFocus: true,
-  });
-
-  const { data: diesel } = useQuery<IDieselPaginated>({
-    queryKey: ["diesel"],
-    queryFn: () => fetchDiesel(1),
-    refetchOnWindowFocus: true,
-  });
-
-  const { data: flights_in_uzb } = useQuery<IDieselPaginated>({
-    queryKey: ["flights_in_uzb"],
-    queryFn: () => fetchFlightStats(1, "IN_UZB"),
-    refetchOnWindowFocus: true,
-  });
-
-  const { data: flights_out } = useQuery<IDieselPaginated>({
-    queryKey: ["flights_out"],
-    queryFn: () => fetchFlightStats(1, "OUT"),
-    refetchOnWindowFocus: true,
-  });
-  
-  const { data: ordered_flights } = useQuery<IDieselPaginated>({
-    queryKey: ["ordered_flights"],
-    queryFn: () => fetchOrderedFlights("", 1),
-    refetchOnWindowFocus: true,
-  });
-
-  const { data: car_prices } = useQuery<{total_price_usd: number}>({
-    queryKey: ["car_prices"],
-    queryFn: () => fetchCarPrices(),
-    refetchOnWindowFocus: true,
-  });
-
-  const data = stats?.results[0];
-  const gasVolume = stations?.reduce((total, station) => {
-    return total + (station.remaining_gas ?? 0);
-  }, 0);
-  const oilVolume = oil?.reduce((total, oil) => {
-    return total + (oil.oil_volume ?? 0);
-  }, 0);
-  const diesel_volume = diesel?.results?.[0]?.remaining_volume?.volume;
 
   return (
     <div>
@@ -131,42 +91,42 @@ export function ExpenseStats({ start, end, setStart, setEnd }: Props) {
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           <StatCard
             title="Рейсы"
-            value={data?.flight_count || 0}
+            value={finance_stats?.total_flights || 0}
             icon={PlaneIcon}
             url="/flight/info/"
             name="Рейсы"
           />
           <StatCard
             title="Активные рейсы"
-            value={data?.active_flight_count || 0}
+            value={finance_stats?.active_flights || 0}
             icon={PlaneTakeoff}
             url="/flight/info/?status=ACTIVE"
             name="Активные рейсы"
           />
           <StatCard
             title="Рейсы в Узбекистане"
-            value={flights_in_uzb?.count || 0}
+            value={finance_stats?.in_uzb_flights || 0}
             icon={PlaneIcon}
             url="/flight/info/?flight_type=IN_UZB"
             name="Рейсы в Узбекистане"
           />
           <StatCard
             title="Рейсы за пределы Узбекистана"
-            value={flights_out?.count || 0}
+            value={finance_stats?.out_uzb_flights || 0}
             icon={PlaneTakeoffIcon}
             url="/flight/info/?flight_type=OUT"
             name="Рейсы за пределы Узбекистана"
           />
           <StatCard
             title="Рейс на заказ"
-            value={ordered_flights?.count || 0}
+            value={finance_stats?.order_flight || 0}
             icon={PlaneTakeoffIcon}
             url="/flight/info/?type=ordered"
             name="Рейс на заказ"
           />
           <StatCard
             title="Сумма дохода"
-            value={data?.income_sum?.toFixed(2) || 0}
+            value={finance_stats?.total_income || 0}
             icon={TrendingUpIcon}
             url="/finance/export-logs/?action=INCOME"
             name="Сумма дохода"
@@ -174,7 +134,7 @@ export function ExpenseStats({ start, end, setStart, setEnd }: Props) {
           />
           <StatCard
             title="Сумма расхода"
-            value={data?.outcome_sum?.toFixed(2) || 0}
+            value={finance_stats?.total_expense || 0}
             icon={TrendingDownIcon}
             url="/finance/export-logs/?action=OUTCOME"
             name="Сумма расхода"
@@ -182,7 +142,7 @@ export function ExpenseStats({ start, end, setStart, setEnd }: Props) {
           />
           <StatCard
             title="Расходы на сотрудников"
-            value={salaries?.results[0]?.outcome_sum?.toFixed(2) || 0}
+            value={finance_stats?.employee_expense || 0}
             icon={TrendingDownIcon}
             url="/finance/export-logs/?action=OUTCOME&kind=PAY_SALARY"
             name="Расходы на сотрудников"
@@ -190,7 +150,7 @@ export function ExpenseStats({ start, end, setStart, setEnd }: Props) {
           />
           <StatCard
             title="Проче расходы"
-            value={other_expenses?.results[0]?.outcome_sum?.toFixed(2) || 0}
+            value={finance_stats?.other_expense || 0}
             icon={TrendingDownIcon}
             url="/finance/export-logs/?action=OUTCOME&kind=OTHER"
             name="Проче расходы"
@@ -198,7 +158,7 @@ export function ExpenseStats({ start, end, setStart, setEnd }: Props) {
           />
           <StatCard
             title="Итого по всем автомобилям"
-            value={car_prices?.total_price_usd?.toFixed(2) || 0}
+            value={finance_stats?.total_for_all_cars || 0}
             icon={TrendingDownIcon}
             // url="/flight/info/?action=OUTCOME"
             name="Итого по всем автомобилям"
@@ -206,7 +166,7 @@ export function ExpenseStats({ start, end, setStart, setEnd }: Props) {
           />
           <StatCard
             title="Лизинговый баланс"
-            value={data?.leasing_balance?.toFixed(2) || 0}
+            value={warehouse_stats?.leasing_paid?.toFixed(2) || 0}
             icon={TrendingDownIcon}
             // url="/flight/info/?action=OUTCOME"
             name="Лизинговый баланс"
@@ -214,14 +174,14 @@ export function ExpenseStats({ start, end, setStart, setEnd }: Props) {
           />
           <StatCard
             title={"Сумма лизинга выплачена"}
-            value={data?.total_leasing_paid?.toFixed(2) || 0}
+            value={warehouse_stats?.leasing_paid?.toFixed(2) || 0}
             icon={AwardIcon}
             // sum
           />
           <StatCard
             status={true}
             title="Газ"
-            value={`${gasVolume?.toFixed(2) || 0} м3`}
+            value={`${warehouse_stats?.gas_total_volume?.toFixed(2) || 0} м3`}
             icon={AwardIcon}
             title1="Покупка газа"
             title2="Продажа газа"
@@ -233,7 +193,7 @@ export function ExpenseStats({ start, end, setStart, setEnd }: Props) {
           <StatCard
             status={true}
             title="Масло"
-            value={`${oilVolume?.toFixed(2) || 0} л`}
+            value={`${warehouse_stats?.oil_total_volume?.toFixed(2) || 0} л`}
             icon={AwardIcon}
             title1="Покупка масло"
             title2="Продажа масло"
@@ -245,7 +205,9 @@ export function ExpenseStats({ start, end, setStart, setEnd }: Props) {
           <StatCard
             status={true}
             title="Солярка"
-            value={`${diesel_volume?.toFixed(2) || 0} л`}
+            value={`${
+              warehouse_stats?.salarka_total_volume?.toFixed(2) || 0
+            } л`}
             icon={AwardIcon}
             title1="Покупка солярка"
             title2="Продажа солярка"

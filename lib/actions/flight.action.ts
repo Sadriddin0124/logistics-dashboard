@@ -16,11 +16,6 @@ export const fetchFlights = async (page: number, type?: string, status?: string,
   return response.data;
 };
 
-export const fetchFlightStats = async (page: number, type: string) => {
-  const response = await $api.get(`/flight/?page=${page}&flight_type=${type}`);
-  return response.data;
-};
-
 export const fetchAllFlights = async () => {
   const response = await $api.get(`/flight/list-pg`);
   return response.data;
